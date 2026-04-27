@@ -784,6 +784,45 @@ graph LR
 
 ---
 
+
+## Reference Development Boards
+
+### Cyclone V SoC Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **DE10-Nano** | Terasic | ~$150 | HDMI, Ethernet, Arduino headers, 1 GB DDR3 | Education, MiSTer, hobbyists |
+| **SoCKit** | Arrow / Intel | ~$400 | HSMC expansion, 2 GB DDR3, audio codec | Prototyping, high-speed IO |
+| **Chameleon96** | NovTech / 96Boards | ~$100 | 96Boards CE form factor, WiFi/BT | IoT, embedded Linux |
+| **Atlas-SoC** | Terasic | ~$300 | Dual Ethernet, VGA, PCIe x4 | Networking, vision |
+
+> **MiSTer note:** The DE10-Nano is the official MiSTer platform. Its LWH2F bridge + on-chip RAM configuration is the reference implementation for FPGA retro-computing projects.
+
+### Arria 10 SoC Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **Arria 10 SoC Dev Kit** | Intel | ~$3,500 | 4 GB DDR4, QSFP+, PCIe Gen3 x8 | High-speed comms, 5G baseband |
+| **Hitek Systems A10SoC** | Hitek Systems | Contact | Custom form factors, wide temp | Aerospace, defense |
+
+### Stratix 10 SoC Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **Stratix 10 SoC Dev Kit** | Intel | ~$7,000 | HBM2 option, 8 GB DDR4, 2× QSFP28 | AI inference, HPC |
+| **S10 SoC Modular** | BittWare / Hitek | Contact | 3U VPX, VITA 57.1 FMC | Military, radar |
+
+### Agilex 7 SoC Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **Agilex 7 SoC Dev Kit** | Intel | ~$8,000 | PCIe Gen5, CXL, DDR5 | Cloud acceleration, AI |
+| **Agilex I-Series Dev Kit** | Intel | ~$6,000 | 400G Ethernet, R-Tile transceivers | Networking, NFV |
+
+> **Price note:** Intel dev kit pricing is approximate and subject to academic discounts (typically 40-60% off for universities). Contact Intel FPGA sales for volume pricing.
+
+--
+
 ## Further Reading
 
 | Document | Intel Doc ID |

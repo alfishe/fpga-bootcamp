@@ -53,3 +53,36 @@ No external ADC/DAC chips. No JESD204B link. No board-level RF layout. Everythin
 ```
 
 400 AI Engine tiles × 1.25 GHz × 8 FP32 MACs/tile = ~4 TFLOPS on-die. This is GPU-class compute integrated with FPGA fabric, not a soft accelerator built from LUTs.
+
+---
+
+## Reference Development Boards
+
+### RFSoC Platforms
+
+| Board | Vendor | Price Range | RF Specs | Best For |
+|---|---|---|---|---|
+| **ZCU111** | Xilinx / Avnet | ~$8,000 | 8× ADC 4 GSPS, 8× DAC 6.4 GSPS, Gen 1 | 5G NR sub-6 GHz, research |
+| **ZCU216** | Xilinx / Avnet | ~$12,000 | 16× ADC 5 GSPS, 16× DAC 9.85 GSPS, Gen 3 | Radar, EW, wideband SDR |
+| **ZCU208** | Xilinx / Avnet | ~$10,000 | 8× ADC 5 GSPS, 8× DAC 9.85 GSPS, Gen 3 | T&M, spectrum analysis |
+| **RFSoC Explorer** | Avnet | ~$6,000 | ZCU111-based, pre-loaded RF toolkit | Education, rapid RF prototyping |
+
+> **RFSoC pricing:** These boards include precision RF front-end components (clock synthesis, baluns, filters) that represent a significant portion of the cost. The bare RFSoC silicon is available separately for custom board designs.
+
+### AI Engine / Versal Platforms
+
+| Board | Vendor | Price Range | AI Engine Specs | Best For |
+|---|---|---|---|---|
+| **VCK190** | Xilinx / Avnet | ~$12,000 | VC1902, 400 AI Engines, INT8/FP32 | AI inference, computer vision |
+| **VEK280** | Xilinx / Avnet | ~$15,000 | VE2802, video codec, 8K capable | Automotive, broadcast |
+| **VHK158** | Xilinx / Avnet | ~$20,000 | VH1582, 32 GB HBM2e, HPC | Genomics, financial modeling |
+
+### HBM-Integrated FPGA Platforms
+
+| Board | Vendor | Price Range | HBM Specs | Best For |
+|---|---|---|---|---|
+| **Stratix 10 MX Dev Kit** | Intel | ~$10,000 | 2× HBM2 stacks, 512 GB/s | AI training, HPC |
+| **VHK158** | Xilinx / Avnet | ~$20,000 | 32 GB HBM2e, 820 GB/s | Graph analytics, simulation |
+| **BittWare S10-MX** | BittWare | Contact | Stratix 10 MX, 3U VPX | Military SIGINT |
+
+> **HBM note:** HBM dev kits are premium platforms targeting data center and HPC applications. For evaluation, Intel and Xilinx both offer cloud-based FPGA instances (AWS F1, Azure NP-series) with HBM-equipped devices.

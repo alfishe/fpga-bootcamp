@@ -915,6 +915,49 @@ graph LR
 
 **MPSoC upgrade:** Replace ACP with S_AXI_HPC — same zero-copy semantics but 128-bit width and higher bandwidth.
 
+## Reference Development Boards
+
+### Zynq-7000 Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **ZedBoard** | Avnet | ~$500 | FMC LPC, 512 MB DDR3, HDMI | Education, embedded vision |
+| **ZC702** | Xilinx / Avnet | ~$400 | FMC LPC/HPC, 1 GB DDR3 | Prototyping, Xilinx reference |
+| **ZC706** | Xilinx / Avnet | ~$2,500 | FMC HPC, 2 GB DDR3, SFP+ | High-speed comms, DSP |
+| **PYNQ-Z1** | Digilent | ~$200 | Arduino shield compat, 512 MB DDR3 | Python education, ML |
+| **PYNQ-Z2** | Digilent | ~$150 | Raspberry Pi header, 512 MB DDR3 | Hobbyists, IoT |
+| **MicroZed** | Avnet | ~$200 | SODIMM form factor, 1 GB DDR3 | Embedded integration |
+| **MiniZed** | Avnet | ~$100 | WiFi/BT, Arduino, 512 MB DDR3 | Wireless IoT, low cost |
+| **Ultra96-V2** | Avnet | ~$250 | 96Boards Ultra form factor, Zynq UltraScale+ | AI at edge, Linaro |
+
+> **PYNQ note:** PYNQ-Z1/Z2 are the reference boards for the PYNQ framework. They trade high-speed transceivers for accessibility and Python ecosystem integration.
+
+### Zynq UltraScale+ MPSoC Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **ZCU102** | Xilinx / Avnet | ~$2,500 | 4 GB DDR4, FMC HPC, SFP+, DisplayPort | Vision, video analytics |
+| **ZCU104** | Xilinx / Avnet | ~$1,000 | 2 GB DDR4, FMC LPC, DisplayPort | Edge AI, embedded |
+| **ZCU106** | Xilinx / Avnet | ~$3,000 | 4 GB DDR4, FMC HPC, 2× SFP+, HDMI 2.0 | Broadcast, Pro AV |
+| **ZCU111** | Xilinx / Avnet | ~$8,000 | RFSoC Gen 1, 8× 4 GSPS ADC, 8× DAC | Direct RF, 5G NR |
+| **ZCU216** | Xilinx / Avnet | ~$12,000 | RFSoC Gen 3, 16× 5 GSPS ADC, 16× DAC | Wideband SDR, radar |
+| **ZCU208** | Xilinx / Avnet | ~$10,000 | RFSoC Gen 3, 8× 5 GSPS ADC, 8× DAC | Test & measurement |
+| **Ultra96-V2** | Avnet | ~$250 | 96Boards, 2 GB LPDDR4 | Edge AI, makers |
+| **KV260** | Xilinx / Avnet | ~$200 | Vision AI Starter Kit, 4 GB DDR4 | Computer vision, Kria |
+| **KR260** | Xilinx / Avnet | ~$400 | Robotics Starter Kit, 10G Ethernet | Industrial robotics |
+
+> **Kria note:** KV260 and KR260 are Kria SOM-based starter kits. The Kria K26 SOM itself is production-grade and available separately for integration into custom carrier boards.
+
+### Versal AI Core Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **VCK190** | Xilinx / Avnet | ~$12,000 | Versal AI Core VC1902, AI Engines, DDR4 | AI inference, DSP |
+| **VEK280** | Xilinx / Avnet | ~$15,000 | Versal AI Edge VE2802, video codec | Automotive, broadcast |
+| **VHK158** | Xilinx / Avnet | ~$20,000 | Versal HBM VH1582, 32 GB HBM2e | HPC, genomics |
+
+> **Versal pricing:** Versal dev kits are premium platforms. For evaluation without hardware, use the Vitis unified software platform and hardware emulation.
+
 ## Per-Family Comparison
 
 | Feature | Zynq-7000 | Zynq MPSoC | Versal |

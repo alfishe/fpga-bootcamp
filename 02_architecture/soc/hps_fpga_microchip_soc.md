@@ -331,6 +331,29 @@ In Linux, the `riscv,plic0` device tree node declares the PLIC, and drivers requ
 
 ---
 
+## Reference Development Boards
+
+### PolarFire SoC Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **Icicle Kit** | Microchip | ~$500 | 1 GB LPDDR4, eMMC, SD, WiFi/BT module, MikroE click | RISC-V Linux, IoT gateway |
+| **MPFS250T-EVAL-KIT** | Microchip | ~$1,200 | 2 GB DDR4, QSFP+, PCIe Gen2 x4 | High-speed comms, evaluation |
+| **BeagleV-Fire** | BeagleBoard.org | ~$150 | BeagleBone form factor, 2 GB LPDDR4, eMMC | Open hardware, education |
+| **MPFS-PROTO-KIT** | Microchip | ~$800 | Prototyping platform, FMC, multiple fabric sizes | Custom designs, evaluation |
+
+> **Icicle Kit note:** The Icicle Kit is the primary development platform for PolarFire SoC. It includes a pre-built Linux image with Yocto and supports mainline Linux 5.10+ out of the box. The BeagleV-Fire brings PolarFire SoC to the popular BeagleBone ecosystem.
+
+### SmartFusion2 / IGLOO2 Boards
+
+| Board | Vendor | Price Range | Key Features | Best For |
+|---|---|---|---|---|
+| **SmartFusion2 KickStart Kit** | Microchip | ~$100 | Cortex-M3, 64 MB DDR, Ethernet, USB | Low-power IoT, motor control |
+| **IGLOO2 Evaluation Kit** | Microchip | ~$150 | Flash-based FPGA, 1 MB SRAM, PCIe Gen2 | Space, radiation-tolerant designs |
+| **SF2-STARTER-KIT** | Microchip | ~$200 | Full-featured, LCD touch, expansion headers | General evaluation |
+
+> **SmartFusion2 note:** These boards target RTOS and bare-metal development. No Linux support — the Cortex-M3 is too resource-constrained. Flash-based FPGAs retain configuration without power, making them ideal for battery and space applications.
+
 ## Per-Family Comparison
 
 | Feature | PolarFire SoC | SmartFusion2 / IGLOO2 |
