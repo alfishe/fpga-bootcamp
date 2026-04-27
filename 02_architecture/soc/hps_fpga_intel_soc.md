@@ -793,11 +793,29 @@ graph LR
 |---|---|---|---|---|---|
 | **DE10-Nano** | Terasic | $225 ($190 academic) | HDMI, Ethernet, Arduino headers, 1 GB DDR3 | Education, MiSTer, hobbyists | Active |
 | **DE1-SoC** | Terasic | $377 ($322 academic) | VGA, video-in, audio codec, 1 GB DDR3 | University courses, OpenCL | Active |
+| **DE10-Standard** | Terasic | $499 ($365 academic) | VGA, video-in, HSMC, OpenCL BSP, accelerometer | University labs, embedded vision | Active |
+| **DE1-SoC-MTL2** | Terasic | $588 ($485 academic) | 1 GB DDR3, VGA, video-in, multi-touch LCD | Embedded GUI, touch apps | Active |
+| **FPGA Cloud Connectivity Kit 2.0** | Terasic | $314 ($279 academic) | WiFi, Bluetooth, Arduino, HDMI, 1 GB DDR3 | IoT, wireless, cloud edge | Active |
 | **SoCKit** | Arrow / Terasic | — | HSMC expansion, 2 GB DDR3, audio codec | Prototyping, high-speed IO | **Phased out** |
 | **Atlas-SoC** | Terasic | — | Dual Ethernet, VGA, PCIe x4 | Networking, vision | **Phased out** |
 | **Chameleon96** | NovTech / 96Boards | — | 96Boards CE form factor, WiFi/BT | IoT, embedded Linux | **Discontinued** |
 
 > **MiSTer note:** The DE10-Nano is the official MiSTer platform. Its LWH2F bridge + on-chip RAM configuration is the reference implementation for FPGA retro-computing projects.
+>
+> **Current as of:** 2026-04 (verified against Terasic official store)
+
+### Agilex 5 SoC Boards
+
+| Board | Vendor | Price | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **DE25-Nano** | Terasic | $248 ($207 academic) | Agilex 5 SoC, A76+A55 HPS, 138K LEs, 2 GB LPDDR4, HDMI, MIPI, USB-Blaster III | Education, edge AI, robotics, DE10-Nano successor | Active |
+| **DE25-Standard** | Terasic | $586 ($415 academic) | Agilex 5 SoC, A76+A55, 656K LEs, DDR4, HDMI, MIPI, video-in, HSMC | University labs, vision, prototyping | Active |
+| **Agilex 5 E-Series 065B Modular Kit** | Terasic / Intel | $1,995 | Modular + carrier, PCIe Gen4 x4, SFP+, HDMI 2.0, DP 2.0 | High-speed IO, modular evaluation | Active |
+| **Atum A5 Dev Kit** | Terasic | $2,343 | Agilex 5 E-Series 656K LEs, HPC FMC+, 2.5G Ethernet, QSFP+, PCIe Gen3 x4 | HPC, networking, vision | Active |
+| **Comet A13 SOM + Eval Kit** | Terasic | Contact | Agilex 5 E-Series, SEAM8 connectors, 191 HVIO, 4 transceivers | Embedded integration, custom carrier | Active |
+| **Comet A65 SOM** | Terasic | Contact | Agilex 5 E-Series, 102 HVIO, 143 HSIO, 24 transceivers, BMS | Industrial, high IO count | Active |
+
+> **DE25-Nano note:** The DE25-Nano is Terasic's successor to the DE10-Nano. It upgrades from Cyclone V (Cortex-A9) to Agilex 5 (Cortex-A76+A55), adds MIPI CSI-2 for camera input, and includes USB-Blaster III. Same compact form factor, modern edge-AI capable HPS.
 >
 > **Current as of:** 2026-04 (verified against Terasic official store)
 

@@ -915,6 +915,40 @@ graph LR
 
 **MPSoC upgrade:** Replace ACP with S_AXI_HPC — same zero-copy semantics but 128-bit width and higher bandwidth.
 
+## Per-Family Comparison
+
+| Feature | Zynq-7000 | Zynq MPSoC | Versal |
+|---|---|---|---|
+| CPU | Dual A9 | Quad A53 + Dual R5F | Dual A72 + Dual R5F |
+| PS-PL interface | 9 AXI ports | HP/HPC/GP/ACP | NoC (NMU/NSU) |
+| Coherency | ACP via SCU | ACP + HPC via CCI-400 | CHI via NoC |
+| Max HP width | 64-bit | 128-bit | NoC packetized |
+| HP count | 4 | 4 HP + 2 HPC | NMU-configurable |
+| QoS | None | Programmable per port | Programmable per NMU |
+| Max DDR | 1 GB (default) | 32 GB | 128 GB |
+| Fabric LEs | 444K | 1,143K | ~2,000K |
+| Linux DMA driver | `xilinx-vdma` | `xilinx-vdma` + `zynqmp-dma` | `xilinx-axipmon` |
+| Cache flush needed? | Yes (HP non-coherent) | No (HPC coherent) | No (CHI coherent) |
+
+---
+
+## Common Pitfalls
+
+| Problem | Symptom | Fix |
+|---|---|---|
+| ACP unaligned access | Bus error, data corruption | Ensure 64-byte alignment, 64-byte bursts only |
+| HPC partial write | Unexpected line corruption | Use full cache-line writes or switch to HP |
+| HP FIFO overflow | AXI slave responds with SLVERR | Reduce outstanding transactions in FPGA master (max 16) |
+| Wrong PL clock | Timing failure, unreliable AXI | Constrain FCLK_CLK in XDC, verify with `report_clock_networks` |
+| No DDR init | PL accesses hang | Ensure PS boots first (DDR trained by FSBL/U-Boot SPL) |
+| MPSoC HP QoS ignored | CPU starvation | Program AFI QoS registers at `0xFD380000+`, verify with `devmem` |
+| Versal NoC misconfigured | No PL access to DDR | Validate NoC routing in Vivado DRC; check NMU clock |
+| DMA timeout | AXI-DMA hangs mid-transfer | Enable `axistream-connected` in device tree; check TLAST |
+| Cache coherency bug | Stale data, race conditions | On Zynq-7000: always flush before FPGA read, invalidate after |
+| Linux mmap failure | `-EINVAL` from `mmap()` | Check `/dev/mem` permissions; use UIO for production |
+
+---
+
 ## Reference Development Boards
 
 ### Zynq-7000 Boards
@@ -958,39 +992,7 @@ graph LR
 
 > **Versal pricing:** Versal dev kits are premium platforms. For evaluation without hardware, use the Vitis unified software platform and hardware emulation.
 
-## Per-Family Comparison
-
-| Feature | Zynq-7000 | Zynq MPSoC | Versal |
-|---|---|---|---|
-| CPU | Dual A9 | Quad A53 + Dual R5F | Dual A72 + Dual R5F |
-| PS-PL interface | 9 AXI ports | HP/HPC/GP/ACP | NoC (NMU/NSU) |
-| Coherency | ACP via SCU | ACP + HPC via CCI-400 | CHI via NoC |
-| Max HP width | 64-bit | 128-bit | NoC packetized |
-| HP count | 4 | 4 HP + 2 HPC | NMU-configurable |
-| QoS | None | Programmable per port | Programmable per NMU |
-| Max DDR | 1 GB (default) | 32 GB | 128 GB |
-| Fabric LEs | 444K | 1,143K | ~2,000K |
-| Linux DMA driver | `xilinx-vdma` | `xilinx-vdma` + `zynqmp-dma` | `xilinx-axipmon` |
-| Cache flush needed? | Yes (HP non-coherent) | No (HPC coherent) | No (CHI coherent) |
-
----
-
-## Common Pitfalls
-
-| Problem | Symptom | Fix |
-|---|---|---|
-| ACP unaligned access | Bus error, data corruption | Ensure 64-byte alignment, 64-byte bursts only |
-| HPC partial write | Unexpected line corruption | Use full cache-line writes or switch to HP |
-| HP FIFO overflow | AXI slave responds with SLVERR | Reduce outstanding transactions in FPGA master (max 16) |
-| Wrong PL clock | Timing failure, unreliable AXI | Constrain FCLK_CLK in XDC, verify with `report_clock_networks` |
-| No DDR init | PL accesses hang | Ensure PS boots first (DDR trained by FSBL/U-Boot SPL) |
-| MPSoC HP QoS ignored | CPU starvation | Program AFI QoS registers at `0xFD380000+`, verify with `devmem` |
-| Versal NoC misconfigured | No PL access to DDR | Validate NoC routing in Vivado DRC; check NMU clock |
-| DMA timeout | AXI-DMA hangs mid-transfer | Enable `axistream-connected` in device tree; check TLAST |
-| Cache coherency bug | Stale data, race conditions | On Zynq-7000: always flush before FPGA read, invalidate after |
-| Linux mmap failure | `-EINVAL` from `mmap()` | Check `/dev/mem` permissions; use UIO for production |
-
----
+--
 
 ## Further Reading
 
