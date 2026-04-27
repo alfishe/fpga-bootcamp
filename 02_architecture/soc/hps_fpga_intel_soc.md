@@ -532,6 +532,229 @@ Bridge FIFOs handle the asynchronous crossing. Platform Designer inserts `altclk
 
 ---
 
+## Interaction Patterns: Real-World Workflows
+
+### Pattern 1: Doorbell + Ring Buffer (Low-Latency Control)
+
+The most common pattern for CPU→FPGA command streaming. Used in software-defined radio, motor control, and network packet processing.
+
+```mermaid
+graph LR
+    subgraph CPU[Linux Kernel]
+        A[Fill Ring Entry] --> B[Write Doorbell Reg]
+        B --> C[iowrite32]
+    end
+    subgraph Bridge[H2F Bridge]
+        C --> D[Doorbell Reg @ 0x00]
+        A --> E[Ring Buffer @ 0x1000]
+    end
+    subgraph FPGA[Fabric]
+        D --> F[IRQ or Poll]
+        F --> G[Read Ring Entry]
+        E --> G
+        G --> H[Execute Command]
+    end
+```
+
+**Workflow:**
+1. CPU fills command entry in FPGA ring buffer (H2F bridge, 64-bit AXI)
+2. CPU writes doorbell register — triggers FPGA action
+3. FPGA either polls doorbell or receives interrupt (via F2H)
+4. FPGA reads command from ring buffer, executes, optionally writes response
+
+**Latency:** ~200 ns doorbell → FPGA action (H2F bridge + fabric routing)
+
+**Best bridge:** H2F (64-bit) for ring buffer, LWH2F (32-bit) for doorbell if only toggling a flag
+
+---
+
+### Pattern 2: Ping-Pong Frame Buffer (Video / Display)
+
+Standard for video pipelines where CPU generates UI overlays and FPGA drives the display controller.
+
+```mermaid
+graph TD
+    subgraph CPU[Linux Userspace]
+        A[Render Frame N] --> B[Flip to Buffer 0]
+        C[Render Frame N+1] --> D[Flip to Buffer 1]
+    end
+    subgraph DDR[DDR SDRAM]
+        B --> E[Frame Buffer 0]
+        D --> F[Frame Buffer 1]
+    end
+    subgraph FPGA[Video Pipeline]
+        E --> G[Display Controller]
+        F --> G
+        G --> H[HDMI Output]
+        I[VSync Interrupt] --> J[F2H → CPU]
+    end
+    J --> A
+    J --> C
+```
+
+**Workflow:**
+1. CPU renders frame N into frame buffer 0 via H2F bridge (or direct DDR mmap)
+2. FPGA display controller scans out frame buffer 1 (previous frame)
+3. At VSync, FPGA fires interrupt (F2H → GIC → Linux IRQ)
+4. CPU atomically flips pointer — FPGA now reads buffer 0, CPU renders into buffer 1
+
+**Key constraint:** FPGA read must never stall. Use F2S bridge (Cyclone V) or dedicated FPGA DDR controller to guarantee bandwidth.
+
+**Buffer sizing:** 1920×1080 @ 32bpp = 8.3 MB per frame. Triple buffering adds one more buffer for GPU/CPU composition safety.
+
+---
+
+### Pattern 3: Cyclic Audio DMA (Low-Latency Streaming)
+
+Real-time audio requires <10 ms round-trip latency. Used in guitar effects, software synthesizers, and professional audio interfaces.
+
+```mermaid
+graph LR
+    subgraph Audio[Audio Codec]
+        A[ADC] --> B[I2S → FPGA]
+        C[I2S ← FPGA] --> D[DAC]
+    end
+    subgraph FPGA[Audio Processing]
+        B --> E[Processing Core]
+        E --> F[AXI DMA Engine]
+    end
+    subgraph Bridge[F2S / F2H]
+        F --> G[DMA to DDR]
+        H[DMA from DDR] --> E
+    end
+    subgraph CPU[Linux ALSA]
+        G --> I[Circular Buffer]
+        I --> J[ALSA Playback]
+        K[ALSA Capture] --> H
+    end
+```
+
+**Workflow:**
+1. FPGA receives I2S audio samples, processes through DSP pipeline
+2. AXI DMA engine (in FPGA) moves processed samples to DDR via F2S or F2H bridge
+3. Linux ALSA driver reads from circular DMA buffer, delivers to userspace
+4. Reverse path: userspace → ALSA → DDR → DMA → FPGA → DAC
+
+**Latency budget:**
+- FPGA processing: 1-2 samples (<50 µs @ 48 kHz)
+- DMA transfer: 64 samples buffer = 1.3 ms
+- Linux ALSA buffer: 128-256 samples = 2.7-5.3 ms
+- **Total round-trip:** ~5-10 ms
+
+**Critical:** Use cyclic DMA (`dmaengine_prep_dma_cyclic`) with period sizes of 64-128 samples. Never use userspace mmap for audio — ALSA kernel driver handles DMA directly.
+
+---
+
+### Pattern 4: Bulk Data Ingest (Signal Processing / ML)
+
+High-bandwidth data capture from ADCs or sensors, processed by FPGA then consumed by CPU.
+
+```mermaid
+graph TD
+    subgraph ADC[Sensor / ADC]
+        A[1 GSPS 14-bit ADC] --> B[LVDS → FPGA]
+    end
+    subgraph FPGA[Signal Processing]
+        B --> C[Digital Down-Conversion]
+        C --> D[256-point FFT]
+        D --> E[AXI DMA SG]
+    end
+    subgraph Bridge[F2S / H2F]
+        E --> F[Scatter-Gather DMA]
+    end
+    subgraph DDR[DDR SDRAM]
+        F --> G[Buffer Pool: 16 × 1 MB]
+    end
+    subgraph CPU[Linux Application]
+        G --> H[Read Complete Buffer]
+        H --> I[ML Inference]
+        I --> J[Decision Output]
+    end
+```
+
+**Workflow:**
+1. FPGA receives high-speed raw ADC samples (e.g., 1 GSPS @ 14-bit = 1.75 GB/s)
+2. FPGA DSP chain decimates and processes (DDC + FFT reduces to ~100 MB/s)
+3. AXI DMA with scatter-gather moves completed buffers to DDR via F2S
+4. CPU processes full buffers via `dma_mmap_coherent()` or `read()` from character device
+
+**Bridge choice:** F2S (Cyclone V) for highest bandwidth, bypassing CPU cache. On Stratix 10/Agilex, use dedicated FPGA DDR controller.
+
+---
+
+### Pattern 5: FPGA-Initiated Interrupt (Event Notification)
+
+FPGA detects external events (packet arrival, threshold crossing, error condition) and notifies CPU.
+
+```mermaid
+graph LR
+    subgraph External[External World]
+        A[Packet Arrives] --> B[FPGA Parser]
+        C[Error Condition] --> D[FPGA Monitor]
+    end
+    subgraph FPGA[Fabric]
+        B --> E[Queue Packet]
+        D --> F[Set IRQ Flag]
+    end
+    subgraph Bridge[F2H]
+        F --> G[F2H Interrupt Line]
+    end
+    subgraph HPS[Linux IRQ Handler]
+        G --> H[GIC SPI 72+]
+        H --> I[irq_handler]
+        I --> J[Read Status Reg]
+        J --> K[Schedule NAPI / workqueue]
+    end
+```
+
+**Workflow:**
+1. FPGA detects event, sets flag in F2H-accessible status register
+2. FPGA asserts interrupt line (wired to GIC SPI 72-143 on Cyclone V)
+3. Linux IRQ handler reads status register via F2H bridge, determines event type
+4. Handler schedules deferred processing (NAPI for networking, workqueue for general)
+5. FPGA de-asserts interrupt when acknowledged
+
+**Latency:**
+- FPGA → GIC: ~20 ns (on-chip routing)
+- GIC → CPU: ~50 ns (interrupt entry)
+- Linux handler dispatch: 2-5 µs
+- **Total:** ~3-10 µs (dominated by Linux overhead)
+
+---
+
+### Pattern 6: Shared Memory Mailbox (Short Messages)
+
+For sub-microsecond latency control where interrupts are too slow. CPU and FPGA poll a shared flag.
+
+```mermaid
+graph LR
+    subgraph CPU[Linux]
+        A[Write Message] --> B[Set NEW_MSG Flag]
+        C[Poll ACK Flag] --> D[Message Consumed?]
+    end
+    subgraph Bridge[H2F + F2H]
+        B --> E[Mailbox Region]
+        E --> F[Shared SRAM or DDR]
+        F --> C
+    end
+    subgraph FPGA[Fabric]
+        G[Poll NEW_MSG] --> H[Read Message]
+        H --> I[Set ACK Flag]
+        I --> F
+    end
+```
+
+**Workflow:**
+1. CPU writes 32-64 byte message to mailbox (H2F bridge)
+2. CPU sets NEW_MSG flag in shared register
+3. FPGA polls flag (every clock cycle), reads message
+4. FPGA processes, sets ACK flag
+5. CPU sees ACK, writes next message
+
+**Latency:** ~100-300 ns per message (limited by bridge round-trip and FPGA polling)
+
+**Best for:** Motor control PWM updates, real-time PID setpoint changes, radio frequency hopping.
+
 ## Per-Family Comparison
 
 | Feature | Cyclone V SoC | Arria 10 SoC | Stratix 10 SoC | Agilex 7 SoC | Agilex 5 SoC |

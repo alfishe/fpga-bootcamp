@@ -669,6 +669,252 @@ Python allocate() → dma_alloc_coherent() → DDR buffer
 
 ---
 
+## Interaction Patterns: Real-World Workflows
+
+### Pattern 1: Doorbell + Ring Buffer (Low-Latency Control)
+
+The canonical pattern for CPU→FPGA command streaming. Used in SDR basebands, motor controllers, and NIC offloads.
+
+```mermaid
+graph LR
+    subgraph CPU[Linux Kernel]
+        A[Fill Ring Entry] --> B[Write Doorbell Reg]
+        B --> C[iowrite32]
+    end
+    subgraph Bridge[M_AXI_GP0]
+        C --> D[Doorbell @ 0x43C0_0000]
+        A --> E[Ring @ 0x43C0_1000]
+    end
+    subgraph FPGA[Fabric]
+        D --> F[IRQ or Poll]
+        F --> G[Read Ring Entry]
+        E --> G
+        G --> H[Execute Command]
+    end
+```
+
+**Workflow:**
+1. CPU allocates ring buffer in DDR, shares physical address with FPGA via doorbell
+2. CPU writes command entry (64-128 bytes), updates tail pointer
+3. CPU writes doorbell register via M_AXI_GP0 (MMIO)
+4. FPGA polls doorbell or receives interrupt via PL→PS IRQ
+5. FPGA reads command from DDR via S_AXI_HP, executes
+
+**Latency:** ~300 ns doorbell → FPGA action (GP port + AXI interconnect)
+
+**Zynq-7000 vs MPSoC:** On MPSoC, use HPC port for ring buffer if CPU and FPGA share it frequently — no flush needed.
+
+---
+
+### Pattern 2: Ping-Pong Frame Buffer (Video / Display)
+
+CPU composes UI, FPGA drives display timing. Standard in embedded graphics, automotive HUD, and digital signage.
+
+```mermaid
+graph TD
+    subgraph CPU[Linux DRM / GPU]
+        A[Compose Frame N] --> B[Flip to Buffer 0]
+        C[Compose Frame N+1] --> D[Flip to Buffer 1]
+    end
+    subgraph DDR[DDR SDRAM]
+        B --> E[Frame Buffer 0 8MB]
+        D --> F[Frame Buffer 1 8MB]
+    end
+    subgraph FPGA[Video Pipeline]
+        E --> G[AXI VDMA]
+        F --> G
+        G --> H[HDMI Tx]
+        I[VSync IRQ] --> J[PL→PS IRQ 0]
+    end
+    J --> A
+    J --> C
+```
+
+**Workflow:**
+1. CPU/GPU renders frame into buffer 0 via S_AXI_HP (MPSoC) or direct cache flush (Zynq-7000)
+2. FPGA AXI VDMA reads buffer 1 and drives HDMI timing controller
+3. At VSync, FPGA asserts PL interrupt → CPU receives Linux IRQ
+4. CPU updates VDMA pointer register — next frame reads from buffer 0
+5. CPU begins composing frame N+2 into buffer 1
+
+**Key constraint:** Display scanout must never underflow. VDMA uses a 3-frame FIFO internally; if CPU misses deadline, VDMA repeats previous frame (visible tear).
+
+**Bridge choice:** S_AXI_HP for frame buffers (high bandwidth). M_AXI_GP for VDMA control register updates.
+
+**Buffer sizing:** 1920×1080 @ 32bpp = 8.3 MB. 60 FPS requires 498 MB/s sustained — well within 1× HP @ 900 MB/s.
+
+---
+
+### Pattern 3: Cyclic Audio DMA (Low-Latency Streaming)
+
+Real-time audio effects and synthesis where <10 ms round-trip is mandatory.
+
+```mermaid
+graph LR
+    subgraph Audio[Codec]
+        A[ADC I2S] --> B[FPGA I2S Rx]
+        C[FPGA I2S Tx] --> D[DAC I2S]
+    end
+    subgraph FPGA[Audio FX Core]
+        B --> E[Reverb/Delay DSP]
+        E --> F[AXI DMA S2MM]
+        G[AXI DMA MM2S] --> H[Output Mix]
+        H --> C
+    end
+    subgraph Bridge[S_AXI_HP]
+        F --> I[Circular Buffer in DDR]
+        I --> G
+    end
+    subgraph CPU[Linux ALSA]
+        I --> J[ALSA PCM Capture]
+        K[ALSA PCM Playback] --> I
+    end
+```
+
+**Workflow:**
+1. FPGA receives I2S samples, processes through DSP pipeline (reverb, EQ, compression)
+2. AXI DMA S2MM writes processed samples to DDR circular buffer via S_AXI_HP
+3. Linux ALSA driver reads from circular buffer, delivers to userspace (JACK, PulseAudio)
+4. Reverse path: userspace → ALSA → DDR → AXI DMA MM2S → FPGA → DAC
+
+**Latency budget (48 kHz, 128-sample periods):**
+- FPGA DSP: 128 samples = 2.7 ms pipeline delay
+- DMA transfer: 64-sample period = 1.3 ms
+- ALSA buffer: 2 periods = 2.7 ms
+- **Total round-trip:** ~6-7 ms
+
+**Critical:** Use `xilinx-vdma` cyclic mode with 3-period buffering. Never use userspace mmap for audio — ALSA handles DMA buffer management.
+
+**Zynq-7000 trap:** HP port is non-coherent. ALSA driver must use `dma_alloc_coherent()` for audio buffers, or CPU will read stale cache lines.
+
+---
+
+### Pattern 4: Bulk Data Ingest (SDR / Radar / ML Preprocessing)
+
+High-bandwidth ADC capture, FPGA preprocessing, CPU post-processing.
+
+```mermaid
+graph TD
+    subgraph RF[RF Front-End]
+        A[ADC 2.4 GSPS] --> B[Digital Down-Conv]
+    end
+    subgraph FPGA[Signal Processing]
+        B --> C[256-tap FIR]
+        C --> D[1K-point FFT]
+        D --> E[AXI DMA SG]
+    end
+    subgraph Bridge[S_AXI_HP / HPC]
+        E --> F[Buffer Pool in DDR]
+    end
+    subgraph CPU[Linux Application]
+        F --> G[Read via mmap]
+        G --> H[TensorFlow Lite]
+        H --> I[Classification Result]
+    end
+```
+
+**Workflow:**
+1. FPGA receives raw ADC samples (e.g., 2.4 GSPS @ 16-bit = 4.8 GB/s raw)
+2. DDC + decimation reduces to 100 MSPS complex = 800 MB/s
+3. FFT produces spectrum frames, DMA writes to DDR buffer pool via S_AXI_HP
+4. CPU processes full frames via `mmap()` on `/dev/mem` or UIO
+
+**Bridge choice:**
+- **Zynq-7000:** Use 2× S_AXI_HP @ 64-bit to get ~1.8 GB/s aggregate
+- **MPSoC:** Use 1× S_AXI_HPC if CPU needs coherent access to spectrum data; 2× S_AXI_HP if write-only
+- **Versal:** NoC NMU with QoS reservation for guaranteed bandwidth
+
+**Buffer management:** Use AXI DMA scatter-gather with 16 × 1 MB buffers. FPGA fills buffer N while CPU processes buffer N-1.
+
+---
+
+### Pattern 5: FPGA-Initiated Interrupt (Event-Driven)
+
+FPGA detects external events and wakes CPU for handling. Used in network packet processing, industrial control, and security monitoring.
+
+```mermaid
+graph LR
+    subgraph External[Physical Layer]
+        A[GigE Packet] --> B[FPGA PCS/MAC]
+        C[GPIO Alarm] --> D[FPGA Debounce]
+    end
+    subgraph FPGA[Logic]
+        B --> E[Packet Buffer]
+        D --> F[IRQ Flag]
+    end
+    subgraph Bridge[PL→PS IRQ]
+        F --> G[IRQ 0 → GIC SPI 61]
+        E --> H[S_AXI_HP Write]
+    end
+    subgraph CPU[Linux NAPI]
+        G --> I[irq_handler]
+        I --> J[napi_schedule]
+        J --> K[napi_poll]
+        K --> L[Read Packet]
+        H --> L
+    end
+```
+
+**Workflow:**
+1. FPGA receives packet, writes to DDR via S_AXI_HP, sets flag
+2. FPGA asserts PL IRQ 0 (mapped to GIC SPI 61 on Zynq-7000)
+3. Linux IRQ handler acknowledges, schedules NAPI poll
+4. NAPI poll reads packet from DDR buffer, delivers to network stack
+5. FPGA de-asserts IRQ when buffer drained
+
+**Zynq-7000 PL IRQ mapping:**
+| PL IRQ | GIC SPI | Linux IRQ |
+|---|---|---|
+| PL IRQ 0 | SPI 61 | platform-defined |
+| PL IRQ 1 | SPI 62 | platform-defined |
+| PL IRQ 15 | SPI 76 | platform-defined |
+
+**Latency:**
+- FPGA → GIC: ~20 ns
+- GIC → CPU: ~50 ns
+- Linux IRQ dispatch: 2-5 µs
+- NAPI poll scheduling: 1-3 µs
+- **Total:** ~5-12 µs before CPU begins packet processing
+
+---
+
+### Pattern 6: ACP Shared Buffer (Zero-Copy Coherency)
+
+Zynq-7000 ACP enables true zero-copy between CPU and FPGA — no flush, no invalidate.
+
+```mermaid
+graph LR
+    subgraph CPU[Userspace]
+        A[Write Parameters] --> B[Shared Struct]
+        C[Read Results] --> B
+    end
+    subgraph Bridge[S_AXI_ACP]
+        B --> D[SCU Snoop]
+    end
+    subgraph FPGA[Accelerator]
+        D --> E[Read Params]
+        E --> F[Compute]
+        F --> G[Write Results]
+        G --> D
+    end
+```
+
+**Workflow:**
+1. CPU allocates cacheable buffer in DDR, shares physical address with FPGA
+2. CPU writes parameters directly — data goes to L1/L2 cache
+3. FPGA reads via S_AXI_ACP → SCU snoops CPU caches, forwards data if dirty
+4. FPGA computes, writes results via ACP
+5. CPU reads results — SCU ensures coherence, no cache invalidation needed
+
+**Requirements:**
+- Buffer must be 64-byte aligned, 64-byte multiples
+- ACP transactions must be cache-line-sized bursts
+- CPU pages must be marked cacheable (not `dma_alloc_coherent`)
+
+**Best for:** Small shared data structures (< 1 MB) with frequent read-modify-write. Financial tick processing, real-time control loops, sensor fusion.
+
+**MPSoC upgrade:** Replace ACP with S_AXI_HPC — same zero-copy semantics but 128-bit width and higher bandwidth.
+
 ## Per-Family Comparison
 
 | Feature | Zynq-7000 | Zynq MPSoC | Versal |
