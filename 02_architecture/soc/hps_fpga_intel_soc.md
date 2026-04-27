@@ -145,6 +145,34 @@ The full H2F bridge has deep FIFOs and wide datapaths optimized for burst DMA. F
 | Address space | 2 MB | 960 MB |
 | Use case | GPIO, simple control regs | DMA, framebuffers, bulk data |
 
+### L3 Interconnect Routing (Not Point-to-Point)
+
+The LWH2F is **not** a direct wire from the CPU to the FPGA. The CPU's AXI master connects to an **L3 interconnect** (bus matrix), and the LWH2F is a **slave port** on that matrix:
+
+```
+CPU (AXI master)
+    │
+    ▼
+L3 Interconnect ──► LWH2F slave port ──► FPGA fabric
+    │
+    ├──► H2F slave port ──► FPGA fabric
+    ├──► DDR controller
+    └──► Peripherals (UART, USB, DMA, etc.)
+```
+
+| Family | L3 Interconnect | Notes |
+|---|---|---|
+| **Cyclone V / Arria V** | ARM CoreLink NIC-301 | Single-ported switch; CPU transactions serialized |
+| **Arria 10** | Arteris FlexNoC | Higher bandwidth, lower latency than NIC-301 |
+| **Stratix 10** | Netspeed Gemini | Integrated with CCU for coherency routing |
+| **Agilex 7** | Arteris Ncore2 | Supports QoS and multiple simultaneous transactions |
+| **Agilex 5** | Arteris Ncore3 | CHI-B protocol; cache stashing from F2H bridge |
+
+**Implications:**
+- LWH2F transactions **share arbitration** with DMA, DDR, and peripheral traffic on the L3 interconnect
+- On Cyclone V's NIC-301, the CPU's AXI master is a single port — H2F and LWH2F transactions from the same CPU core are serialized by the interconnect
+- The "lightweight" in LWH2F refers to its **narrow 32-bit datapath** and **smaller FIFOs**, not a separate physical path bypassing the L3 interconnect
+
 ### MiSTer Example: LWH2F for SPI Control Register
 
 MiSTer (DE10-Nano, Cyclone V SoC) uses the LWH2F bridge for all HPS→FPGA control plane traffic, including the SPI interface that loads ROMs and handles SD card I/O:
