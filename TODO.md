@@ -32,10 +32,10 @@
 | 1.13 | Intel HPS-FPGA deep dive | `02_architecture/soc/hps_fpga_intel_soc.md` | ✅ COMPLETE |
 | 1.14 | Xilinx PS-PL deep dive | `02_architecture/soc/hps_fpga_xilinx_zynq.md` | ✅ COMPLETE |
 | 1.15 | Microchip MSS-Fabric deep dive | `02_architecture/soc/hps_fpga_microchip_soc.md` | ✅ COMPLETE |
-| 1.16 | CPLD architecture & macrocells | `02_architecture/cpld/cpld_architecture.md` | ⬜ PENDING |
-| 1.17 | Intel MAX family (MAX V, MAX 10) | `02_architecture/cpld/intel_max_family.md` | ⬜ PENDING |
-| 1.18 | CPLD vs FPGA: when to use which | `02_architecture/cpld/cpld_vs_fpga.md` | ⬜ PENDING |
-| 1.19 | Non-volatile programmable logic (flash, antifuse, SRAM+flash) | `02_architecture/cpld/non_volatile_logic.md` | ⬜ PENDING |
+| 1.16 | CPLD architecture & macrocells | `02_architecture/cpld/cpld_architecture.md` | ✅ COMPLETE |
+| 1.17 | Intel MAX family (MAX V, MAX 10) | `02_architecture/cpld/intel_max_family.md` | ✅ COMPLETE |
+| 1.18 | CPLD vs FPGA: when to use which | `02_architecture/cpld/cpld_vs_fpga.md` | ✅ COMPLETE |
+| 1.19 | Non-volatile programmable logic (flash, antifuse, SRAM+flash) | `02_architecture/cpld/non_volatile_logic.md` | ✅ COMPLETE |
 
 ## Phase 2: Design Flow (`03_design_flow/`)
 
@@ -216,8 +216,8 @@
 | X.2 | Factual verification: MAX 10 is CPLD/FPGA (not SoC) | ✅ COMPLETE |
 | X.3 | Factual verification: Zynq-7000 AXI port counts | ✅ COMPLETE |
 | X.4 | Documentation map: root README.md updated with all sections | ✅ COMPLETE |
-| X.5 | Consistency check: cross-links between common + sub-articles | ⬜ PENDING |
-| X.6 | Index maintenance: all README.md files point to correct articles | 🔄 IN PROGRESS |
+| X.5 | Consistency check: cross-links between common + sub-articles | ✅ COMPLETE |
+| X.6 | Index maintenance: all README.md files point to correct articles | ✅ COMPLETE |
 
 ---
 

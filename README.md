@@ -18,7 +18,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 |---|---|
 | **Overview** | FPGA landscape, vendor comparison matrix, technology nodes, history |
 | **Vendors & Families** | Intel/Altera (Cyclone V anchor), Xilinx (7-series, UltraScale+, Versal, Zynq), Lattice (ECP5, MachXO, CrossLink-NX), Gowin (LittleBee, Arora), Microchip (PolarFire, SmartFusion), others |
-| **Architecture** | LUTs/CLBs, BRAM/URAM, DSP slices, clocking (PLL/MMCM/DCM), IO standards, SERDES, routing, configuration |
+| **Architecture** | LUTs/CLBs, BRAM/URAM, DSP slices, clocking (PLL/MMCM/DCM), IO standards, SERDES, routing, configuration, **CPLD & non-volatile logic** |
 | **Design Flow** | Synthesis, placement, routing, bitstream generation, floorplanning, partial reconfiguration |
 | **HDL & Synthesis** | Verilog-2001/SystemVerilog/VHDL, inference rules, vendor pragmas, CDC coding patterns, state machines |
 | **Timing & Constraints** | SDC/XDC/QSF syntax, clock domain crossing (CDC), false paths, multicycle paths, timing closure methodology, IO timing |
@@ -91,6 +91,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [fabric/](02_architecture/fabric/) | **LUTs & CLBs** (4-input, 6-input, fracturable, ALM/Slice), **BRAM & URAM** (18Kb/36Kb/20Kb, dual-port, ECC), **DSP slices** (DSP48/DSP58, cascading, pipelining), **routing** (interconnect, switch matrices, congestion) |
 | [infrastructure/](02_architecture/infrastructure/) | **Clocking** (PLL/MMCM/DCM, global/regional networks), **IO standards** (LVDS, SSTL, HSTL, LVCMOS, SERDES, bank constraints), **configuration** (bitstream format, SPI/BPI/JTAG/SelectMAP, encryption, authentication) |
 | [soc/](02_architecture/soc/) | **Hard CPU + FPGA integration**: HPS/PS bridge architectures, AXI-3/4/NoC interconnect, cache coherency models (ACP/CCI-400/CHI), memory hierarchy, boot architecture. Vendor deep dives: [Intel HPS-FPGA](02_architecture/soc/hps_fpga_intel_soc.md), [Xilinx PS-PL](02_architecture/soc/hps_fpga_xilinx_zynq.md), [Microchip MSS-Fabric](02_architecture/soc/hps_fpga_microchip_soc.md) |
+| [cpld/](02_architecture/cpld/) | **CPLD & non-volatile logic**: macrocells, AND-OR arrays, flash/antifuse/SONOS, Intel MAX V/MAX 10, CPLD vs FPGA decision framework, devboard reference |
 
 ### 03 — Design Flow
 | File | Topic |

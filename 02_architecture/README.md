@@ -12,3 +12,4 @@ The silicon fundamentals every FPGA shares, organized into four layers: **fabric
 | [infrastructure/](infrastructure/README.md) | Clocking, IO standards & SERDES, configuration & bitstream |
 | [soc/](soc/README.md) | Hard CPU integration: ARM/RISC-V + FPGA, AXI bridges, shared memory, boot architecture |
 | [hybrid/](hybrid/README.md) | Specialized integration: RF DAC/ADC (RFSoC), AI Engine arrays (Versal), HBM stacks |
+| [cpld/](cpld/README.md) | CPLD & non-volatile logic: macrocells, flash/antifuse/SONOS, Intel MAX families, CPLD vs FPGA decision |

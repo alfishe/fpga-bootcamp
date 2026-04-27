@@ -953,46 +953,47 @@ graph LR
 
 ### Zynq-7000 Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **ZedBoard** | Avnet | ~$500 | FMC LPC, 512 MB DDR3, HDMI | Education, embedded vision |
-| **ZC702** | Xilinx / Avnet | ~$400 | FMC LPC/HPC, 1 GB DDR3 | Prototyping, Xilinx reference |
-| **ZC706** | Xilinx / Avnet | ~$2,500 | FMC HPC, 2 GB DDR3, SFP+ | High-speed comms, DSP |
-| **PYNQ-Z1** | Digilent | ~$200 | Arduino shield compat, 512 MB DDR3 | Python education, ML |
-| **PYNQ-Z2** | Digilent | ~$150 | Raspberry Pi header, 512 MB DDR3 | Hobbyists, IoT |
-| **MicroZed** | Avnet | ~$200 | SODIMM form factor, 1 GB DDR3 | Embedded integration |
-| **MiniZed** | Avnet | ~$100 | WiFi/BT, Arduino, 512 MB DDR3 | Wireless IoT, low cost |
-| **Ultra96-V2** | Avnet | ~$250 | 96Boards Ultra form factor, Zynq UltraScale+ | AI at edge, Linaro |
+| Board | Vendor | Price (USD) | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **ZedBoard** | Digilent | $619 | FMC LPC, 512 MB DDR3, HDMI, Audio codec | Education, embedded vision | Active |
+| **ZC702** | AMD / Avnet | $1,160 | FMC LPC/HPC, 1 GB DDR3, Zynq-7000 XC7Z020 | Prototyping, reference design | Active |
+| **ZC706** | AMD / Avnet | N/A (was ~$2,995) | FMC HPC, 2 GB DDR3, SFP+, Zynq-7000 XC7Z045 | High-speed comms, DSP | **Discontinued** |
+| **PYNQ-Z1** | Digilent | $299 | Arduino shield compat, 512 MB DDR3, HDMI in/out | Python education, ML | Active |
+| **PYNQ-Z2** | TUL / AMD | $129 | Raspberry Pi header, 512 MB DDR3, HDMI in/out | Hobbyists, IoT, education | Active |
+| **MicroZed** | Avnet | $289 | SODIMM form factor, 1 GB DDR3, Zynq-7000 | Embedded integration | Active |
+| **MiniZed** | Avnet | ~$89–$119 | WiFi/BT, Arduino shield, 512 MB DDR3, 7Z007S | Wireless IoT, low cost | Active |
 
-> **PYNQ note:** PYNQ-Z1/Z2 are the reference boards for the PYNQ framework. They trade high-speed transceivers for accessibility and Python ecosystem integration.
+> **PYNQ note:** PYNQ-Z1/Z2 are the reference boards for the PYNQ framework. They trade high-speed transceivers for accessibility and Python ecosystem integration. PYNQ-Z2 is the lower-cost option and is officially supported by the AMD University Program.
 
 ### Zynq UltraScale+ MPSoC Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **ZCU102** | Xilinx / Avnet | ~$2,500 | 4 GB DDR4, FMC HPC, SFP+, DisplayPort | Vision, video analytics |
-| **ZCU104** | Xilinx / Avnet | ~$1,000 | 2 GB DDR4, FMC LPC, DisplayPort | Edge AI, embedded |
-| **ZCU106** | Xilinx / Avnet | ~$3,000 | 4 GB DDR4, FMC HPC, 2× SFP+, HDMI 2.0 | Broadcast, Pro AV |
-| **ZCU111** | Xilinx / Avnet | ~$8,000 | RFSoC Gen 1, 8× 4 GSPS ADC, 8× DAC | Direct RF, 5G NR |
-| **ZCU216** | Xilinx / Avnet | ~$12,000 | RFSoC Gen 3, 16× 5 GSPS ADC, 16× DAC | Wideband SDR, radar |
-| **ZCU208** | Xilinx / Avnet | ~$10,000 | RFSoC Gen 3, 8× 5 GSPS ADC, 8× DAC | Test & measurement |
-| **Ultra96-V2** | Avnet | ~$250 | 96Boards, 2 GB LPDDR4 | Edge AI, makers |
-| **KV260** | Xilinx / Avnet | ~$200 | Vision AI Starter Kit, 4 GB DDR4 | Computer vision, Kria |
-| **KR260** | Xilinx / Avnet | ~$400 | Robotics Starter Kit, 10G Ethernet | Industrial robotics |
+| Board | Vendor | Price (USD) | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **ZCU102** | AMD / Avnet | $3,234 | 4 GB DDR4, FMC HPC, SFP+, DisplayPort, ZU9EG | Vision, video analytics | Active |
+| **ZCU104** | AMD / Avnet | $1,678 | 2 GB DDR4, FMC LPC, DisplayPort, ZU7EV | Edge AI, embedded vision | Active |
+| **ZCU106** | AMD / Avnet | $3,234 | 4 GB DDR4, FMC HPC, 2× SFP+, HDMI 2.0, ZU7EV | Broadcast, Pro AV | Active |
+| **ZCU111** | AMD / Avnet | $14,995 | RFSoC Gen 1 ZU28DR, 8× 4 GSPS ADC, 8× DAC | Direct RF, 5G NR | Active |
+| **ZCU216** | AMD / Avnet | $16,995 | RFSoC Gen 3 ZU49DR, 16× 5 GSPS ADC, 16× DAC | Wideband SDR, radar | Active |
+| **ZCU208** | AMD / Avnet | $15,995 | RFSoC Gen 3 ZU48DR, 8× 5 GSPS ADC, 8× DAC | Test & measurement | Active |
+| **Ultra96-V2** | Avnet | ~$249 | 96Boards form factor, ZU3EG, 2 GB LPDDR4, WiFi/BT | Edge AI, makers, Linaro | Active |
+| **KV260** | AMD / Avnet | $249 | Vision AI Starter Kit, K26 SOM, 4 GB DDR4 | Computer vision, Kria | Active |
+| **KR260** | AMD / Avnet | $349 | Robotics Starter Kit, K26 SOM, 10G Ethernet, SFP+ | Industrial robotics | Active |
 
-> **Kria note:** KV260 and KR260 are Kria SOM-based starter kits. The Kria K26 SOM itself is production-grade and available separately for integration into custom carrier boards.
+> **Kria note:** KV260 and KR260 are Kria SOM-based starter kits using the K26 Zynq UltraScale+ MPSoC SOM. The K26 SOM itself is production-grade and available separately for integration into custom carrier boards. KV260 was refreshed in 2025.
 
 ### Versal AI Core Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **VCK190** | Xilinx / Avnet | ~$12,000 | Versal AI Core VC1902, AI Engines, DDR4 | AI inference, DSP |
-| **VEK280** | Xilinx / Avnet | ~$15,000 | Versal AI Edge VE2802, video codec | Automotive, broadcast |
-| **VHK158** | Xilinx / Avnet | ~$20,000 | Versal HBM VH1582, 32 GB HBM2e | HPC, genomics |
+| Board | Vendor | Price (USD) | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **VCK190** | AMD / Avnet | $13,195 | Versal AI Core VC1902, AI Engines, DDR4 | AI inference, DSP | Active |
+| **VEK280** | AMD / Avnet | $6,995 | Versal AI Edge VE2802, video codec, 8× GTH | Automotive, broadcast | Active |
+| **VHK158** | AMD / Avnet | $14,995 | Versal HBM VH1582, 32 GB HBM2e, 112G PAM4 | HPC, genomics | Active |
 
 > **Versal pricing:** Versal dev kits are premium platforms. For evaluation without hardware, use the Vitis unified software platform and hardware emulation.
 
---
+> **Current as of: 2026-04.** Prices verified from AMD official store (shop-us-en.amd.com) and authorized distributors (Digilent, Avnet, Newark). Discontinued boards are no longer orderable from AMD; remaining stock may be available through resale channels.
+
+---
 
 ## Further Reading
 
