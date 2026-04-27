@@ -32,6 +32,10 @@
 | 1.13 | Intel HPS-FPGA deep dive | `02_architecture/soc/hps_fpga_intel_soc.md` | ✅ COMPLETE |
 | 1.14 | Xilinx PS-PL deep dive | `02_architecture/soc/hps_fpga_xilinx_zynq.md` | ✅ COMPLETE |
 | 1.15 | Microchip MSS-Fabric deep dive | `02_architecture/soc/hps_fpga_microchip_soc.md` | ✅ COMPLETE |
+| 1.16 | CPLD architecture & macrocells | `02_architecture/cpld/cpld_architecture.md` | ⬜ PENDING |
+| 1.17 | Intel MAX family (MAX V, MAX 10) | `02_architecture/cpld/intel_max_family.md` | ⬜ PENDING |
+| 1.18 | CPLD vs FPGA: when to use which | `02_architecture/cpld/cpld_vs_fpga.md` | ⬜ PENDING |
+| 1.19 | Non-volatile programmable logic (flash, antifuse, SRAM+flash) | `02_architecture/cpld/non_volatile_logic.md` | ⬜ PENDING |
 
 ## Phase 2: Design Flow (`03_design_flow/`)
 
