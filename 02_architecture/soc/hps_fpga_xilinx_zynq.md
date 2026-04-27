@@ -13,28 +13,28 @@ Xilinx provides the richest set of PS-PL interfaces in the industry. Unlike Inte
 ```
                     ┌─────────────────────────────────────┐
                     │      Xilinx Processing System       │
-                    │  ┌─────────┐    ┌───────────────┐  │
-                    │  │ Dual/   │    │   L2 Cache    │  │
-                    │  │ Quad    │◄──►│  (SCU/CCI)    │  │
-                    │  │ Cortex  │    └───────┬───────┘  │
-                    │  │ -A9/A53 │            │          │
-                    │  └────┬────┘            │          │
-                    │       │                 │          │
-                    │  ┌────▼─────────────────▼────┐     │
-                    │  │  AXI Interconnect / NoC   │     │
-                    │  │  (Central interconnect)   │     │
-                    │  └────┬────┬────┬────┬──────┘     │
-                    │       │    │    │    │            │
-                    └───────┼────┼────┼────┼────────────┘
+                    │  ┌─────────┐    ┌───────────────┐   │
+                    │  │ Dual/   │    │   L2 Cache    │   │
+                    │  │ Quad    │◄──►│  (SCU/CCI)    │   │
+                    │  │ Cortex  │    └───────┬───────┘   │
+                    │  │ -A9/A53 │            │           │
+                    │  └────┬────┘            │           │
+                    │       │                 │           │
+                    │  ┌────▼─────────────────▼────┐      │
+                    │  │  AXI Interconnect / NoC   │      │
+                    │  │  (Central interconnect)   │      │
+                    │  └────┬────┬────┬────┬───────┘      │
+                    │       │    │    │    │              │
+                    └───────┼────┼────┼────┼──────────────┘
                             │    │    │    │
         ┌───────────────────┼────┼────┼────┼───────────────────┐
         │                   ▼    ▼    ▼    ▼                   │
         │  PL (FPGA Fabric) ─────────────────────────────────  │
-        │                                                     │
-        │   M_AXI_GP0/1  S_AXI_HP0-3  S_AXI_HPC0/1  S_AXI_ACP │
+        │                                                      │
+        │   M_AXI_GP0/1  S_AXI_HP0-3  S_AXI_HPC0/1  S_AXI_ACP  │
         │   (PS→PL ctrl) (PL→DDR HP) (PL→DDR coherent) (cache) │
-        │                                                     │
-        └─────────────────────────────────────────────────────┘
+        │                                                      │
+        └──────────────────────────────────────────────────────┘
 ```
 
 **Key architectural principle:** Xilinx offers **optional cache coherency** through the ACP (Accelerator Coherency Port) and HPC ports. The FPGA can participate in the CPU's cache coherency protocol, eliminating explicit software cache management for shared data structures.
@@ -168,17 +168,121 @@ The AFI sits between the PL and PS interconnect. It provides:
 
 ### Bandwidth (Zynq-7000)
 
-| Configuration | Theoretical | Realistic |
-|---|---|---|
-| 1× HP @ 64-bit × 150 MHz | 1.2 GB/s | ~800 MB/s |
-| 4× HP @ 64-bit × 150 MHz | 4.8 GB/s | ~3.2 GB/s |
-| DDR3-1066 (32-bit bus) | 4.26 GB/s | ~3.4 GB/s |
+| Configuration | Theoretical | Realistic (Linux DMA) | Realistic (Bare-metal) | Bottleneck |
+|---|---|---|---|---|
+| 1× HP @ 64-bit × 150 MHz | 1.2 GB/s | ~600 MB/s | ~900 MB/s | AXI-DMA overhead, FIFO depth |
+| 4× HP @ 64-bit × 150 MHz | 4.8 GB/s | ~2.5 GB/s | ~3.5 GB/s | DDR controller arbitration |
+| 1× GP @ 32-bit × 150 MHz | 600 MB/s | ~40 MB/s (mmap) | ~300 MB/s | Linux mmap overhead, narrow bus |
+| ACP @ 64-bit × 150 MHz | 1.2 GB/s | ~400 MB/s | ~700 MB/s | SCU snoop latency, cache line fill |
+| DDR3-1066 (32-bit bus) | 4.26 GB/s | ~3.0 GB/s | ~3.8 GB/s | Memory controller, DRAM timing |
 
-With 4 HP ports active, the DDR controller becomes the bottleneck — not the bridges.
+**Key insight:** With 4 HP ports active, the DDR controller becomes the bottleneck — not the bridges. The ACP is slower than HP for bulk transfers because SCU snooping adds 2-3 cache-line-fill latency cycles per transaction.
+
+**DMA burst size tuning:**
+- **Optimal:** 16 beats × 64-bit = 128 bytes per burst (matches AXI-DMA default)
+- **Suboptimal:** 1-4 beat bursts cause AFI FIFO thrashing and ~40% bandwidth loss
+- **Maximum:** 256 beats (AXI-DMA max) only beneficial for contiguous DDR regions > 4 KB
 
 ### MPSoC HP Upgrade
 
-MPSoC HP ports support **128-bit data width** and higher clock frequencies (up to 333 MHz). Four HP ports at 128-bit × 333 MHz = 21.3 GB/s theoretical — enough to saturate DDR4-2400 (38.4 GB/s for 64-bit, but PS interconnect limits are lower).
+MPSoC HP ports support **128-bit data width** and higher clock frequencies (up to 333 MHz):
+
+| Configuration | Theoretical | Realistic | Notes |
+|---|---|---|---|
+| 1× HP @ 128-bit × 333 MHz | 5.3 GB/s | ~4.0 GB/s | AXI-DMA SG mode overhead ~20% |
+| 4× HP @ 128-bit × 333 MHz | 21.3 GB/s | ~12 GB/s | PS interconnect becomes bottleneck |
+| 2× HPC @ 128-bit × 333 MHz | 10.6 GB/s | ~6 GB/s | CCI-400 snoop filter adds ~15% latency |
+| DDR4-2400 (64-bit bus) | 38.4 GB/s | ~30 GB/s | Theoretical max, rarely saturated by PS |
+
+The PS-side L3 interconnect (using ARM NIC-400) limits aggregate throughput to ~15-18 GB/s regardless of how many HP ports are active. For maximum bandwidth, use the PL-side DDR controller directly (not via PS HP ports).
+
+---
+
+## Linux DMA Engine Integration (Zynq-7000 / MPSoC)
+
+Xilinx provides the `xilinx-vdma`, `xilinx-axidma`, and `xilinx-frmbuf` drivers. Here's a complete Zynq-7000 AXI-DMA kernel example:
+
+```c
+#include <linux/dmaengine.h>
+#include <linux/dma-mapping.h>
+#include <linux/of_dma.h>
+
+struct zynq_dma_chan {
+    struct dma_chan *chan;           // From dma_request_slave_channel()
+    dma_addr_t buf_addr;             // Physical address for FPGA
+    void *buf_virt;                  // CPU virtual address
+    struct completion done;
+};
+
+static void zynq_dma_callback(void *data) {
+    struct zynq_dma_chan *ch = data;
+    complete(&ch->done);
+}
+
+static int zynq_setup_dma(struct device *dev, struct zynq_dma_chan *ch) {
+    struct dma_async_tx_descriptor *desc;
+    dma_cap_mask_t mask;
+
+    dma_cap_zero(mask);
+    dma_cap_set(DMA_SLAVE, mask);
+
+    // 1. Request channel from device tree (matches "dma-names" in DT)
+    ch->chan = dma_request_slave_channel(dev, "axidma0");
+    if (!ch->chan) return -ENODEV;
+
+    // 2. Allocate 256 KB coherent buffer (CPU + FPGA accessible)
+    ch->buf_virt = dma_alloc_coherent(dev, 256 * 1024,
+                                      &ch->buf_addr, GFP_KERNEL);
+
+    // 3. Configure slave parameters (from device tree or explicit)
+    struct dma_slave_config cfg = {
+        .direction = DMA_DEV_TO_MEM,     // FPGA → CPU memory
+        .src_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES,
+        .dst_addr_width = DMA_SLAVE_BUSWIDTH_4_BYTES,
+        .src_maxburst = 16,              // 16 beats = optimal for Zynq HP
+    };
+    dmaengine_slave_config(ch->chan, &cfg);
+
+    // 4. Prepare cyclic transfer (double-buffering for streaming)
+    desc = dmaengine_prep_dma_cyclic(ch->chan,
+        ch->buf_addr, 256 * 1024,       // buffer base, total size
+        128 * 1024,                     // period size (half buffer)
+        DMA_DEV_TO_MEM, DMA_PREP_INTERRUPT);
+
+    desc->callback = zynq_dma_callback;
+    desc->callback_param = ch;
+
+    // 5. Submit and start
+    dmaengine_submit(desc);
+    dma_async_issue_pending(ch->chan);
+
+    return 0;
+}
+```
+
+**Zynq-7000 Device Tree snippet:**
+```dts
+axidma_0: axidma@40400000 {
+    compatible = "xlnx,axi-dma-1.00.a";
+    reg = <0x40400000 0x10000>;
+    interrupt-parent = <&intc>;
+    interrupts = <0 29 4>;           // GIC SPI 29, rising edge
+    #dma-cells = <1>;
+
+    dma-channel@40400000 {
+        compatible = "xlnx,axi-dma-s2mm-channel";
+        dma-channels = <1>;
+        xlnx,datawidth = <32>;       // 32-bit AXI Stream → HP port
+        xlnx,include-dre;            // Data Realignment Engine
+    };
+};
+```
+
+**Performance tuning for Zynq DMA:**
+1. **Enable DRE (Data Realignment Engine)** — allows non-64-byte-aligned buffers through ACP/HPC
+2. **Use SG (Scatter-Gather) mode** only for non-contiguous buffers; simple mode has lower latency
+3. **Set `src_maxburst = 16`** — matches Zynq HP AFI FIFO depth optimally
+4. **Align buffers to 64 bytes** — avoids ACP/HPC bus errors and improves DDR burst efficiency
 
 ---
 
@@ -216,11 +320,44 @@ The CCI-400 implements the AXI-ACE (AXI Coherency Extensions) protocol:
 | FPGA accelerator on shared data structures | HPC | Coherency eliminates software bugs |
 | FPGA writes results CPU never reads | HP | Bypass cache is faster |
 
+### HPC Linux Integration
+
+On MPSoC, the CCI-400 is transparent to software — you simply map the HPC address region and use it like any other AXI slave:
+
+```c
+// MPSoC HPC0 physical base (from Xilinx UG1085)
+#define HPC0_PHYS_BASE  0x00000000ULL   // Maps to DDR via CCI-400
+#define HPC0_SIZE       0x80000000ULL   // 2 GB coherent region
+
+// In kernel driver: map HPC region for coherent FPGA access
+static void __iomem *hpc_base;
+
+static int __init hpc_init(void) {
+    // ioremap_cache() maps as Normal Cacheable (not Device memory)
+    // CCI-400 handles coherency automatically
+    hpc_base = ioremap_cache(HPC0_PHYS_BASE, HPC0_SIZE);
+
+    // Write data — CPU L2 cache holds line, CCI snoops FPGA reads
+    writel(0xDEADBEEF, hpc_base + 0x1000);
+    // No flush needed! CCI-400 invalidates FPGA's copy on CPU write
+    return 0;
+}
+```
+
+**Critical difference from Zynq-7000 ACP:**
+| Aspect | Zynq-7000 ACP | MPSoC HPC |
+|---|---|---|
+| Cacheability | Must mark pages as cacheable manually | Handled by CCI-400 automatically |
+| Alignment | 64-byte mandatory | 64-byte mandatory |
+| Software flush | Required before FPGA read | **Not required** — hardware coherency |
+| CPU overhead | High (flush/invalidate cycles) | Near-zero |
+
 ### HPC Limitations
 
 - **Cache-line granularity:** All HPC transactions must be 64-byte aligned and sized (cache line size)
 - **No partial writes:** You cannot do a 32-bit write through HPC — the CCI treats it as a full line operation
 - **Bandwidth overhead:** Snoop traffic adds ~10-20% latency vs HP
+- **CCI-400 throughput limit:** ~6-8 GB/s aggregate coherent traffic (all HPC + ACP + CPU combined)
 
 ---
 
@@ -288,25 +425,42 @@ This is impossible on Intel SoC without explicit `__cpuc_flush_dcache_area()` ca
 
 Zynq-7000 has **no programmable QoS**. The HP ports share the DDR controller through a round-robin arbiter. A bandwidth-hungry FPGA DMA can starve the CPU.
 
+**Measured impact:** When FPGA DMA saturates 1× HP at 800 MB/s, CPU L2 cache miss latency increases from ~20 ns to ~120 ns (6× degradation). With 4× HP active, CPU can stall for 10s of microseconds.
+
 **Mitigation:**
-- Use PL-side FIFOs to burst at controlled intervals
+- Use PL-side FIFOs to burst at controlled intervals (e.g., 4 KB bursts every 1 ms)
 - Spread traffic across multiple HP ports (round-robin across ports helps)
 - Lower HP port priority by throttling AXI `AWVALID/ARVALID` in FPGA logic
+- Reserve a DDR region for CPU-exclusive access via `reserved-memory` in device tree
 
 ### MPSoC QoS
 
-MPSoC introduces programmable QoS per HP/HPC port:
+MPSoC introduces programmable QoS per HP/HPC port through the **AFI (AXI FIFO Interface)** registers:
 
 ```c
-// Set QoS priority for HP0 (higher value = higher priority)
-// Via Xilinx PMU firmware or direct register write
-writel(0xF, ZYNQMP_QOS_HP0);  // Highest priority
+// MPSoC AFI QoS register addresses (from UG1085, Section 33.3)
+#define AFI_HP0_RDQOS    0xFD380000   // HP0 read QoS
+#define AFI_HP0_WRQOS    0xFD380004   // HP0 write QoS
+#define AFI_HP1_RDQOS    0xFD390000   // HP1 read QoS
+// ... HP2-HP3 follow same pattern
+
+// Set QoS: 0x0 = lowest, 0xF = highest priority
+writel(0xF, ioremap(AFI_HP0_RDQOS, 4));   // Real-time video: highest
+writel(0xA, ioremap(AFI_HP1_RDQOS, 4));   // CPU traffic: medium
+writel(0x3, ioremap(AFI_HP2_RDQOS, 4));   // Background DMA: lowest
 ```
 
-The QoS values propagate through the PS interconnect to the DDR controller, which uses them for arbitration. You can assign:
-- **Real-time traffic** (video output): Highest QoS
-- **CPU traffic:** Medium QoS
-- **Background FPGA DMA:** Lowest QoS
+The QoS values propagate through the PS interconnect to the DDR controller, which uses them for arbitration:
+- **Real-time traffic** (display pipeline, video output): QoS 0xF
+- **CPU traffic** (Linux kernel, userspace): QoS 0xA-0xB
+- **Best-effort FPGA DMA:** QoS 0x3-0x5
+
+**Verifying QoS effect:**
+```bash
+# Read current HP0 QoS value
+busybox devmem 0xFD380000 32
+# → Should return 0x0000000F if set to highest priority
+```
 
 ### AFI Registers
 
@@ -439,6 +593,67 @@ set_property CONFIG.DDR_MEMORY {DDR4_2400} [get_bd_cells versal_cips_0]
 
 ---
 
+## PYNQ / ZedBoard Practical Example
+
+### Scenario: Python-Controlled FPGA Accelerator
+
+The PYNQ framework (Python on Zynq) uses the GP port for control and HP port for data:
+
+```python
+# Python (running on Zynq ARM Linux via PYNQ)
+from pynq import Overlay, allocate
+
+# 1. Load bitstream (configures PL via PCAP)
+ol = Overlay("my_accelerator.bit")
+
+# 2. Allocate physically contiguous buffer (maps to HP port)
+#    This buffer is visible to both CPU and FPGA
+input_buf = allocate(shape=(1024,), dtype='u4')   # 4 KB input
+output_buf = allocate(shape=(1024,), dtype='u4')  # 4 KB output
+
+# 3. Fill input data
+input_buf[:] = range(1024)
+input_buf.flush()  # Ensure data reaches DDR before FPGA reads
+
+# 4. Configure accelerator registers via GP port (MMIO)
+ol.my_accel.register_map.src_addr = input_buf.physical_address
+ol.my_accel.register_map.dst_addr = output_buf.physical_address
+ol.my_accel.register_map.len = 1024
+ol.my_accel.register_map.ctrl = 1  # Start
+
+# 5. Poll for completion (or use interrupt)
+while ol.my_accel.register_map.status != 1:
+    pass
+
+# 6. Invalidate cache before reading results
+output_buf.invalidate()
+result = output_buf[:]
+```
+
+**Physical path:**
+```
+Python allocate() → dma_alloc_coherent() → DDR buffer
+    │
+    ├──► CPU writes data → cacheable DDR region
+    │    input_buf.flush() → __cpuc_flush_dcache_area()
+    │
+    ├──► FPGA reads via HP0 (AXI-DMA in PL)
+    │    AXI-DMA → S_AXI_HP0 → AFI → DDR controller
+    │
+    └──► FPGA writes results → DDR
+         output_buf.invalidate() → invalidate_cpu_cache()
+         Python reads results
+```
+
+**Why `flush()` and `invalidate()` are needed on Zynq-7000:**
+- The HP port is **non-coherent** — it bypasses the SCU/ACP
+- CPU writes go to L1 cache first; `flush()` pushes dirty lines to DDR
+- FPGA writes go directly to DDR; `invalidate()` drops stale CPU cache copies
+
+**On MPSoC with HPC:** `flush()`/`invalidate()` are **not needed** — CCI-400 handles coherency automatically.
+
+---
+
 ## Per-Family Comparison
 
 | Feature | Zynq-7000 | Zynq MPSoC | Versal |
@@ -451,6 +666,8 @@ set_property CONFIG.DDR_MEMORY {DDR4_2400} [get_bd_cells versal_cips_0]
 | QoS | None | Programmable per port | Programmable per NMU |
 | Max DDR | 1 GB (default) | 32 GB | 128 GB |
 | Fabric LEs | 444K | 1,143K | ~2,000K |
+| Linux DMA driver | `xilinx-vdma` | `xilinx-vdma` + `zynqmp-dma` | `xilinx-axipmon` |
+| Cache flush needed? | Yes (HP non-coherent) | No (HPC coherent) | No (CHI coherent) |
 
 ---
 
@@ -460,11 +677,14 @@ set_property CONFIG.DDR_MEMORY {DDR4_2400} [get_bd_cells versal_cips_0]
 |---|---|---|
 | ACP unaligned access | Bus error, data corruption | Ensure 64-byte alignment, 64-byte bursts only |
 | HPC partial write | Unexpected line corruption | Use full cache-line writes or switch to HP |
-| HP FIFO overflow | AXI slave responds with SLVERR | Reduce outstanding transactions in FPGA master |
+| HP FIFO overflow | AXI slave responds with SLVERR | Reduce outstanding transactions in FPGA master (max 16) |
 | Wrong PL clock | Timing failure, unreliable AXI | Constrain FCLK_CLK in XDC, verify with `report_clock_networks` |
-| No DDR init | PL accesses hang | Ensure PS boots first (DDR trained by FSBL) |
-| MPSoC HP QoS ignored | CPU starvation | Program AFI QoS registers, verify with `devmem` |
-| Versal NoC misconfigured | No PL access to DDR | Validate NoC routing in Vivado DRC |
+| No DDR init | PL accesses hang | Ensure PS boots first (DDR trained by FSBL/U-Boot SPL) |
+| MPSoC HP QoS ignored | CPU starvation | Program AFI QoS registers at `0xFD380000+`, verify with `devmem` |
+| Versal NoC misconfigured | No PL access to DDR | Validate NoC routing in Vivado DRC; check NMU clock |
+| DMA timeout | AXI-DMA hangs mid-transfer | Enable `axistream-connected` in device tree; check TLAST |
+| Cache coherency bug | Stale data, race conditions | On Zynq-7000: always flush before FPGA read, invalidate after |
+| Linux mmap failure | `-EINVAL` from `mmap()` | Check `/dev/mem` permissions; use UIO for production |
 
 ---
 
