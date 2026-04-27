@@ -97,6 +97,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [overview.md](03_design_flow/overview.md) | End-to-end design flow: RTL → synthesis → place & route → bitstream → configuration |
 | [project_structure.md](03_design_flow/project_structure.md) | Recommended directory layout, revision control for HDL, IP versioning, constraint files |
 | [synthesis.md](03_design_flow/synthesis.md) | Synthesis engine behavior, optimization strategies, resource sharing, retiming, FSM extraction |
+| [netlist.md](03_design_flow/netlist.md) | Netlist formats across all vendors: EDIF, structural Verilog, VQM/QDB/QXP (Intel), DCP (Xilinx), NGO (Lattice), RTLIL/JSON (Yosys) — cross-vendor interchange, ECO, inspection |
 | [place_and_route.md](03_design_flow/place_and_route.md) | Placement algorithms (simulated annealing, analytical), routing congestion, physical optimization |
 | [bitstream.md](03_design_flow/bitstream.md) | Bitstream generation, compression, encryption, authentication, partial reconfiguration (DFX) |
 | [floorplanning.md](03_design_flow/floorplanning.md) | Manual floorplanning, pblock/LogicLock constraints, region constraints, IO planning |
