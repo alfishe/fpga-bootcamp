@@ -789,37 +789,52 @@ graph LR
 
 ### Cyclone V SoC Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **DE10-Nano** | Terasic | ~$150 | HDMI, Ethernet, Arduino headers, 1 GB DDR3 | Education, MiSTer, hobbyists |
-| **SoCKit** | Arrow / Intel | ~$400 | HSMC expansion, 2 GB DDR3, audio codec | Prototyping, high-speed IO |
-| **Chameleon96** | NovTech / 96Boards | ~$100 | 96Boards CE form factor, WiFi/BT | IoT, embedded Linux |
-| **Atlas-SoC** | Terasic | ~$300 | Dual Ethernet, VGA, PCIe x4 | Networking, vision |
+| Board | Vendor | Price | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **DE10-Nano** | Terasic | $225 ($190 academic) | HDMI, Ethernet, Arduino headers, 1 GB DDR3 | Education, MiSTer, hobbyists | Active |
+| **DE1-SoC** | Terasic | $377 ($322 academic) | VGA, video-in, audio codec, 1 GB DDR3 | University courses, OpenCL | Active |
+| **SoCKit** | Arrow / Terasic | — | HSMC expansion, 2 GB DDR3, audio codec | Prototyping, high-speed IO | **Phased out** |
+| **Atlas-SoC** | Terasic | — | Dual Ethernet, VGA, PCIe x4 | Networking, vision | **Phased out** |
+| **Chameleon96** | NovTech / 96Boards | — | 96Boards CE form factor, WiFi/BT | IoT, embedded Linux | **Discontinued** |
 
 > **MiSTer note:** The DE10-Nano is the official MiSTer platform. Its LWH2F bridge + on-chip RAM configuration is the reference implementation for FPGA retro-computing projects.
+>
+> **Current as of:** 2026-04 (verified against Terasic official store)
 
 ### Arria 10 SoC Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **Arria 10 SoC Dev Kit** | Intel | ~$3,500 | 4 GB DDR4, QSFP+, PCIe Gen3 x8 | High-speed comms, 5G baseband |
-| **Hitek Systems A10SoC** | Hitek Systems | Contact | Custom form factors, wide temp | Aerospace, defense |
+| Board | Vendor | Price | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **Arria 10 SX SoC Dev Kit** | Terasic / Intel | $3,995 | 4 GB DDR4, QSFP+, PCIe Gen3 x8 | High-speed comms, 5G baseband | Active |
+| **Hitek Systems A10SoC** | Hitek Systems | Contact | Custom form factors, wide temp | Aerospace, defense | Active |
+
+> **Current as of:** 2026-04 (verified against Terasic official store)
 
 ### Stratix 10 SoC Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **Stratix 10 SoC Dev Kit** | Intel | ~$7,000 | HBM2 option, 8 GB DDR4, 2× QSFP28 | AI inference, HPC |
-| **S10 SoC Modular** | BittWare / Hitek | Contact | 3U VPX, VITA 57.1 FMC | Military, radar |
+| Board | Vendor | Price | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **Stratix 10 SX SoC Dev Kit** | Terasic / Intel | $8,995 | HBM2 option, 8 GB DDR4, 2× QSFP28 | AI inference, HPC | Active |
+| **Stratix 10 MX Dev Kit** | Terasic | $10,000 | HBM2 integrated, 1 GB DDR4, RLDRAM3 | HPC, AI training | Active |
+| **S10 SoC Modular** | BittWare / Hitek | Contact | 3U VPX, VITA 57.1 FMC | Military, radar | Active |
+
+> **Current as of:** 2026-04 (verified against Terasic official store)
 
 ### Agilex 7 SoC Boards
 
-| Board | Vendor | Price Range | Key Features | Best For |
-|---|---|---|---|---|
-| **Agilex 7 SoC Dev Kit** | Intel | ~$8,000 | PCIe Gen5, CXL, DDR5 | Cloud acceleration, AI |
-| **Agilex I-Series Dev Kit** | Intel | ~$6,000 | 400G Ethernet, R-Tile transceivers | Networking, NFV |
+| Board | Vendor | Price | Key Features | Best For | Status |
+|---|---|---|---|---|---|
+| **DE10-Agilex** | Terasic | $7,288 | 2× QSFPDD, PCIe Gen4 x16, 4× DDR4 SODIMM | Education, 200G networking | Active |
+| **Agilex 7 FPGA Starter Kit** | Terasic | $5,491 | QSFP28, FMC+, 2× DDR4, HPS system | Evaluation, prototyping | Active |
+| **Agilex 7 F-Series Dev Kit** | Terasic | $8,495 | 2× F-Tile, transceivers, 16 GB DDR4 | High-speed IO, signal integrity | Active |
+| **Agilex 7 F-Series Transceiver-SoC** | Terasic | $9,495 | P-Tile + E-Tile, ARM SoC, PCIe Gen4 x8 | SoC designs, transceiver eval | Active |
+| **Agilex 7 I-Series Dev Kit** | Terasic | $9,999 | PCIe 5.0, CXL, high-speed networking | Cloud acceleration, CXL dev | Active |
+| **Agilex 7 I-Series Transceiver-SoC** | Terasic | $13,995 | 4× F-Tile, ARM SoC, 400G Ethernet | NFV, 5G infrastructure | Active |
+| **Agilex 7 I-Series Transceiver (6× F-Tile)** | Terasic | $15,999 | 6× F-Tile, maximum transceiver count | Telecom, highest bandwidth | Active |
 
-> **Price note:** Intel dev kit pricing is approximate and subject to academic discounts (typically 40-60% off for universities). Contact Intel FPGA sales for volume pricing.
+> **Price note:** Intel dev kit pricing is direct from Terasic (Intel's primary board partner). Academic discounts are available through the Intel FPGA University Program — typically 30-50% off select kits. Contact Terasic or Intel FPGA sales for academic/volume pricing.
+>
+> **Current as of:** 2026-04 (verified against Terasic official store)
 
 --
 
