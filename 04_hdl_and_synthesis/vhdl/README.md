@@ -7,7 +7,7 @@ VHDL (VHSIC Hardware Description Language) is a strongly-typed, IEEE-standardize
 ## Index
 
 | File | Topic |
-|---|---|---|
+|---|---|
 | [vhdl_basics.md](vhdl_basics.md) | VHDL-2008 for synthesis: entities, architectures, processes, records, generics |
 
 ## See Also

@@ -7,7 +7,7 @@ Hardware description languages that predate or coexist with modern Verilog/VHDL,
 ## Index
 
 | File | Topic |
-|---|---|---|
+|---|---|
 | [ahdl.md](ahdl.md) | Altera HDL: Boolean equations, state machines, megafunctions — Quartus-specific textual design format |
 | [abel.md](abel.md) | Advanced Boolean Expression Language: CUPL successor, widely used for CPLDs and PALs |
 | [palasm.md](palasm.md) | PAL Assembler: early fuse-map language for programmable array logic |

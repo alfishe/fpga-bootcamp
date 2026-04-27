@@ -7,7 +7,7 @@ HLS raises the abstraction level from RTL to C/C++, OpenCL, or MATLAB, automatic
 ## Index
 
 | File | Topic |
-|---|---|---|
+|---|---|
 | [hls_overview.md](hls_overview.md) | HLS fundamentals: scheduling, pipelining, loop unroll, array partition, interface synthesis |
 
 ## See Also

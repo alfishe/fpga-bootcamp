@@ -7,7 +7,7 @@ Verilog (IEEE 1364) and its superset SystemVerilog (IEEE 1800) are the most wide
 ## Index
 
 | File | Topic |
-|---|---|---|
+|---|---|
 | [verilog_basics.md](verilog_basics.md) | Verilog-2001 for synthesis: always blocks, non-blocking vs blocking assignment, inferring structures |
 | [systemverilog_synthesis.md](systemverilog_synthesis.md) | SV constructs safe for synthesis: always_ff/always_comb, enums, structs, interfaces, packages |
 
