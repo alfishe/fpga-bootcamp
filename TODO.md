@@ -77,10 +77,10 @@
 | 4.1 | Verilog: origins, history, standards, philosophy | `04_hdl_and_synthesis/verilog_sv/verilog.md` | ✅ COMPLETE |
 | 4.2 | SystemVerilog: lineage, design+verification, UVM, IEEE 1800 | `04_hdl_and_synthesis/verilog_sv/systemverilog.md` | ✅ COMPLETE |
 | 4.3 | VHDL: VHSIC origins, strong typing, IEEE 1076, verification | `04_hdl_and_synthesis/vhdl/vhdl_basics.md` | ✅ COMPLETE |
-| 4.4 | Inference rules | `04_hdl_and_synthesis/inference_rules.md` | ⬜ PENDING |
-| 4.5 | Vendor pragmas | `04_hdl_and_synthesis/vendor_pragmas.md` | ⬜ PENDING |
-| 4.6 | CDC coding patterns | `04_hdl_and_synthesis/cdc_coding.md` | ⬜ PENDING |
-| 4.7 | State machines | `04_hdl_and_synthesis/state_machines.md` | ⬜ PENDING |
+| 4.4 | Inference rules (flop vs latch, RAM, ROM, DSP, SRL, MUX) | `04_hdl_and_synthesis/inference_rules.md` | ✅ COMPLETE |
+| 4.5 | Vendor pragmas (Xilinx/Intel/Gowin/Synplify attribute reference) | `04_hdl_and_synthesis/vendor_pragmas.md` | ✅ COMPLETE |
+| 4.6 | CDC patterns (2-FF, Gray code, async FIFO, handshake, MCP) | `04_hdl_and_synthesis/cdc_coding.md` | ✅ COMPLETE |
+| 4.7 | FSM design (encoding, Moore/Mealy, reset, safe recovery) | `04_hdl_and_synthesis/state_machines.md` | ✅ COMPLETE |
 
 ## Phase 5: Timing & Constraints (`05_timing_and_constraints/`)
 
