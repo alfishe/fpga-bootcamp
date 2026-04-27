@@ -93,12 +93,12 @@ This is why an FPGA SoC demands a different design mindset: you're not writing s
 
 Both use dual Cortex-A9 at the same 28nm node, running at similar frequencies (~800 MHz). From a benchmark perspective they are nearly identical. But the way the CPU connects to the FPGA fabric makes them architecturally divergent:
 
-- **Cyclone V SoC HPS** has three AXI-3 bridge pairs (H2F 64-bit, LWH2F 32-bit, F2H 64-bit) plus six FPGA-to-SDRAM ports. FPGA access to DDR **bypasses the L2 cache**. Consistently non-coherent.
+- **Cyclone V SoC HPS** has three AXI-3 bridge pairs (H2F 64-bit, LWH2F 32-bit, F2H 64-bit) plus six FPGA-to-SDRAM ports. The **F2S ports bypass L2 cache** (non-coherent), but the **F2H bridge can route through the ACP mapper** to access the SCU, giving the FPGA cache-coherent access to CPU L1/L2 on Cyclone V and Arria 10 — a feature often overlooked.
 - **Zynq-7000** has 2 M_AXI_GP (32-bit PS→PL control), 4 S_AXI_HP (64-bit PL→DDR high-performance), 2 S_AXI_GP (32-bit PL→PS slave), and one **ACP** (64-bit cache-coherent). The ACP connects FPGA logic directly to the Cortex-A9 Snoop Control Unit (SCU), giving the FPGA **cache-coherent access** to the CPU's L2 cache. This means an FPGA accelerator can read/write CPU memory without explicit cache flush/invalidate operations — the hardware maintains coherency automatically.
 
 | Property | Cyclone V SoC HPS | Zynq-7000 PS |
 |---|---|---|
-| Coherent FPGA access | ❌ F2S bypasses L2 | ✅ ACP snoops L2 via SCU |
+| Coherent FPGA access | ✅ ACP via F2H+mapper (A9 SCU) | ✅ ACP snoops L2 via SCU |
 | FPGA→DDR path count | 6× F2S ports | 4× S_AXI_HP ports |
 | Control register path | LWH2F 32-bit | M_AXI_GP 32-bit (4 ports) |
 

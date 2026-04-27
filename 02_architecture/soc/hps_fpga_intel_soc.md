@@ -308,29 +308,60 @@ The shift to 64-bit addressing in Agilex allows the HPS to address much larger F
 
 ---
 
-## No ACP — Intel's Non-Coherent Model
+## ACP on Intel SoC: Cyclone V / Arria 10 Only
 
-Intel SoC FPGAs **do not have an Accelerator Coherency Port (ACP)**. There is no hardware mechanism for FPGA logic to participate in the CPU cache coherency protocol. This is the single biggest architectural difference from Xilinx Zynq.
+Intel SoC FPGAs have a nuanced coherency story that depends entirely on the CPU generation:
 
-| Coherency Feature | Intel SoC (All Families) | Xilinx Zynq-7000 | Xilinx MPSoC |
+| Family | CPU | Has ACP? | Coherency Path |
 |---|---|---|---|
-| **ACP equivalent** | ❌ None | ✅ S_AXI_ACP (snoops SCU/L2) | ✅ S_AXI_ACP + S_AXI_HPC (CCI-400) |
-| FPGA cache access | Bypasses L2 entirely | ACP snoops L1/L2 | HPC snoops L1/L2 via CCI |
-| Software flush/inv | **Required** for all shared data | Only for HP (non-ACP) traffic | Only for HP (non-HPC) traffic |
-| Shared buffer latency | Higher (software management) | Lower (hardware coherency) | Lower (hardware coherency) |
-| Use case impact | Streaming DMA works fine; fine-grained sharing needs explicit cache ops | Fine-grained CPU-FPGA sharing is seamless | Fine-grained CPU-FPGA sharing is seamless |
+| **Cyclone V SoC** | Dual Cortex-A9 | ✅ Yes | F2H bridge → ACP mapper → SCU → L1/L2 |
+| **Arria 10 SoC** | Dual Cortex-A9 | ✅ Yes | Same as Cyclone V |
+| **Stratix 10 SoC** | Quad Cortex-A53 | ❌ No | CCI-400 (no ACP exposed to FPGA) |
+| **Agilex 7 SoC** | Quad Cortex-A53 | ❌ No | NoC + CCI (no ACP) |
+| **Agilex 5 SoC** | A76 + A55 | ❌ No | DSU + CCI-550 (no ACP) |
 
-### What Intel Recommends Instead of ACP
+**The rule:** Only the ARM Cortex-A9-based Intel SoCs (Cyclone V, Arria 10) expose an ACP to the FPGA fabric. Newer Intel SoCs with Cortex-A53/A76/A55 use ARM's CoreLink CCI/NoC coherency architecture, which does **not** include an ACP port.
 
-Without ACP, Intel documents recommend three patterns for CPU-FPGA data sharing:
+### How Cyclone V / Arria 10 ACP Works
 
-1. **`dma_alloc_coherent()` — Non-cacheable buffers:** Allocate buffers that bypass the CPU cache entirely. No flush/invalidate needed, but CPU access is slower.
-2. **Explicit cache maintenance:** Use `__cpuc_flush_dcache_area()` + `outer_flush_range()` before FPGA access, and `outer_inv_range()` after.
-3. **FPGA-managed DDR via F2S:** For bulk streaming (video, signal processing), use F2S ports and treat DDR as a shared mailbox — the CPU never caches these regions.
+The FPGA accesses the ACP not through a dedicated port, but through the **F2H bridge + ACP mapper**:
 
-## Cache Coherency: Explicitly Absent
+```
+FPGA Fabric
+    │
+    ▼
+F2H Bridge ──► ACP Mapper ──► SCU (Snoop Control Unit) ──► L1/L2 Cache
+                  │
+                  └──► Translates F2H AXI transactions to ACP protocol
+```
 
-Intel SoC FPGAs offer **no hardware cache coherency** between the CPU and FPGA fabric. This is the single biggest architectural difference from Xilinx Zynq.
+When FPGA logic issues a read/write through the F2H bridge with ACP attributes:
+1. The ACP mapper translates the AXI transaction to ACP protocol
+2. The SCU checks CPU0/CPU1 L1 caches for the requested address
+3. If dirty in L1, data is forwarded from L1 (with possible eviction to L2)
+4. If clean or absent, L2 or DDR provides the data
+5. Cache state is updated atomically — the FPGA sees coherent data
+
+### Enabling ACP Access
+
+The ACP mapper is enabled through the `L2 Cache Controller` registers in the HPS. In Platform Designer, the F2H bridge has a configuration option to mark transactions as ACP (via the `AxCACHE` and `AxUSER` signals). Not all F2H transactions are ACP — only those explicitly configured.
+
+### ACP vs F2S: When to Use What
+
+| Scenario | Use | Why |
+|---|---|---|
+| Small shared data structures (< 1 MB) | F2H → ACP | Hardware coherency, no software flush/inv |
+| Bulk streaming (video, DMA, signal proc) | F2S | Higher bandwidth, cache is irrelevant |
+| FPGA needs CPU memory without coherency | F2S or F2H (non-ACP) | Bypass cache entirely |
+| Linux userspace shared buffers | F2H → ACP | No `dma_sync_*` calls needed |
+
+### Why Stratix 10 / Agilex Lost ACP
+
+ARM replaced the SCU+ACP architecture with **CoreLink CCI** (Cache Coherent Interconnect) starting with Cortex-A53. CCI uses a distributed coherency protocol (ACE/ACE-Lite) rather than a central snoop port. Intel's newer SoCs connect the FPGA fabric to DDR through the F2H bridge and (on Agilex) the NoC — neither exposes an ACP equivalent. For coherency on Stratix 10 / Agilex, you must use software-managed cache operations or non-cacheable buffers.
+
+## Cache Coherency: Mostly Absent
+
+Intel SoC FPGAs offer **hardware cache coherency only on Cyclone V and Arria 10** through the ACP. All newer families (Stratix 10, Agilex 5/7) require explicit software cache management. This is the single biggest architectural difference from Xilinx, where ACP (and HPC on MPSoC) is available across all Zynq families.
 
 ### What This Means
 
