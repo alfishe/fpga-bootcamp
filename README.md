@@ -175,7 +175,10 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [boot_flow_intel_soc.md](10_embedded_linux/boot_flow_intel_soc.md) | Intel/Altera SoC boot: Cyclone V, Arria 10, Agilex. BSEL, preloader, FPP/AVST config, secure boot |
 | [boot_flow_xilinx_zynq.md](10_embedded_linux/boot_flow_xilinx_zynq.md) | Xilinx Zynq boot: Zynq-7000, MPSoC, Versal. CSU/PMC, PCAP, bootgen, ATF/PMUFW, RSA/AES/PUF secure boot |
 | [boot_flow_microchip_soc.md](10_embedded_linux/boot_flow_microchip_soc.md) | Microchip SoC boot: PolarFire (RISC-V), SmartFusion2. System Controller, HSS, OpenSBI, Flash-based config |
-| [hps_fpga_bridges.md](10_embedded_linux/hps_fpga_bridges.md) | **★ HPS↔FPGA interaction** — AXI bridges, ioremap, userspace mmap, interrupt routing (FPGA → GIC), DMA setup, cache coherency patterns |
+| [hps_fpga_bridges.md](10_embedded_linux/hps_fpga_bridges.md) | **★ HPS↔FPGA interaction** — Common overview: AXI bridges, four CPU→FPGA paths (ioremap, mmap, IRQ, DMA), cache coherency fundamentals, kernel code examples |
+| [hps_fpga_bridges_intel_soc.md](10_embedded_linux/hps_fpga_bridges_intel_soc.md) | Intel deep dive: Cyclone V/Arria 10/Stratix 10/Agilex bridge addresses, DT bindings, non-coherent DMA, FPGA IRQ numbers |
+| [hps_fpga_bridges_xilinx_zynq.md](10_embedded_linux/hps_fpga_bridges_xilinx_zynq.md) | Xilinx deep dive: Zynq-7000/MPSoC/Versal AXI port inventory, ACP coherency programming, GP/HP/HPC, worked DMA+ACP example |
+| [hps_fpga_bridges_microchip_soc.md](10_embedded_linux/hps_fpga_bridges_microchip_soc.md) | Microchip deep dive: PolarFire SoC FIC0/FIC1/FIC2, coherent-by-default, RISC-V PLIC interrupts, shared memory patterns |
 | [device_tree_and_overlays.md](10_embedded_linux/device_tree_and_overlays.md) | Device tree for FPGA SoCs, reserved-memory, FPGA Manager configfs, device tree overlay compilation and loading |
 | [kernel_drivers_and_dma.md](10_embedded_linux/kernel_drivers_and_dma.md) | Three driver patterns: UIO, platform driver, VFIO. DMA Engine cyclic DMA, buffer type selection |
 | [build_and_update.md](10_embedded_linux/build_and_update.md) | Buildroot vs Yocto for FPGA SoCs, OTA bitstream updates (A/B scheme, fallback, secure boot) |

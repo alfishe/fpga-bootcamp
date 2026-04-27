@@ -147,7 +147,10 @@
 | 10.3 | Boot flow — Intel SoC deep dive | `10_embedded_linux/boot_flow_intel_soc.md` | ✅ COMPLETE |
 | 10.4 | Boot flow — Xilinx Zynq deep dive | `10_embedded_linux/boot_flow_xilinx_zynq.md` | ✅ COMPLETE |
 | 10.5 | Boot flow — Microchip SoC deep dive | `10_embedded_linux/boot_flow_microchip_soc.md` | ✅ COMPLETE |
-| 10.6 | HPS-FPGA bridges & interaction | `10_embedded_linux/hps_fpga_bridges.md` | ⬜ PENDING |
+| 10.6 | HPS-FPGA bridges — vendor-agnostic common overview | `10_embedded_linux/hps_fpga_bridges.md` | ✅ COMPLETE |
+| 10.6a | HPS-FPGA bridges — Intel SoC deep dive | `10_embedded_linux/hps_fpga_bridges_intel_soc.md` | ✅ COMPLETE |
+| 10.6b | HPS-FPGA bridges — Xilinx Zynq deep dive | `10_embedded_linux/hps_fpga_bridges_xilinx_zynq.md` | ✅ COMPLETE |
+| 10.6c | HPS-FPGA bridges — Microchip SoC deep dive | `10_embedded_linux/hps_fpga_bridges_microchip_soc.md` | ✅ COMPLETE |
 | 10.7 | Device tree & overlays | `10_embedded_linux/device_tree_and_overlays.md` | ⬜ PENDING |
 | 10.8 | Kernel drivers & DMA | `10_embedded_linux/kernel_drivers_and_dma.md` | ⬜ PENDING |
 | 10.9 | Build systems & OTA updates | `10_embedded_linux/build_and_update.md` | ⬜ PENDING |
