@@ -55,6 +55,17 @@ Intel SoC FPGAs use a fixed set of AXI bridges between the HPS and FPGA fabric. 
 
 > **Note:** Stratix 10 and Agilex families do **not** expose dedicated F2S ports. Instead, the FPGA fabric accesses DDR through the HPS SDRAM scheduler via the F2H bridge or through a dedicated FPGA DDR controller (hard memory controller in the fabric). The F2S bridge is unique to Cyclone V and Arria 10 SoC.
 
+### Bridge Bandwidth Summary (Cyclone V SoC @ Typical Clocks)
+
+| Bridge | Width | Clock | Theoretical | Realistic (Linux) | Realistic (Bare-metal) | Bottleneck |
+|---|---|---|---|---|---|---|
+| **H2F** | 64-bit | 400 MHz | 3.2 GB/s | ~45-100 MB/s | ~800 MB/s | Linux memcpy overhead, bridge arbitration |
+| **LWH2F** | 32-bit | 400 MHz | 1.6 GB/s | ~10-20 MB/s | ~200 MB/s | Single-beat only, no burst aggregation |
+| **F2H** | 64-bit | 400 MHz | 3.2 GB/s | ~50-120 MB/s | ~900 MB/s | NIC-301 arbitration, DDR contention |
+| **F2S** | 64-bit | 400 MHz | 3.2 GB/s per port | ~300 MB/s per port | ~2.0 GB/s per port | DDR controller, 6-port arbitration |
+
+> **Why the Linux-to-realistic gap?** The HPS runs Linux with virtual memory, cache coherency management, and generic memcpy. A 65 KB `memcpy` from userspace through `/dev/mem` mmap measures ~45 MB/s (forum-reported). Bare-metal code with custom burst loops achieves 5-10× higher throughput. For production, use `dma_alloc_coherent()` buffers and kernel-space transfer routines.
+
 ### AXI-3 vs AXI-4: The WID Problem
 
 Cyclone V and Arria 10 use AXI-3, which includes the **WID** signal for write interleaving. AXI-4 (Stratix 10, Agilex) removes WID and relies on in-order write data. If you connect third-party AXI-4 IP to a Cyclone V H2F bridge:
@@ -296,6 +307,26 @@ Agilex uses a newer address map with larger windows and NoC integration:
 The shift to 64-bit addressing in Agilex allows the HPS to address much larger FPGA fabric and external PCIe spaces.
 
 ---
+
+## No ACP — Intel's Non-Coherent Model
+
+Intel SoC FPGAs **do not have an Accelerator Coherency Port (ACP)**. There is no hardware mechanism for FPGA logic to participate in the CPU cache coherency protocol. This is the single biggest architectural difference from Xilinx Zynq.
+
+| Coherency Feature | Intel SoC (All Families) | Xilinx Zynq-7000 | Xilinx MPSoC |
+|---|---|---|---|
+| **ACP equivalent** | ❌ None | ✅ S_AXI_ACP (snoops SCU/L2) | ✅ S_AXI_ACP + S_AXI_HPC (CCI-400) |
+| FPGA cache access | Bypasses L2 entirely | ACP snoops L1/L2 | HPC snoops L1/L2 via CCI |
+| Software flush/inv | **Required** for all shared data | Only for HP (non-ACP) traffic | Only for HP (non-HPC) traffic |
+| Shared buffer latency | Higher (software management) | Lower (hardware coherency) | Lower (hardware coherency) |
+| Use case impact | Streaming DMA works fine; fine-grained sharing needs explicit cache ops | Fine-grained CPU-FPGA sharing is seamless | Fine-grained CPU-FPGA sharing is seamless |
+
+### What Intel Recommends Instead of ACP
+
+Without ACP, Intel documents recommend three patterns for CPU-FPGA data sharing:
+
+1. **`dma_alloc_coherent()` — Non-cacheable buffers:** Allocate buffers that bypass the CPU cache entirely. No flush/invalidate needed, but CPU access is slower.
+2. **Explicit cache maintenance:** Use `__cpuc_flush_dcache_area()` + `outer_flush_range()` before FPGA access, and `outer_inv_range()` after.
+3. **FPGA-managed DDR via F2S:** For bulk streaming (video, signal processing), use F2S ports and treat DDR as a shared mailbox — the CPU never caches these regions.
 
 ## Cache Coherency: Explicitly Absent
 
