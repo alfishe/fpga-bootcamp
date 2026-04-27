@@ -11,7 +11,7 @@
 | 0.1 | FPGA market landscape | `00_overview/landscape.md` | ✅ COMPLETE |
 | 0.2 | History of FPGA technology | `00_overview/history.md` | ✅ COMPLETE |
 | 0.3 | Process technology nodes | `00_overview/technology_nodes.md` | ✅ COMPLETE |
-| 0.4 | Vendor comparison matrix | `00_overview/vendor_comparison.md` | ⬜ PENDING |
+| 0.4 | Vendor comparison matrix | `00_overview/vendor_comparison.md` | 🔄 IN PROGRESS |
 
 ## Phase 1: Architecture (`02_architecture/`)
 
@@ -79,14 +79,14 @@
 | 4.3 | VHDL: VHSIC origins, strong typing, IEEE 1076, verification | `04_hdl_and_synthesis/vhdl/vhdl_basics.md` | ✅ COMPLETE |
 | 4.4 | Inference rules (flop vs latch, RAM, ROM, DSP, SRL, MUX) | `04_hdl_and_synthesis/inference_rules.md` | ✅ COMPLETE |
 | 4.5 | Vendor pragmas (Xilinx/Intel/Gowin/Synplify attribute reference) | `04_hdl_and_synthesis/vendor_pragmas.md` | ✅ COMPLETE |
-| 4.6 | CDC patterns (2-FF, Gray code, async FIFO, handshake, MCP) | `04_hdl_and_synthesis/cdc_coding.md` | ✅ COMPLETE |
+| 4.6 | CDC patterns (metastability theory, 2-FF, pulse sync, Gray code, async FIFO, handshake, MCP, correlated signals, verification) | `04_hdl_and_synthesis/cdc_coding.md` | ✅ COMPLETE |
 | 4.7 | FSM design (encoding, Moore/Mealy, reset, safe recovery) | `04_hdl_and_synthesis/state_machines.md` | ✅ COMPLETE |
 
 ## Phase 5: Timing & Constraints (`05_timing_and_constraints/`)
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 5.1 | SDC/XDC/QSF basics | `05_timing_and_constraints/sdc_basics.md` | ⬜ PENDING |
+| 5.1 | SDC/XDC/QSF basics | `05_timing_and_constraints/sdc_basics.md` | 🔄 IN PROGRESS |
 | 5.2 | Clock domain crossing | `05_timing_and_constraints/clock_domain_crossing.md` | ⬜ PENDING |
 | 5.3 | False paths | `05_timing_and_constraints/false_paths.md` | ⬜ PENDING |
 | 5.4 | Multicycle paths | `05_timing_and_constraints/multicycle_paths.md` | ⬜ PENDING |
@@ -142,7 +142,7 @@
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 10.1 | SoC Linux architecture overview | `10_embedded_linux/soc_linux_architecture.md` | ⬜ PENDING |
+| 10.1 | SoC Linux architecture overview | `10_embedded_linux/soc_linux_architecture.md` | 🔄 IN PROGRESS |
 | 10.2 | Boot flow — vendor-agnostic common | `10_embedded_linux/boot_flow.md` | ✅ COMPLETE |
 | 10.3 | Boot flow — Intel SoC deep dive | `10_embedded_linux/boot_flow_intel_soc.md` | ✅ COMPLETE |
 | 10.4 | Boot flow — Xilinx Zynq deep dive | `10_embedded_linux/boot_flow_xilinx_zynq.md` | ✅ COMPLETE |
