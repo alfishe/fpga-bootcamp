@@ -2,19 +2,28 @@
 
 # Intel/Altera FPGA SoC Boot Flow — Deep Dive
 
-This article covers the complete boot flow for Intel/Altera FPGA SoC families: **Cyclone V SoC**, **MAX 10** (CPLD + hard MCU core), **Arria 10 SoC**, **Agilex 5 SoC**, and **Agilex 7 SoC**. It details the Boot ROM behavior, preloader generation, U-Boot integration, FPGA configuration interfaces, secure boot, and per-board specifics for popular development kits.
+This article covers the complete boot flow for Intel/Altera **FPGA SoC** and **FPGA/CPLD** families. SoC families with a hard processor: **Cyclone V SoC**, **Arria 10 SoC**, **Agilex 5 SoC** (Cortex-A76/A55), and **Agilex 7 SoC** (Cortex-A53). Non-SoC FPGA with soft processor support: **MAX 10** (CPLD/FPGA — uses soft Nios II or external MCU, not a hard ARM processor). It details the Boot ROM behavior, preloader generation, U-Boot integration, FPGA configuration interfaces, secure boot, and per-board specifics for popular development kits.
 
 ---
 
 ## Family Overview
 
+### True SoC FPGA Families (Hard Processor System)
+
+These devices contain a **hard processor** (ARM cores in silicon, not FPGA fabric) alongside the FPGA:
+
 | Family | CPU | FPGA Fabric | Boot ROM Size | Key Document |
 |---|---|---|---|---|
 | **Cyclone V SoC** | ARM Cortex-A9 dual-core @ 925 MHz | Cyclone V FPGA (28 nm) | 64 KB | Intel AN-730 |
-| **MAX 10** | Nios II soft core or external MCU | MAX 10 CPLD/FPGA (55 nm) | 8 KB (config only) | MAX 10 Handbook |
 | **Arria 10 SoC** | ARM Cortex-A9 dual-core @ 1.2 GHz | Arria 10 GX/SX FPGA (20 nm) | 128 KB | Intel AN-728 |
-| **Agilex 5 SoC** | ARM Cortex-A76/A55 or RISC-V | Agilex 5 FPGA (Intel 7) | 256 KB | Agilex Boot Guide |
-| **Agilex 7 SoC** | ARM Cortex-A76/A55 | Agilex 7 FPGA (Intel 7) | 256 KB | Agilex Security Guide |
+| **Agilex 5 SoC** | Dual ARM Cortex-A76 + Dual Cortex-A55 @ 1.8 GHz | Agilex 5 FPGA (Intel 7) | 256 KB | Agilex Boot Guide |
+| **Agilex 7 SoC** | Quad-core ARM Cortex-A53 @ 1.5 GHz | Agilex 7 FPGA (Intel 7) | 256 KB | Agilex Security Guide |
+
+### Non-SoC FPGA/CPLD with Soft Processor Support
+
+| Family | Processor | Fabric | Notes |
+|---|---|---|---|
+| **MAX 10** | Nios II **soft core** (implemented in FPGA logic) or external MCU | MAX 10 CPLD/FPGA (55 nm) | Not a true SoC — no hard ARM processor. Uses soft Nios II or external host processor. Boot flow is FPGA-centric, not HPS-centric |
 
 ---
 

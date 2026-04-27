@@ -405,7 +405,8 @@ openocd -f interface/ftdi/flashpro.cfg -f target/polarfire.cfg
 | **Cyclone V SoC** | ARM Cortex-A9 dual-core @ 925 MHz | 64 KB, BSEL pins | FPP x16 (HPS → FPGA) | [boot_flow_intel_soc.md](boot_flow_intel_soc.md) |
 | **MAX 10** | Nios II soft core or external MCU | 8 KB (config only) | Internal flash | [boot_flow_intel_soc.md](boot_flow_intel_soc.md) |
 | **Arria 10 SoC** | ARM Cortex-A9 dual-core @ 1.2 GHz | 128 KB, BSEL pins | HPS-to-FPGA bridge | [boot_flow_intel_soc.md](boot_flow_intel_soc.md) |
-| **Agilex 5/7 SoC** | ARM Cortex-A76/A55 or RISC-V | 256 KB, BSEL + eFuse | AVST + HPS bridge | [boot_flow_intel_soc.md](boot_flow_intel_soc.md) |
+| **Agilex 5 SoC** | Dual Cortex-A76 + Dual Cortex-A55 @ 1.8 GHz | 256 KB, BSEL + eFuse | AVST + HPS bridge | [boot_flow_intel_soc.md](boot_flow_intel_soc.md) |
+| **Agilex 7 SoC** | Quad-core Cortex-A53 @ 1.5 GHz | 256 KB, BSEL + eFuse | AVST + HPS bridge | [boot_flow_intel_soc.md](boot_flow_intel_soc.md) |
 | **Zynq-7000** | ARM Cortex-A9 dual-core @ 1 GHz | 128 KB OCM, mode straps | PCAP | [boot_flow_xilinx_zynq.md](boot_flow_xilinx_zynq.md) |
 | **Zynq UltraScale+ MPSoC** | Cortex-A53 quad + R5F dual | 256 KB CSU ROM, mode straps | PCAP via PMU | [boot_flow_xilinx_zynq.md](boot_flow_xilinx_zynq.md) |
 | **Versal ACAP** | Cortex-A72 dual + R5F dual | 512 KB PMC ROM | PLM + NoC config | [boot_flow_xilinx_zynq.md](boot_flow_xilinx_zynq.md) |
