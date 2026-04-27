@@ -145,6 +145,53 @@ The full H2F bridge has deep FIFOs and wide datapaths optimized for burst DMA. F
 | Address space | 2 MB | 960 MB |
 | Use case | GPIO, simple control regs | DMA, framebuffers, bulk data |
 
+### MiSTer Example: LWH2F for SPI Control Register
+
+MiSTer (DE10-Nano, Cyclone V SoC) uses the LWH2F bridge for all HPS→FPGA control plane traffic, including the SPI interface that loads ROMs and handles SD card I/O:
+
+```verilog
+// MiSTer hps_io module — simplified SPI register interface
+// Connected to LWH2F (32-bit Avalon-MM slave)
+
+module mister_spi_ctrl (
+    input         clk,
+    input         reset,
+    // LWH2F interface (from HPS Linux)
+    input  [7:0]  avs_address,      // 256 x 32-bit registers
+    input         avs_read,
+    output [31:0] avs_readdata,
+    input         avs_write,
+    input  [31:0] avs_writedata,
+    output        avs_waitrequest,
+    // SPI output to FPGA core
+    output [31:0] spi_w,            // 32-bit SPI write data
+    input  [31:0] spi_r,            // 32-bit SPI read data
+    output        spi_stb           // SPI transaction strobe
+);
+    reg [31:0] regs [0:255];
+
+    // Address 0x00: SPI write data register
+    // Address 0x01: SPI read data register
+    // Address 0x02: SPI control/status
+
+    always @(posedge clk) begin
+        if (avs_write) regs[avs_address] <= avs_writedata;
+    end
+
+    assign spi_w       = regs[8'h00];
+    assign spi_stb     = avs_write && (avs_address == 8'h02);
+    assign avs_readdata = (avs_address == 8'h01) ? spi_r : regs[avs_address];
+    assign avs_waitrequest = 1'b0;
+endmodule
+```
+
+The LWH2F bridge is ideal here because:
+- SPI transactions are small (1-4 bytes payload + control)
+- Low latency matters for interactive ROM loading
+- Single-beat-only is fine — SPI is inherently byte-serial
+
+**Physical path:** Linux userspace → `/dev/mem` mmap → H2F/LWH2F bridge → `hps_io` → `spi_w/spi_r` registers → FPGA SPI core → SD card
+
 ### Typical RTL Connection
 
 ```verilog
