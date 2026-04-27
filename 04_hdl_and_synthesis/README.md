@@ -2,15 +2,23 @@
 
 # 04 — HDL & Synthesis
 
-Writing hardware description languages that synthesize correctly and efficiently. Covers the three major HDLs (Verilog, SystemVerilog, VHDL), inference rules that map code to silicon primitives, vendor pragmas, CDC coding patterns, and safe state machine design.
+Writing hardware description languages that synthesize correctly and efficiently. Covers legacy vendor-specific HDLs, VHDL, Verilog/SystemVerilog, high-level synthesis (HLS), and cross-cutting topics: inference rules, vendor pragmas, CDC coding patterns, and safe state machine design.
 
 ## Index
 
+### HDL Families
+
+| Folder | Coverage |
+|---|---|---|
+| [legacy_hdl/](legacy_hdl/README.md) | Ancient/vendor-specific HDLs: AHDL, ABEL, PALASM — languages that predate modern Verilog/VHDL |
+| [vhdl/](vhdl/README.md) | **VHDL-2008** for synthesis: entities, architectures, processes, records, generics |
+| [verilog_sv/](verilog_sv/README.md) | **Verilog-2001** and **SystemVerilog** for synthesis: always blocks, interfaces, structs, packages |
+| [hls/](hls/README.md) | **High-Level Synthesis**: scheduling, pipelining, loop unroll, array partition, interface synthesis |
+
+### Cross-HDL Topics
+
 | File | Topic |
-|---|---|
-| [verilog_basics.md](verilog_basics.md) | Verilog-2001 for synthesis: always blocks, non-blocking vs blocking assignment, inferring structures |
-| [systemverilog_synthesis.md](systemverilog_synthesis.md) | SV constructs safe for synthesis: always_ff/always_comb, enums, structs, interfaces, packages |
-| [vhdl_basics.md](vhdl_basics.md) | VHDL-2008 for synthesis: entities, architectures, processes, records, generics |
+|---|---|---|
 | [inference_rules.md](inference_rules.md) | What HDL pattern infers what hardware: RAM, ROM, multiplier, shift register, latch vs flop |
 | [vendor_pragmas.md](vendor_pragmas.md) | Xilinx attributes, Altera synthesis directives, Gowin pragmas, keep/dont_touch, async_reg |
 | [cdc_coding.md](cdc_coding.md) | HDL patterns for clock domain crossing: 2-FF synchronizer, handshake, async FIFO, MCP |

@@ -1,6 +1,6 @@
-[← 04 Hdl And Synthesis Home](README.md) · [← Project Home](../../README.md)
+[← VHDL Home](README.md) · [← HDL & Synthesis Home](../README.md) · [← Project Home](../../README.md)
 
-# vhdl_basics.md
+# VHDL Basics
 
 > **Stub — planned content. Full article to be written in a future documentation pass.**
 
@@ -13,5 +13,4 @@ VHDL-2008 for synthesis: entities, architectures, processes, records, generics
 
 ## Referenced By
 
-- [README.md](../README.md)
 - [README.md](README.md)

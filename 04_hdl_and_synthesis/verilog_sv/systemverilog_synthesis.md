@@ -1,10 +1,10 @@
-[← 04 Hdl And Synthesis Home](README.md) · [← Project Home](../../README.md)
+[← Verilog & SV Home](README.md) · [← HDL & Synthesis Home](../README.md) · [← Project Home](../../README.md)
 
-# verilog_basics.md
+# SystemVerilog Synthesis
 
 > **Stub — planned content. Full article to be written in a future documentation pass.**
 
-Verilog-2001 for synthesis: always blocks, non-blocking vs blocking assignment, inferring structures
+SV constructs safe for synthesis: always_ff/always_comb, enums, structs, interfaces, packages
 
 ## Planned Content
 
@@ -13,5 +13,4 @@ Verilog-2001 for synthesis: always blocks, non-blocking vs blocking assignment, 
 
 ## Referenced By
 
-- [README.md](../README.md)
 - [README.md](README.md)

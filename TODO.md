@@ -74,9 +74,9 @@
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 4.1 | Verilog basics for synthesis | `04_hdl_and_synthesis/verilog_basics.md` | ⬜ PENDING |
-| 4.2 | SystemVerilog synthesis | `04_hdl_and_synthesis/systemverilog_synthesis.md` | ⬜ PENDING |
-| 4.3 | VHDL basics | `04_hdl_and_synthesis/vhdl_basics.md` | ⬜ PENDING |
+| 4.1 | Verilog basics for synthesis | `04_hdl_and_synthesis/verilog_sv/verilog_basics.md` | ⬜ PENDING |
+| 4.2 | SystemVerilog synthesis | `04_hdl_and_synthesis/verilog_sv/systemverilog_synthesis.md` | ⬜ PENDING |
+| 4.3 | VHDL basics | `04_hdl_and_synthesis/vhdl/vhdl_basics.md` | ⬜ PENDING |
 | 4.4 | Inference rules | `04_hdl_and_synthesis/inference_rules.md` | ⬜ PENDING |
 | 4.5 | Vendor pragmas | `04_hdl_and_synthesis/vendor_pragmas.md` | ⬜ PENDING |
 | 4.6 | CDC coding patterns | `04_hdl_and_synthesis/cdc_coding.md` | ⬜ PENDING |
