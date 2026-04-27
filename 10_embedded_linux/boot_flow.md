@@ -9,14 +9,14 @@ The FPGA SoC boot is fundamentally asymmetric: the hard processor (HPS/PS) boots
 ## The Full Sequence
 
 ```
-    T+0ms     T+50ms          T+500ms       T+2s         T+5s
-    │         │               │             │            │
-    ▼         ▼               ▼             ▼            ▼
-[Boot ROM]→[Preloader]→[U-Boot / SSBL]→[Kernel]→[Userspace]
-    │         │               │             │            │
-    └─ No FPGA └─ Optionally  └─ Can load   └─ Drivers   └─ App opens
-       config    configure     FPGA via      probe        /dev/uioX
-       possible  FPGA here     "fpga load"   devices      or mmaps
+    T+0ms             T+50ms                    T+500ms            T+2s         T+5s
+    │                  │                           │                │            │
+    ▼                  ▼                           ▼                ▼            ▼
+[Boot ROM].   →   [Preloader]        →     [U-Boot / SSBL]   →   [Kernel]  →  [Userspace]
+    │                  │                           │                │            │
+    └─ No FPGA         └─ Optionally               └─ Can load      └─ Drivers   └─ App opens
+       config             configure                   FPGA via         probe        /dev/uioX
+       possible          FPGA here                    "fpga load"      devices      or mmaps
 ```
 
 ---
