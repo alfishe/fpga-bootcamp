@@ -81,6 +81,21 @@ Versal eliminates traditional AXI bridges and replaces them with a **hard Networ
 | QoS | Programmable latency/bandwidth guarantees per NMU |
 | DDR access | NoC routes directly to DDR controllers |
 
+### Interface Bandwidth Summary (All Families)
+
+| Interface | Family | Width | Clock | Theoretical | Realistic (Linux DMA) | Realistic (Bare-metal) | Bottleneck |
+|---|---|---|---|---|---|---|---|
+| **M_AXI_GP0/1** | Zynq-7000 | 32-bit | 150 MHz | 600 MB/s | ~40 MB/s (mmap) | ~300 MB/s | Linux mmap overhead, narrow bus |
+| **M_AXI_HPM0/1** | MPSoC | 128-bit | 333 MHz | 5.3 GB/s | ~500 MB/s (mmap) | ~2.5 GB/s | PS interconnect arbitration |
+| **S_AXI_HP0-3** | Zynq-7000 | 64-bit | 150 MHz | 1.2 GB/s per port | ~600 MB/s per port | ~900 MB/s | AXI-DMA SG overhead, FIFO depth |
+| **S_AXI_HP0-3** | MPSoC | 128-bit | 333 MHz | 5.3 GB/s per port | ~4.0 GB/s per port | ~5.0 GB/s | DDR controller, PS NIC-400 limit |
+| **S_AXI_HPC0/1** | MPSoC | 128-bit | 333 MHz | 5.3 GB/s per port | ~3.5 GB/s per port | ~4.5 GB/s | CCI-400 snoop filter, coherency traffic |
+| **S_AXI_ACP** | Zynq-7000 | 64-bit | 150 MHz | 1.2 GB/s | ~400 MB/s | ~700 MB/s | SCU snoop latency, cache line fill |
+| **S_AXI_ACP** | MPSoC | 128-bit | 333 MHz | 5.3 GB/s | ~1.5 GB/s | ~3.0 GB/s | CCI-400 coherency overhead |
+| **NoC NMU** | Versal | 256-bit packet | 1 GHz | ~25 GB/s per NMU | ~20 GB/s per NMU | ~23 GB/s | NoC mesh congestion, DDR scheduler |
+
+**Key insight:** The Zynq-7000 ACP is slower than HP for bulk transfers because SCU snooping adds latency. On MPSoC, HPC ports achieve ~90% of HP bandwidth while providing full coherency — a much better tradeoff than Zynq-7000's ACP. Versal's NoC sustains the highest per-port bandwidth but requires careful NMU QoS configuration to avoid mesh hot spots.
+
 ---
 
 ## M_AXI_GP — PS Master, PL Slave
