@@ -88,10 +88,10 @@
 |---|---|---|---|
 | 5.1 | SDC/XDC/QSF basics | `05_timing_and_constraints/sdc_basics.md` | ✅ COMPLETE |
 | 5.2 | Clock domain crossing | `05_timing_and_constraints/clock_domain_crossing.md` | ✅ COMPLETE |
-| 5.3 | False paths | `05_timing_and_constraints/false_paths.md` | ⬜ PENDING |
-| 5.4 | Multicycle paths | `05_timing_and_constraints/multicycle_paths.md` | ⬜ PENDING |
+| 5.3 | False paths | `05_timing_and_constraints/false_paths.md` | ✅ COMPLETE |
+| 5.4 | Multicycle paths | `05_timing_and_constraints/multicycle_paths.md` | ✅ COMPLETE |
 | 5.5 | Timing closure methodology | `05_timing_and_constraints/timing_closure.md` | ✅ COMPLETE |
-| 5.6 | IO timing | `05_timing_and_constraints/io_timing.md` | ⬜ PENDING |
+| 5.6 | IO timing | `05_timing_and_constraints/io_timing.md` | ✅ COMPLETE |
 
 ## Phase 6: IP & Cores (`06_ip_and_cores/`)
 
@@ -152,8 +152,8 @@
 | 10.6b | HPS-FPGA bridges — Xilinx Zynq deep dive | `10_embedded_linux/hps_fpga_bridges_xilinx_zynq.md` | ✅ COMPLETE |
 | 10.6c | HPS-FPGA bridges — Microchip SoC deep dive | `10_embedded_linux/hps_fpga_bridges_microchip_soc.md` | ✅ COMPLETE |
 | 10.7 | Device tree & overlays | `10_embedded_linux/device_tree_and_overlays.md` | ✅ COMPLETE |
-| 10.8 | Kernel drivers & DMA | `10_embedded_linux/kernel_drivers_and_dma.md` | ⬜ PENDING |
-| 10.9 | Build systems & OTA updates | `10_embedded_linux/build_and_update.md` | ⬜ PENDING |
+| 10.8 | Kernel drivers & DMA | `10_embedded_linux/kernel_drivers_and_dma.md` | ✅ COMPLETE |
+| 10.9 | Build systems & OTA updates | `10_embedded_linux/build_and_update.md` | ✅ COMPLETE |
 
 ## Phase 11: Soft Cores & SoC Design (`11_soft_cores_and_soc_design/`)
 
