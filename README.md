@@ -20,7 +20,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | **Vendors & Families** | Intel/Altera (Cyclone V anchor), Xilinx (7-series, UltraScale+, Versal, Zynq), Lattice (ECP5, MachXO, CrossLink-NX), Gowin (LittleBee, Arora), Microchip (PolarFire, SmartFusion), others |
 | **Architecture** | LUTs/CLBs, BRAM/URAM, DSP slices, clocking (PLL/MMCM/DCM), IO standards, SERDES, routing, configuration, **CPLD & non-volatile logic** |
 | **Design Flow** | Synthesis, placement, routing, bitstream generation, floorplanning, partial reconfiguration |
-| **HDL & Synthesis** | Verilog-2001/SystemVerilog/VHDL, inference rules, vendor pragmas, CDC coding patterns, state machines |
+| **HDL & Synthesis** | Verilog (Gateway 1983 → IEEE 1364), SystemVerilog (Superlog+Vera → IEEE 1800), VHDL (VHSIC program → IEEE 1076), legacy HDLs (AHDL/ABEL/PALASM), inference rules, vendor pragmas, CDC coding, state machines |
 | **Timing & Constraints** | SDC/XDC/QSF syntax, clock domain crossing (CDC), false paths, multicycle paths, timing closure methodology, IO timing |
 | **IP & Cores** | Bus protocols (AXI4/Wishbone/Avalon/APB), DDR controllers (MIG/UniPHY), PCIe blocks, transceivers, vendor IP ecosystems, IP packaging & reuse (FuseSoC, IP-XACT), licensing |
 | **Verification** | Simulation (ModelSim, XSim, Verilator), formal verification (SymbiYosys), UVM, cocotb, testbench patterns |
@@ -39,7 +39,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 |---|---|
 | **New to FPGAs (MiSTer path)** | [Cyclone V & MiSTer](01_vendors_and_families/README.md) → [Architecture basics](02_architecture/README.md) → [Design flow overview](03_design_flow/overview.md) |
 | **Choosing a vendor** | [Vendor comparison matrix](00_overview/vendor_comparison.md) → [Vendor family guides](01_vendors_and_families/README.md) |
-| **Writing HDL** | [HDL basics](04_hdl_and_synthesis/verilog_sv/verilog.md) → [Synthesis inference rules](04_hdl_and_synthesis/inference_rules.md) → [Timing constraints](05_timing_and_constraints/sdc_basics.md) |
+| **Writing HDL** | [Verilog & SV](04_hdl_and_synthesis/verilog_sv/verilog.md) → [VHDL](04_hdl_and_synthesis/vhdl/vhdl_basics.md) → [Synthesis inference rules](04_hdl_and_synthesis/inference_rules.md) → [Timing constraints](05_timing_and_constraints/sdc_basics.md) |
 | **Power-On to Linux userland** | [Configuration modes](02_architecture/infrastructure/configuration.md) → [Bitstream generation](03_design_flow/bitstream.md) → [Embedded Linux overview](10_embedded_linux/overview.md) → [U-Boot](10_embedded_linux/uboot.md) |
 | **Building an SoC** | [Soft cores overview](11_soft_cores_and_soc_design/README.md) → [Bus matrix design](11_soft_cores_and_soc_design/soc_design/bus_matrix_design.md) → [Memory map planning](11_soft_cores_and_soc_design/soc_design/memory_map_design.md) |
 | **Exploring open projects** | [Open source & HW overview](12_open_source_open_hardware/README.md) → [MiSTer deep dive](12_open_source_open_hardware/retro_computing/mister.md) → [OSSC](12_open_source_open_hardware/video_display/ossc.md) |
@@ -107,8 +107,8 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 ### 04 — HDL & Synthesis
 | File | Topic |
 |---|---|
-| [verilog_sv/](04_hdl_and_synthesis/verilog_sv/README.md) | **Verilog-2001** and **SystemVerilog** for synthesis: always blocks, interfaces, structs, packages |
-| [vhdl/](04_hdl_and_synthesis/vhdl/README.md) | **VHDL-2008** for synthesis: entities, architectures, processes, records, generics |
+| [verilog_sv/](04_hdl_and_synthesis/verilog_sv/README.md) | **Verilog** (IEEE 1364) and **SystemVerilog** (IEEE 1800): origins at Gateway (1983), C-like philosophy, multi-parent lineage, dual design/verification roles, UVM ecosystem |
+| [vhdl/](04_hdl_and_synthesis/vhdl/README.md) | **VHDL** (IEEE 1076): DoD VHSIC origins (1981), Ada heritage, strong typing, IEEE 1076-1987 through 2019, PSL verification, OSVVM/UVVM |
 | [legacy_hdl/](04_hdl_and_synthesis/legacy_hdl/README.md) | Ancient/vendor-specific HDLs: AHDL, ABEL, PALASM — languages that predate modern Verilog/VHDL |
 | [hls/](04_hdl_and_synthesis/hls/README.md) | **High-Level Synthesis**: scheduling, pipelining, loop unroll, array partition, interface synthesis |
 | [inference_rules.md](04_hdl_and_synthesis/inference_rules.md) | What HDL pattern infers what hardware: RAM, ROM, multiplier, shift register, latch vs flop |
