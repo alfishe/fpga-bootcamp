@@ -11,8 +11,8 @@ Writing hardware description languages that synthesize correctly and efficiently
 | Folder | Coverage |
 |---|---|
 | [legacy_hdl/](legacy_hdl/README.md) | Ancient/vendor-specific HDLs: AHDL, ABEL, PALASM — languages that predate modern Verilog/VHDL |
-| [vhdl/](vhdl/README.md) | **VHDL-2008** for synthesis: entities, architectures, processes, records, generics |
-| [verilog_sv/](verilog_sv/README.md) | **Verilog-2001** and **SystemVerilog** for synthesis: always blocks, interfaces, structs, packages |
+| [vhdl/](vhdl/README.md) | **VHDL** (IEEE 1076): origins in the DoD VHSIC program (1981), Ada heritage, strong typing, standards evolution from 1987 through 2019, PSL verification, OSVVM/UVVM, synthesis subset |
+| [verilog_sv/](verilog_sv/README.md) | **Verilog** (IEEE 1364) and **SystemVerilog** (IEEE 1800): origins at Gateway (1983), C-like philosophy, multi-parent lineage (Superlog + Vera + Verilog), dual design/verification roles, UVM ecosystem, synthesis subset |
 | [hls/](hls/README.md) | **High-Level Synthesis**: scheduling, pipelining, loop unroll, array partition, interface synthesis |
 
 ### Cross-HDL Topics
