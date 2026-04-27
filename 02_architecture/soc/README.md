@@ -13,7 +13,8 @@ When a hardened CPU complex shares a die with FPGA fabric, the architecture shif
 | **Intel** | [Cyclone V SoC](../../01_vendors_and_families/altera_intel/cyclone_v/soc/README.md) | Dual Cortex-A9 (32-bit ARMv7) | 28nm | 301K | MiSTer ecosystem, cheapest HPS entry |
 | Intel | [Arria 10 SoC](../../01_vendors_and_families/altera_intel/arria_10/README.md) | Dual Cortex-A9 @ 1.2 GHz | 20nm | 660K | Same HPS as Cyclone V, faster fabric + 28G XCVR |
 | Intel | [Stratix 10 SoC](../../01_vendors_and_families/altera_intel/stratix_10/README.md) | Quad Cortex-A53 (64-bit ARMv8) | 14nm | 5,510K | HyperFlex routing, HBM2 option |
-| Intel | [Agilex 7 SoC](../../01_vendors_and_families/altera_intel/agilex/README.md) | Quad Cortex-A55 or A76 | Intel 7 | 4,500K+ | Chiplet (EMIB), AI tensor DSP, HBM2e |
+| Intel | [Agilex 7 SoC](../../01_vendors_and_families/altera_intel/agilex/README.md) | Quad Cortex-A53 (ARMv8) | Intel 7 | up to ~4M | Chiplet (EMIB), PCIe 5.0, HBM2e option |
+| Intel | [Agilex 5 SoC](../../01_vendors_and_families/altera_intel/agilex/README.md) | Dual A76 + Dual A55 | Intel 7 | up to ~1.7M | Lowest power Agilex, MIPI D-PHY, cost-optimized |
 | **Xilinx** | [Zynq-7000](../../01_vendors_and_families/xilinx/7series/README.md) | Dual Cortex-A9 (32-bit ARMv7) | 28nm | 444K | **ACP** — FPGA cache-coherent access |
 | Xilinx | [Zynq MPSoC](../../01_vendors_and_families/xilinx/ultrascale_plus/README.md) | Quad A53 + Dual R5F | 16nm | 1,143K | GPU (Mali-400), video codec (VCU) |
 | Xilinx | [Zynq RFSoC](../../01_vendors_and_families/xilinx/ultrascale_plus/README.md) | Quad A53 + Dual R5F | 16nm | 930K | Direct RF ADCs/DACs on-die (→ [hybrid/](../hybrid/README.md)) |
@@ -93,7 +94,7 @@ This is why an FPGA SoC demands a different design mindset: you're not writing s
 Both use dual Cortex-A9 at the same 28nm node, running at similar frequencies (~800 MHz). From a benchmark perspective they are nearly identical. But the way the CPU connects to the FPGA fabric makes them architecturally divergent:
 
 - **Cyclone V SoC HPS** has three AXI-3 bridge pairs (H2F 64-bit, LWH2F 32-bit, F2H 64-bit) plus six FPGA-to-SDRAM ports. FPGA access to DDR **bypasses the L2 cache**. Consistently non-coherent.
-- **Zynq-7000** has 9 AXI ports: four GP (general-purpose, 32-bit), four HP (high-performance, 64-bit, direct DDR access), and one **ACP** (Accelerator Coherency Port, 64-bit). The ACP connects FPGA logic directly to the Cortex-A9 Snoop Control Unit (SCU), giving the FPGA **cache-coherent access** to the CPU's L2 cache. This means an FPGA accelerator can read/write CPU memory without explicit cache flush/invalidate operations — the hardware maintains coherency automatically.
+- **Zynq-7000** has 2 M_AXI_GP (32-bit PS→PL control), 4 S_AXI_HP (64-bit PL→DDR high-performance), 2 S_AXI_GP (32-bit PL→PS slave), and one **ACP** (64-bit cache-coherent). The ACP connects FPGA logic directly to the Cortex-A9 Snoop Control Unit (SCU), giving the FPGA **cache-coherent access** to the CPU's L2 cache. This means an FPGA accelerator can read/write CPU memory without explicit cache flush/invalidate operations — the hardware maintains coherency automatically.
 
 | Property | Cyclone V SoC HPS | Zynq-7000 PS |
 |---|---|---|
@@ -209,6 +210,9 @@ Microchip SmartFusion2 combines a hard Cortex-M3 (166 MHz), 12-bit ADC, and FIPS
 |---|---|
 | [hard_processor_integration.md](hard_processor_integration.md) | CPU-FPGA coupling models: ARM Cortex-A9/A53, RISC-V U54, soft vs hard CPU tradeoffs |
 | [axi_bridges_and_interconnect.md](axi_bridges_and_interconnect.md) | AXI-3/4 bridge architecture: HPS-to-FPGA, FPGA-to-HPS, FPGA-to-SDRAM, lightweight bridges, bandwidth budgets |
+| [hps_fpga_intel_soc.md](hps_fpga_intel_soc.md) | **Intel deep dive:** H2F/F2H/LWH2F/F2S bridges, NIC-301, non-coherent model, Platform Designer integration |
+| [hps_fpga_xilinx_zynq.md](hps_fpga_xilinx_zynq.md) | **Xilinx deep dive:** M_AXI_GP/S_AXI_HP/S_AXI_HPC/ACP ports, CCI-400 coherency, QoS, Vivado integration, Versal NoC |
+| [hps_fpga_microchip_soc.md](hps_fpga_microchip_soc.md) | **Microchip deep dive:** FIC0/1/2 coherent interfaces, AXI4 bus matrix, PLIC interrupts, Libero SmartDesign, security |
 | [memory_hierarchy.md](memory_hierarchy.md) | On-die memory topology: hard DDR controllers, L1/L2 caches, on-chip RAM, cache coherency (ACP vs non-coherent), DMA engines |
 | [boot_architecture.md](boot_architecture.md) | SoC boot sequencing: Boot ROM → preloader → U-Boot → Linux, FPGA configuration via HPS, multi-stage bitstream loading |
 

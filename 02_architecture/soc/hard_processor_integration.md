@@ -26,8 +26,9 @@ How hardened CPU cores are physically integrated with FPGA fabric on the same di
 |---|---|---|---|---|
 | Intel Cyclone V / Arria 10 | Cortex-A9 (ARMv7-A) | 2 | 800–925 MHz / 1.2 GHz | 3× AXI-3 bridges (H2F, F2H, LWH2F) + 6× F2S |
 | Intel Stratix 10 | Cortex-A53 (ARMv8-A) | 4 | 1.2 GHz | AXI-4 bridges + SDRAM interconnect |
-| Intel Agilex 7 | Cortex-A55 or A76 | 4 | TBD | NoC-based (chiplet EMIB interconnect) |
-| Xilinx Zynq-7000 | Cortex-A9 (ARMv7-A) | 2 | 667–866 MHz | 9× AXI3: 4 GP + 4 HP + 1 ACP |
+| Intel Agilex 7 | Cortex-A53 (ARMv8-A) | 4 | ~1.5 GHz | AXI-4 + NoC (chiplet EMIB interconnect) |
+| Intel Agilex 5 | Cortex-A76 + Cortex-A55 | 2+2 | 1.8 / 1.5 GHz | AXI-4 bridges + DDR4/5/LPDDR4/5 |
+| Xilinx Zynq-7000 | Cortex-A9 (ARMv7-A) | 2 | 667–866 MHz | 2× M_AXI_GP + 2× S_AXI_GP + 4× S_AXI_HP + 1× ACP |
 | Xilinx MPSoC | Cortex-A53 + Cortex-R5F | 4 + 2 | 1.3 GHz / 600 MHz | AXI + ACP + CCI (Cache Coherent Interconnect) |
 | Xilinx Versal | Cortex-A72 + Cortex-R5F | 2 + 2 | TBD | Hard NoC (2D-mesh AXI4-Stream) |
 | Microchip SmartFusion2 | Cortex-M3 (ARMv7-M) | 1 | 166 MHz | AHB bus matrix + FPGA fabric |

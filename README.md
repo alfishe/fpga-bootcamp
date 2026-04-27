@@ -90,6 +90,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 |---|---|
 | [fabric/](02_architecture/fabric/) | **LUTs & CLBs** (4-input, 6-input, fracturable, ALM/Slice), **BRAM & URAM** (18Kb/36Kb/20Kb, dual-port, ECC), **DSP slices** (DSP48/DSP58, cascading, pipelining), **routing** (interconnect, switch matrices, congestion) |
 | [infrastructure/](02_architecture/infrastructure/) | **Clocking** (PLL/MMCM/DCM, global/regional networks), **IO standards** (LVDS, SSTL, HSTL, LVCMOS, SERDES, bank constraints), **configuration** (bitstream format, SPI/BPI/JTAG/SelectMAP, encryption, authentication) |
+| [soc/](02_architecture/soc/) | **Hard CPU + FPGA integration**: HPS/PS bridge architectures, AXI-3/4/NoC interconnect, cache coherency models (ACP/CCI-400/CHI), memory hierarchy, boot architecture. Vendor deep dives: [Intel HPS-FPGA](02_architecture/soc/hps_fpga_intel_soc.md), [Xilinx PS-PL](02_architecture/soc/hps_fpga_xilinx_zynq.md), [Microchip MSS-Fabric](02_architecture/soc/hps_fpga_microchip_soc.md) |
 
 ### 03 — Design Flow
 | File | Topic |
