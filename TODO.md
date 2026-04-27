@@ -97,10 +97,10 @@
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 6.1 | Bus protocols (AXI4/Wishbone/Avalon) | `06_ip_and_cores/bus_protocols/` | 🔄 IN PROGRESS |
+| 6.1 | Bus protocols (AXI4/Wishbone/Avalon) | `06_ip_and_cores/bus_protocols/` | ✅ COMPLETE |
 | 6.2 | Vendor IP ecosystems | `06_ip_and_cores/vendor_ip/` | ⬜ PENDING |
 | 6.3 | Interconnect deep dive | `06_ip_and_cores/interconnect/` | ⬜ PENDING |
-| 6.4 | DDR controllers | `06_ip_and_cores/ddr/` | 🔄 IN PROGRESS |
+| 6.4 | DDR controllers | `06_ip_and_cores/ddr/` | ✅ COMPLETE |
 | 6.5 | PCIe hard blocks | `06_ip_and_cores/pcie/` | ⬜ PENDING |
 | 6.6 | Transceivers | `06_ip_and_cores/transceivers/` | ⬜ PENDING |
 | 6.7 | Other hard IP | `06_ip_and_cores/other_hard_ip/` | ⬜ PENDING |
@@ -110,7 +110,7 @@
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 7.1 | Simulation overview | `07_verification/simulation_overview.md` | 🔄 IN PROGRESS |
+| 7.1 | Simulation overview | `07_verification/simulation_overview.md` | ✅ COMPLETE |
 | 7.2 | Testbench patterns | `07_verification/testbench_patterns.md` | ⬜ PENDING |
 | 7.3 | Formal verification (SymbiYosys) | `07_verification/formal_verification.md` | ⬜ PENDING |
 | 7.4 | cocotb Python testbenches | `07_verification/cocotb.md` | ⬜ PENDING |
