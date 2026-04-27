@@ -11,7 +11,7 @@
 | 0.1 | FPGA market landscape | `00_overview/landscape.md` | ✅ COMPLETE |
 | 0.2 | History of FPGA technology | `00_overview/history.md` | ✅ COMPLETE |
 | 0.3 | Process technology nodes | `00_overview/technology_nodes.md` | ✅ COMPLETE |
-| 0.4 | Vendor comparison matrix | `00_overview/vendor_comparison.md` | 🔄 IN PROGRESS |
+| 0.4 | Vendor comparison matrix | `00_overview/vendor_comparison.md` | ✅ COMPLETE |
 
 ## Phase 1: Architecture (`02_architecture/`)
 
@@ -86,7 +86,7 @@
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 5.1 | SDC/XDC/QSF basics | `05_timing_and_constraints/sdc_basics.md` | 🔄 IN PROGRESS |
+| 5.1 | SDC/XDC/QSF basics | `05_timing_and_constraints/sdc_basics.md` | ✅ COMPLETE |
 | 5.2 | Clock domain crossing | `05_timing_and_constraints/clock_domain_crossing.md` | ⬜ PENDING |
 | 5.3 | False paths | `05_timing_and_constraints/false_paths.md` | ⬜ PENDING |
 | 5.4 | Multicycle paths | `05_timing_and_constraints/multicycle_paths.md` | ⬜ PENDING |
@@ -142,7 +142,7 @@
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 10.1 | SoC Linux architecture overview | `10_embedded_linux/soc_linux_architecture.md` | 🔄 IN PROGRESS |
+| 10.1 | SoC Linux architecture overview | `10_embedded_linux/soc_linux_architecture.md` | ✅ COMPLETE |
 | 10.2 | Boot flow — vendor-agnostic common | `10_embedded_linux/boot_flow.md` | ✅ COMPLETE |
 | 10.3 | Boot flow — Intel SoC deep dive | `10_embedded_linux/boot_flow_intel_soc.md` | ✅ COMPLETE |
 | 10.4 | Boot flow — Xilinx Zynq deep dive | `10_embedded_linux/boot_flow_xilinx_zynq.md` | ✅ COMPLETE |
