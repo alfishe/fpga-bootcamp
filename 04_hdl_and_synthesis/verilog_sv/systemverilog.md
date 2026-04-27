@@ -177,5 +177,5 @@ SystemVerilog picks up where Verilog left off with respect to VHDL:
 | [Chris Spear: SystemVerilog for Verification, 3rd Ed.](https://www.amazon.com/SystemVerilog-Verification-Learning-Testbench-Language/dp/1461407141) | Standard verification textbook |
 | [Doulos: SystemVerilog KnowHow](https://www.doulos.com/knowhow/systemverilog/) | Free articles, webinars, reference guides |
 | [Accellera](https://www.accellera.org/) | Standards development organization (IEEE Get Program for free LRM) |
-| [Verilog article](verilog_basics.md) | The parent language — what SystemVerilog builds upon |
+| [Verilog article](verilog.md) | The parent language — what SystemVerilog builds upon |
 | [HDL & Synthesis Home](../README.md) | Cross-HDL topics: inference rules, CDC, pragmas |

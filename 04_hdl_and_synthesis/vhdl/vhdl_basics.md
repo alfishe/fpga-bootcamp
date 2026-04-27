@@ -206,8 +206,8 @@ Neither language is "better" in absolute terms. The choice is path-dependent: wh
 | [OSVVM](https://osvvm.org/) | Open Source VHDL Verification Methodology |
 | [UVVM](https://uvvm.org/) | Universal VHDL Verification Methodology |
 | [GHDL](https://github.com/ghdl/ghdl) | Open-source VHDL simulator with synthesis plugin for Yosys |
-| [Verilog article](../verilog_sv/verilog_basics.md) | Compare: the language war, from the other side |
-| [SystemVerilog article](../verilog_sv/systemverilog_synthesis.md) | Compare what the verification-unified language does |
+| [Verilog article](../verilog_sv/verilog.md) | Compare: the language war, from the other side |
+| [SystemVerilog article](../verilog_sv/systemverilog.md) | Compare what the verification-unified language does |
 
 ---
 

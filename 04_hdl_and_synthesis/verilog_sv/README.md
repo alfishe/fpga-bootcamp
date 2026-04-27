@@ -8,8 +8,8 @@ Verilog (IEEE 1364) and its superset SystemVerilog (IEEE 1800) are the most wide
 
 | File | Topic |
 |---|---|
-| [verilog_basics.md](verilog_basics.md) | Origins (Gateway, 1983), IEEE standards (1364-1995/2001/2005), language philosophy, synthesis baseline, regional adoption, and historical context |
-| [systemverilog_synthesis.md](systemverilog_synthesis.md) | Multi-parent lineage (Superlog + Vera + Verilog), IEEE 1800 timeline (2005–2023), design and verification sides, UVM ecosystem, synthesis subset |
+| [verilog.md](verilog.md) | Origins (Gateway, 1983), IEEE standards (1364-1995/2001/2005), language philosophy, synthesis baseline, regional adoption, and historical context |
+| [systemverilog.md](systemverilog.md) | Multi-parent lineage (Superlog + Vera + Verilog), IEEE 1800 timeline (2005–2023), design and verification sides, UVM ecosystem, synthesis subset |
 
 ## See Also
 

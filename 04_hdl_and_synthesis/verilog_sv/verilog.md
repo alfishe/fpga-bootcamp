@@ -154,5 +154,5 @@ Verilog was not the first HDL. It coexists with a long lineage:
 | [Stuart Sutherland: Verilog HDL Quick Reference Guide](https://sutherland-hdl.com/) | Compact guide to synthesizable Verilog |
 | [Samir Palnitkar: Verilog HDL, 2nd Ed.](https://www.amazon.com/Verilog-HDL-Samir-Palnitkar/dp/0130449113) | Standard textbook, covers 1995/2001 |
 | [Doulos: Verilog KnowHow](https://www.doulos.com/knowhow/verilog/) | Free technical articles |
-| [SystemVerilog article](../verilog_sv/systemverilog_synthesis.md) | Verilog's successor — what carries forward and what is new |
+| [SystemVerilog article](../verilog_sv/systemverilog.md) | Verilog's successor — what carries forward and what is new |
 | [VHDL article](../../vhdl/vhdl_basics.md) | Comparison: turn the telescope around |

@@ -39,7 +39,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 |---|---|
 | **New to FPGAs (MiSTer path)** | [Cyclone V & MiSTer](01_vendors_and_families/README.md) → [Architecture basics](02_architecture/README.md) → [Design flow overview](03_design_flow/overview.md) |
 | **Choosing a vendor** | [Vendor comparison matrix](00_overview/vendor_comparison.md) → [Vendor family guides](01_vendors_and_families/README.md) |
-| **Writing HDL** | [HDL basics](04_hdl_and_synthesis/verilog_sv/verilog_basics.md) → [Synthesis inference rules](04_hdl_and_synthesis/inference_rules.md) → [Timing constraints](05_timing_and_constraints/sdc_basics.md) |
+| **Writing HDL** | [HDL basics](04_hdl_and_synthesis/verilog_sv/verilog.md) → [Synthesis inference rules](04_hdl_and_synthesis/inference_rules.md) → [Timing constraints](05_timing_and_constraints/sdc_basics.md) |
 | **Power-On to Linux userland** | [Configuration modes](02_architecture/infrastructure/configuration.md) → [Bitstream generation](03_design_flow/bitstream.md) → [Embedded Linux overview](10_embedded_linux/overview.md) → [U-Boot](10_embedded_linux/uboot.md) |
 | **Building an SoC** | [Soft cores overview](11_soft_cores_and_soc_design/README.md) → [Bus matrix design](11_soft_cores_and_soc_design/soc_design/bus_matrix_design.md) → [Memory map planning](11_soft_cores_and_soc_design/soc_design/memory_map_design.md) |
 | **Exploring open projects** | [Open source & HW overview](12_open_source_open_hardware/README.md) → [MiSTer deep dive](12_open_source_open_hardware/retro_computing/mister.md) → [OSSC](12_open_source_open_hardware/video_display/ossc.md) |
