@@ -168,7 +168,10 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | Article | Topic |
 |---|---|
 | [soc_linux_architecture.md](10_embedded_linux/soc_linux_architecture.md) | SoC from Linux kernel's perspective — HPS/PS vs PL domains, bridge topology, cache coherency (ACP vs non-coherent) |
-| [boot_flow.md](10_embedded_linux/boot_flow.md) | Complete boot sequence: Boot ROM → SPL → U-Boot → Kernel → Userspace. When FPGA gets configured at each stage |
+| [boot_flow.md](10_embedded_linux/boot_flow.md) | Common boot flow: universal sequence, boot media, SD formatting, FPGA config timing, secure boot, failure diagnostics |
+| [boot_flow_intel_soc.md](10_embedded_linux/boot_flow_intel_soc.md) | Intel/Altera SoC boot: Cyclone V, Arria 10, Agilex. BSEL, preloader, FPP/AVST config, secure boot |
+| [boot_flow_xilinx_zynq.md](10_embedded_linux/boot_flow_xilinx_zynq.md) | Xilinx Zynq boot: Zynq-7000, MPSoC, Versal. CSU/PMC, PCAP, bootgen, ATF/PMUFW, RSA/AES/PUF secure boot |
+| [boot_flow_microchip_soc.md](10_embedded_linux/boot_flow_microchip_soc.md) | Microchip SoC boot: PolarFire (RISC-V), SmartFusion2. System Controller, HSS, OpenSBI, Flash-based config |
 | [hps_fpga_bridges.md](10_embedded_linux/hps_fpga_bridges.md) | **★ HPS↔FPGA interaction** — AXI bridges, ioremap, userspace mmap, interrupt routing (FPGA → GIC), DMA setup, cache coherency patterns |
 | [device_tree_and_overlays.md](10_embedded_linux/device_tree_and_overlays.md) | Device tree for FPGA SoCs, reserved-memory, FPGA Manager configfs, device tree overlay compilation and loading |
 | [kernel_drivers_and_dma.md](10_embedded_linux/kernel_drivers_and_dma.md) | Three driver patterns: UIO, platform driver, VFIO. DMA Engine cyclic DMA, buffer type selection |

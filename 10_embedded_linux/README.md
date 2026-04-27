@@ -11,7 +11,10 @@ Running Linux on FPGA SoCs — Cyclone V SoC, Zynq, PolarFire SoC, Agilex SoC. C
 | Article | Topic |
 |---|---|
 | [soc_linux_architecture.md](soc_linux_architecture.md) | SoC FPGA architecture from Linux's view: HPS/PS vs PL domains, bridge topology, memory maps, cache coherency (ACP vs non-coherent), cross-cutting power/reset/clock concerns |
-| [boot_flow.md](boot_flow.md) | Full boot sequence: Boot ROM → Preloader/SPL → U-Boot → Kernel → Userspace. When to configure FPGA at each stage. U-Boot FPGA commands, distro boot, MiSTer convention |
+| [boot_flow.md](boot_flow.md) | **Common overview**: Universal boot sequence, boot media matrix, SD card formatting, FPGA config decision framework, secure boot fundamentals, common failures |
+| [boot_flow_intel_soc.md](boot_flow_intel_soc.md) | Intel/Altera deep dive: Cyclone V, Arria 10, Agilex, MAX 10. BSEL pins, preloader/mkpimage, FPP config, per-board specifics (DE10-Nano, MiSTer) |
+| [boot_flow_xilinx_zynq.md](boot_flow_xilinx_zynq.md) | Xilinx deep dive: Zynq-7000, Zynq MPSoC, Versal. CSU/PMC boot, PCAP config, bootgen/BOOT.BIN, ATF/PMUFW, per-board specifics (ZedBoard, ZCU102) |
+| [boot_flow_microchip_soc.md](boot_flow_microchip_soc.md) | Microchip deep dive: PolarFire SoC (RISC-V), SmartFusion2/IGLOO2. System Controller, HSS, OpenSBI, Flash-based FPGA config, Icicle Kit specifics |
 | [hps_fpga_bridges.md](hps_fpga_bridges.md) | **★ The core of HPS↔FPGA interaction**: Four paths from CPU to FPGA (MMIO/ioremap, userspace mmap, IRQ, DMA). Complete kernel code examples for register access, interrupt handling, DMA setup. Cache coherency in practice, shared ring buffer patterns |
 | [device_tree_and_overlays.md](device_tree_and_overlays.md) | Device tree for FPGA SoCs: static vs dynamic DT, reserved-memory carveouts, FPGA Manager configfs loading, device tree overlay compilation and application |
 | [kernel_drivers_and_dma.md](kernel_drivers_and_dma.md) | Three driver patterns: UIO (30-line shim), platform driver (production), VFIO (userspace DMA via IOMMU). DMA Engine cyclic DMA, buffer type selection |

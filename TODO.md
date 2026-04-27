@@ -36,6 +36,7 @@
 | 3.6 | Floorplanning | `03_design_flow/floorplanning.md` | ✅ COMPLETE |
 | 3.7 | Netlist formats & fundamentals | `03_design_flow/netlist.md` | ✅ COMPLETE |
 
+| 4.0 | Boot flow common overview + vendor deep dives | `10_embedded_linux/boot_flow.md`, `boot_flow_intel_soc.md`, `boot_flow_xilinx_zynq.md`, `boot_flow_microchip_soc.md` | ✅ COMPLETE |
 ## Phase 4: Cyclone V Anchor Deep Dive (`01_vendors_and_families/altera_intel/cyclone_v/`)
 
 | # | Task | File | Status |
