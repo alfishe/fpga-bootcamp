@@ -13,4 +13,5 @@ What to do when the simulation passes but the hardware doesn't work. Covers embe
 | [jtag_boundary_scan.md](jtag_boundary_scan.md) | Boundary scan (IEEE 1149.1), BSDL files, EXTEST/SAMPLE/PRELOAD, board-level interconnect test |
 | [logic_analyzers.md](logic_analyzers.md) | External LA integration (Saleae, DSLogic, sigrok), decoding protocols (UART, SPI, I2C, AXI stream) |
 | [remote_debugging.md](remote_debugging.md) | Debugging embedded Linux on SoC FPGAs: JTAG + GDB, kgdb, early printk, /dev/mem, devmem2 |
+| [commercial_jtag_tools.md](commercial_jtag_tools.md) | Commercial ecosystem: XJTAG, Corelis, Lauterbach, ARM DSTREAM |
 | [tcl_scripting.md](tcl_scripting.md) | Vendor tool automation: Vivado Tcl, Quartus Tcl (quartus_stp), non-project mode, report generation |

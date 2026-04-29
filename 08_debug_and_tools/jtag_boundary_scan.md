@@ -145,7 +145,9 @@ While JTAG is famous for interactive debugging during board bring-up, it is heav
 
 ### 1. Automated PCB Assembly Testing (PCBA)
 Contract Manufacturers (CMs) use Boundary Scan as a primary testing vector for dense PCBs where flying probe testers cannot reach (e.g., underneath BGA packages). 
-*   **How it works:** Commercial software (like XJTAG or JTAG Technologies) loads the BSDL files for all chips on the board to understand their boundary-scan register topologies. 
+> **Tooling Note**: For a breakdown of the specific software/hardware packages used in production (XJTAG, Corelis, Lauterbach), see the dedicated [Commercial JTAG & Boundary Scan Tools](commercial_jtag_tools.md) guide.
+
+*   **How it works:** Commercial software loads the BSDL files for all chips on the board to understand their boundary-scan register topologies. 
 *   **The Execution:** The tool uses the `EXTEST` instruction to force a specific pin on an FPGA High, and then uses the BSR of an adjacent microcontroller to verify that the corresponding connected pin reads High. 
 *   **The Result:** It automatically detects solder bridges (shorts), cold joints (opens), and missing passive components (pull-ups/pull-downs) without ever booting the CPUs or configuring the FPGAs.
 
