@@ -156,7 +156,8 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [jtag_boundary_scan.md](08_debug_and_tools/jtag_boundary_scan.md) | Boundary scan (IEEE 1149.1), BSDL files, EXTEST/SAMPLE/PRELOAD, board-level interconnect test |
 | [logic_analyzers.md](08_debug_and_tools/logic_analyzers.md) | External LA integration (Saleae, DSLogic, sigrok), decoding protocols (UART, SPI, I2C, AXI stream) |
 | [remote_debugging.md](08_debug_and_tools/remote_debugging.md) | Debugging embedded Linux on SoC FPGAs: JTAG + GDB, kgdb, early printk, /dev/mem, devmem2 |
-| [tcl_scripting.md](08_debug_and_tools/tcl_scripting.md) | Vendor tool automation: Vivado Tcl, Quartus Tcl (quartus_stp), non-project mode, report generation |
+| └ [tcl_scripting.md](08_debug_and_tools/tcl_scripting.md) | Automating Vivado/Quartus workflows with Tcl |
+| └ [commercial_jtag_tools.md](08_debug_and_tools/commercial_jtag_tools.md) | Ecosystem overview: PCBA testing (XJTAG, Corelis) vs High-End Trace (Lauterbach, ARM DSTREAM) |
 
 ### 09 — Board Design
 | File | Topic |
@@ -232,4 +233,15 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [debugging_ddr.md](15_case_studies/debugging_ddr.md) | DDR memory calibration failures: read/write leveling failures, DQS gate issues, diagnosis & resolution |
 | [pcie_bringup.md](15_case_studies/pcie_bringup.md) | PCIe link training debug: LTSSM state traversal, equalization, eye diagrams, common pitfalls |
 | [litex_soc_build.md](15_case_studies/litex_soc_build.md) | Building a complete Linux-capable SoC with LiteX on ECP5 (ULX3S) and Artix-7 (Arty) |
-| [common_failures.md](15_case_studies/common_failures.md) | Frequently encountered failures: metastability, timing violations, power sequencing, configuration, clocking |
+| └ [common_failures.md](15_case_studies/common_failures.md) | Typical failure modes: PLL lock failures, CDC metastability issues, BRAM collision errors |
+
+### 16 — Advanced Topics
+| File | Topic |
+|---|---|
+| └ [dfx_partial_reconfiguration.md](16_advanced_topics/dfx_partial_reconfiguration.md) | Dynamic Function eXchange: hot-swapping bitstreams at runtime via ICAP/PCAP |
+| └ [hardware_acceleration.md](16_advanced_topics/hardware_acceleration.md) | Accelerating specific workloads: Machine Learning (DPU/OpenVINO), DSP, and Blockchain |
+| └ [networking_smartnics.md](16_advanced_topics/networking_smartnics.md) | FinTech & Datacenter: 100G MACs, DPDK integration, TCP Offload Engines (TOE) |
+| └ [hardware_security.md](16_advanced_topics/hardware_security.md) | SecOps: Secure Boot (AES-GCM), Physical Unclonable Functions (PUFs), ARM TrustZone |
+| └ [advanced_hls_patterns.md](16_advanced_topics/advanced_hls_patterns.md) | Advanced C++ to RTL: Pragmas, DSP inference, and fixing pipeline stalls |
+| └ [fpga_as_a_service.md](16_advanced_topics/fpga_as_a_service.md) | Cloud FPGAs: AWS F2 (UltraScale+), Azure NP-Series, Alibaba F3 and 2026 pricing |
+| └ [fpga_vs_gpu_vs_tpu.md](16_advanced_topics/fpga_vs_gpu_vs_tpu.md) | Compute Architecture Comparison: Benchmarks and top use cases for FPGA vs GPU vs TPU |
