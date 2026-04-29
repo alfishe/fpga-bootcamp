@@ -20,6 +20,24 @@ The Cyclone V SoC combines a hardened dual-core ARM Cortex-A9 MPCore (the **HPS*
 
 ---
 
+## Deep Dive Articles
+
+| Article | Coverage |
+|---|---|
+| **[HPS ↔ FPGA Interaction](hps_fpga_interaction.md)** | All 8 HPS-FPGA communication methods: bandwidth, latency, decision matrix, anti-patterns |
+| **[HPS Address Map](address_map.md)** | Complete 4 GB physical memory map: SDRAM, bridges, peripherals, Boot ROM, OCRAM, Linux DT correlation |
+| **[Boot Sequence](boot_sequence.md)** | Multi-stage boot from POR to Linux: Boot ROM, BSEL, preloader, U-Boot, FPGA config timing, common failures |
+| **[MiSTer Platform](mister_platform.md)** | MiSTer framework architecture, SDRAM add-on, core loading, video pipeline, USB vs SNAC latency |
+
+### Cross-Reference
+
+| Article | Location |
+|---|---|
+| **[Cyclone V vs Zynq-7000](../vs_zynq7000.md)** | Head-to-head comparison: bridge architecture, ACP gap, DSP, boot, ecosystem |
+| **[Transceivers (GX/GT)](../fpga_only/transceivers.md)** | PMA/PCS deep dive, clocking, protocol modes, channel bonding |
+
+---
+
 ## Die Architecture
 
 ```mermaid
