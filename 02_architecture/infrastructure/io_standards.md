@@ -16,15 +16,15 @@ FPGA IO architecture is organized into **banks** — groups of pins (typically 2
 
 ```
 ┌─────── IO Bank (Xilinx: HP/HR/HD) ───────┐
-│  VCCO = 1.2V–3.3V (supply rail)           │
-│  VREF = VCCO/2 (for SSTL/HSTL)             │
+│  VCCO = 1.2V–3.3V (supply rail)          │
+│  VREF = VCCO/2 (for SSTL/HSTL)           │
 │  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐         │
 │  │Pin 0│ │Pin 1│ │Pin 2│ │...  │ (24–52) │
 │  └─────┘ └─────┘ └─────┘ └─────┘         │
-│     All share same VCCO, IO standard       │
-│     Differential pairs: N+1 paired         │
-│     Clock-capable: subset of pins          │
-└────────────────────────────────────────────┘
+│     All share same VCCO, IO standard     │
+│     Differential pairs: N+1 paired       │
+│     Clock-capable: subset of pins        │
+└──────────────────────────────────────────┘
 ```
 
 > [!WARNING]
@@ -95,18 +95,18 @@ For data rates above ~1.6 Gbps, general-purpose IO pins are replaced by dedicate
 ### Transceiver Architecture
 
 ```
-┌────────── Transceiver Channel ──────────┐
-│  TX Path:                               │
-│  FPGA → PCS (encoder) → PMA (serializer)│
-│            → TX Driver (pre-emphasis) → Pad
-│                                         │
-│  RX Path:                               │
-│  Pad → CTLE (equalizer) → CDR → DFE     │
-│       → PMA (deserializer) → PCS (decoder) → FPGA
-│                                         │
-│  Reference Clock: dedicated refclk pin   │
-│  Loop BW, charge pump, VCO: tunable      │
-└─────────────────────────────────────────┘
+┌────────── Transceiver Channel ─────────────────────┐
+│  TX Path:                                          │
+│  FPGA → PCS (encoder) → PMA (serializer)           | 
+│            → TX Driver (pre-emphasis) → Pad        |
+│                                                    │
+│  RX Path:                                          │
+│  Pad → CTLE (equalizer) → CDR → DFE                │
+│       → PMA (deserializer) → PCS (decoder) → FPGA  |
+│                                                    │
+│  Reference Clock: dedicated refclk pin             │
+│  Loop BW, charge pump, VCO: tunable                │
+└────────────────────────────────────────────────────┘
 ```
 
 **Equalization:** High-speed serial signals degrade over PCB traces. The receiver's **CTLE (Continuous-Time Linear Equalizer)** amplifies high-frequency components; **DFE (Decision Feedback Equalizer)** cancels post-cursor ISI using feedback from previous bit decisions.
@@ -153,7 +153,7 @@ Exceeding SSO limits causes ground bounce — the internal ground reference shif
 |---|---|
 | Using LVDS for a 10 MHz SPI clock | Overkill. LVCMOS33 at 10 MHz works fine. LVDS adds common-mode and termination complexity |
 | Using SSTL for a GPIO LED | SSTL requires VREF and termination. LVCMOS33 is simpler and works identically at low speed |
-| Connecting 3.3V peripheral to 1.8V HP bank | HR bank needed for >1.8V. Use voltage level translator if no HR bank is available |
+| Connecting 3.3V peripheral to 1.8V HP bank | HR bank needed for >1.8V. Use voltage level translator if no HR bank is available → see [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) |
 | Routing a 10G MGT through general IO | Impossible. MGTs have dedicated analog pins and quad locations |
 
 ---

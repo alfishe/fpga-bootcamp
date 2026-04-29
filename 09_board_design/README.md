@@ -13,3 +13,4 @@ The analog reality surrounding your digital design. Covers high-speed signal int
 | [bga_routing.md](bga_routing.md) | BGA escape routing strategies, layer stackup design, via types (through, blind, buried, microvia) |
 | [thermal_design.md](thermal_design.md) | Junction temperature estimation, heat sink selection, airflow, power dissipation models, thermal vias |
 | [configuration_interfaces.md](configuration_interfaces.md) | Flash selection (QSPI, eMMC, NAND), config pin strapping, fallback/multi-boot, remote update |
+| [io_voltage_levels.md](io_voltage_levels.md) | IO bank voltages, 5V tolerance, level translation techniques, legacy system interfacing, multi-VCCO power design |
