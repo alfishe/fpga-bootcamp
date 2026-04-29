@@ -1,127 +1,161 @@
 [← 08 Debug And Tools Home](README.md) · [← Project Home](../../README.md)
 
-# JTAG Boundary Scan — Board-Level Interconnect Test
+# JTAG and Boundary Scan: From Shift Registers to Core Debugging
 
-Boundary scan (IEEE 1149.1) is the industry-standard method for testing PCB interconnects without physical probes. Every FPGA supports it, and it's your first line of defense when a new board doesn't work — before you even load a bitstream.
+## Overview
 
----
+JTAG is arguably the most misunderstood interface in hardware engineering. It is frequently conflated with "Boundary Scan" or thought of as a specific debugging protocol. In reality, **JTAG is a physical transport layer**—a finite state machine that simply shifts bits through a chain of registers. 
 
-## How Boundary Scan Works
+What a chip *does* with those shifted bits defines its debugging capability. Modern FPGAs and Systems-on-Chip (SoCs) utilize the JTAG transport layer to expose massive internal architectures, allowing developers to halt CPU cores, read AXI memory directly, load bitstreams, and extract gigabytes of internal waveform data.
 
-Each I/O pin on the FPGA has a boundary-scan cell (BSC) between the pad and the core logic:
+## Architecture: The TAP and Shift Registers
 
-```
-Normal mode:  Core Logic ←→ BSC (transparent) ←→ Pad → PCB trace
+JTAG (IEEE 1149.1) defines a Test Access Port (TAP) controller governed by four pins: `TCK` (Clock), `TMS` (Mode Select), `TDI` (Data In), and `TDO` (Data Out).
 
-EXTEST mode:  Core Logic    BSC (controlled by JTAG) ←→ Pad → PCB trace
-              (disconnected)      ↑
-                            JTAG shifts in/out pin values
-```
+Inside the chip, the TAP controller is a 16-state Finite State Machine (FSM). It routes the `TDI` → `TDO` path through one of two main areas: the **Instruction Register (IR)** or one of many **Data Registers (DR)**.
 
-In EXTEST, the JTAG controller drives every FPGA pin — it can wiggle any pin high/low and read back what the connected device sees. This tests solder joints, PCB traces, and inter-device connections without a single line of HDL.
-
----
-
-## Key JTAG Instructions
-
-| Instruction | What It Does | Used For |
-|---|---|---|
-| **BYPASS** | Routes TDI→TDO through 1-bit bypass register | Skipping devices in chain |
-| **IDCODE** | Reads 32-bit device ID | Verifying correct FPGA is on board |
-| **SAMPLE/PRELOAD** | Captures pin states into BSCs (SAMPLE) or preloads BSCs (PRELOAD) | Snapshot of live system; setup before EXTEST |
-| **EXTEST** | Drives BSC values to pins, captures from pins | Interconnect test — the main event |
-| **INTEST** | Drives BSC values to core logic | Static test of internal logic (rarely used) |
-| **USERCODE** | Reads 32-bit user-defined code | PCB revision tracking |
-| **HIGHZ** | Tri-states all FPGA I/O pins | Safe board power-up, isolating FPGA |
-
----
-
-## BSDL Files
-
-BSDL (Boundary Scan Description Language) files are VHDL-format files that describe:
-- Pin names, numbers, and types (input/output/bidirectional/power)
-- Boundary-scan cell order and function (which BSC maps to which pin)
-- Instruction register length and opcodes
-- IDCODE value
-
-**Where to find BSDL files:**
-- Intel: Quartus installation → `quartus/libraries/misc/bsdl/`
-- Xilinx: Vivado installation → `data/parts/bsdl/`
-- Or: vendor website → device page → BSDL models
-
-**BSDL example (excerpt):**
-```vhdl
-attribute INSTRUCTION_LENGTH of EP2C5 : entity is 10;
-attribute IDCODE_REGISTER of EP2C5 : entity is "0010" & x"020D0DD";
-
-"IO1(0)" : INOUT cell "1" ;  -- BSC cell 1 maps to pin IO1, bidirectional
+```text
+┌─────────────────────────────────────────────────┐
+│  TAP Controller (16-state FSM)                  │
+│                                                 │
+│  ┌──────────────┐    ┌────────────────────────┐ │
+│  │  IR Register │    │  DR Registers (many)   │ │
+│  │  (Instr.Reg) │    │  - BYPASS (1 bit)      │ │
+│  │  N bits      │    │  - IDCODE (32 bits)    │ │
+│  └──────────────┘    │  - BOUNDARY SCAN       │ │
+│                      │  - USER1/USER2 (FPGA)  │ │
+│                      │  - DBGACK, RESTART...  │ │
+│                      └────────────────────────┘ │
+└─────────────────────────────────────────────────┘
 ```
 
----
+The fundamental JTAG loop is always the same:
+1. Move the FSM to `Shift-IR` and shift an instruction opcode into the IR.
+2. The loaded instruction physically connects one specific Data Register (DR) between TDI and TDO.
+3. Move the FSM to `Shift-DR` and shift data through the selected register.
+4. Move to `Update-DR` to latch the shifted data into the chip's internal logic.
 
-## Common Test Patterns
+Because every chip defaults to the 1-bit `BYPASS` register, multiple chips can be chained together sequentially (TDO of Chip 1 connects to TDI of Chip 2). The entire board appears as one giant, dynamically resizing shift register.
 
-### 1. Interconnect Test (EXTEST Walk-1)
+## Transport Layer vs. Boundary Scan
 
-Drive a "walking 1" through all FPGA outputs and verify the connected device reads the correct pin:
+These two terms are not synonymous.
 
+**Pure JTAG (Transport Layer)**
+A chip is "JTAG compliant" if it contains a TAP controller and implements the mandatory `BYPASS` and `IDCODE` (Device ID) instructions. However, a purely compliant chip does not necessarily expose any of its internal logic or physical pins to the JTAG chain.
+
+**Boundary Scan (IEEE 1149.1 Application)**
+Boundary Scan is a specific capability built *on top* of the JTAG transport. It dictates that every single physical I/O pad on the chip is wrapped in a Boundary Scan Register (BSR) cell.
+
+```mermaid
+graph TD
+    A[Core Logic] --- B[BSR Cell]
+    B --- C[Pad / Pin]
+    D[TDI] --> B
+    B --> E[TDO]
+    
+    style B fill:#fff9c4,stroke:#f9a825
+    style A fill:#e8f4fd,stroke:#2196f3
+    style C fill:#c8e6c9,stroke:#4caf50
 ```
-Step 1: Load PRELOAD with 0x0001 (pin 0 high, all others low)
-Step 2: Issue EXTEST — FPGA drives pin 0 high
-Step 3: Capture result via JTAG on receiving device
-Step 4: Repeat for pin 1, 2, 3...
+
+A BSR cell allows the JTAG controller to:
+- **SAMPLE**: Silently capture the state of the pin while the core logic is running.
+- **EXTEST**: Disconnect the core logic and force a value directly onto the physical pin (used to test PCB solder joints for shorts/opens without booting the chip).
+- **INTEST**: Force a value into the core logic, ignoring what is on the physical pin.
+
+## What Else Can Be Accessed via JTAG?
+
+If the TAP controller is just a gateway, what else is hiding behind it in modern architectures?
+
+### 1. Advanced Processors (ARM / RISC-V)
+Modern CPUs do not use Boundary Scan for debugging; they use proprietary debug blocks accessed via custom JTAG DRs.
+
+*   **ARM CoreSight (DAP)**: ARM implements a Debug Access Port (DAP) that bridges JTAG to an internal AXI bus. Using the AHB-AP (Advanced High-performance Bus Access Port), a JTAG debugger like OpenOCD can act as an AXI bus master. **This allows the JTAG port to read and write system DDR memory directly**, entirely bypassing the CPU core. It also allows halting the core and reading the Program Counter (PC).
+*   **RISC-V DMI**: RISC-V specifies a Debug Transport Module (DTM) that bridges JTAG to the Debug Module (DM). This enables abstract commands (step, halt, read GPR) via standard shift registers.
+
+### 2. Deep FPGA Features (Xilinx / Intel)
+FPGAs hide their most powerful tools behind the TAP controller.
+
+*   **Configuration Engines**: FPGAs expose specific DRs that connect directly to the SRAM configuration engine. This allows you to stream a `.bit` or `.sof` file directly into the fabric, entirely bypassing the external SPI flash memory.
+*   **The `USER` Instructions**: FPGAs implement undefined instructions like `USER1`, `USER2`, `USER3`. The vendor provides primitives (e.g., Xilinx `BSCANE2`) that allow you to route these JTAG data paths directly into your custom RTL fabric. This is how JTAG-UARTs are built—using a slow, but "zero physical pin cost" serial port.
+*   **Integrated Logic Analyzers (ILA)**: Tools like Vivado ILA and Intel SignalTap leverage these `USER` instructions to extract gigabytes of captured waveform data from Block RAMs back to the host PC.
+*   **Security (eFuses)**: JTAG is used in the factory to blow physical eFuses inside the FPGA, programming AES decryption keys or permanently disabling the JTAG port itself to prevent IP theft.
+
+### 3. Advanced FPGA Use Cases
+
+Beyond basic loading and ILAs, FPGAs leverage JTAG for complex system-level interactions:
+
+*   **Virtual I/O (VIO)**: Tools like Xilinx VIO or Intel In-System Sources and Probes (ISSP) allow you to place virtual buttons, switches, and LEDs inside your RTL. You can click a button in the Vivado GUI on your PC, and it toggles a wire deep inside the FPGA fabric over the JTAG connection. This is invaluable for triggering state machines without physical hardware buttons.
+*   **JTAG-to-AXI Master**: Xilinx provides an IP core that translates JTAG shift register data directly into AXI memory-mapped transactions. This allows a Tcl script on the host PC to read and write to DDR memory, configure peripheral CSRs, or reset IP blocks while the FPGA is running, all without a soft-core processor.
+*   **Xilinx Virtual Cable (XVC)**: XVC is a protocol that encapsulates raw JTAG commands (`tms`, `tdi`, `tck`) into TCP/IP packets. By running a lightweight XVC server on an internal soft-core processor (or the ARM HPS in a Zynq) connected to the network, a remote instance of Vivado can connect to the FPGA over Ethernet and debug it exactly as if a physical USB-JTAG cable were plugged into the board.
+
+### 4. Internal Daisy Chaining (The SoC Reality)
+On a modern System-on-Chip (e.g., Zynq 7000 or Intel Cyclone V SoC), the physical JTAG pins do not go to a single TAP. Internally, the silicon contains **multiple cascaded TAPs**. A Zynq device internally chains the ARM DAP TAP to the FPGA Fabric TAP. To OpenOCD, a single Zynq chip appears as two entirely separate devices in the chain.
+
+## BSDL: Mapping the Unknown
+
+How does a tool know what instructions a chip supports? It uses a **BSDL (Boundary Scan Description Language)** file provided by the vendor. 
+
+The BSDL file defines:
+- The length of the Instruction Register (e.g., Xilinx 7-series is 6 bits; Intel Cyclone V is 10 bits).
+- The opcodes for `BYPASS`, `IDCODE`, `EXTEST`, etc.
+- The exact topology of the BSR cells mapping to physical pins.
+
+> [!CAUTION]
+> **The Vendor Link Rot Problem:** Do not rely on direct web links for BSDL files. Due to constant corporate restructuring (Intel spinning out Altera, AMD buying Xilinx, Microchip buying Microsemi), direct deep-links to BSDL files break on a yearly basis. Furthermore, vendors like Lattice and Microchip actively block direct automated downloads via Cloudflare.
+
+### Where to Find BSDL Files (Active & Legacy)
+
+Because web links rot rapidly, the most robust engineering practice is to pull BSDL files directly from your **local toolchain installation** rather than the web. If you must use the web, follow these navigation paths rather than relying on bookmarks.
+
+| Vendor / Family | Official Navigation Path (Web) | Local Toolchain Path (Most Reliable) | Community Fallback (bsdl.info) |
+|---|---|---|---|
+| **AMD/Xilinx: All Series** | [AMD BSDL Portal](https://www.xilinx.com/support/download/index.html/content/xilinx/en/downloadNav/device-models/bsdl-models.html) | `<Vivado>/data/parts/xilinx/<family>/public/bsdl` | [Legacy Xilinx Mirror](https://bsdl.info/family.htm?m=74) |
+| **Intel/Altera: All Series** | [Altera BSDL Portal](https://www.altera.com/design/devices/resources/models/bsdl) | `<Quartus>/quartus/libraries/misc/bsdl/` | [Legacy Altera Mirror](https://bsdl.info/family.htm?m=111) |
+| **Lattice: CrossLink-NX / ECP5 / MachXO3** | `latticesemi.com` → Products → FPGA → *Device* → Downloads | `<Diamond/Radiant>/data/<family>/` | [Legacy Lattice Mirror](https://bsdl.info/family.htm?m=34) *(N/A for NX)* |
+| **Lattice: iCE40** | *Not Supported* (iCE40 physically lacks a JTAG TAP; uses SPI) | N/A | N/A |
+| **Microchip: PolarFire / SmartFusion2** | `microchip.com` → Search: `"BSDL Tech Docs"` | Exported dynamically via Libero SoC GUI | [Legacy Actel Mirror](https://bsdl.info/family.htm?m=230) |
+| **Gowin: LittleBee / Arora** | Requires Gowin Support Portal Login | `<Gowin>/IDE/data/bsdl/` | Not Available |
+| **Efinix: Trion / Titanium** | Requires Efinix Support Center Login | `<Efinity>/data/bsdl/` | Not Available |
+
+*Note for Retro/Legacy Hardware: If you are dealing with deprecated CPLDs or FPGAs (like Altera MAX7000, Xilinx Spartan-II, Actel ProASIC), you MUST use [bsdl.info](https://www.bsdl.info) as the official vendor documentation has been entirely purged.*
+
+> [!WARNING]
+> **The Limit of BSDL:** Vendors *only* document public Boundary Scan instructions in the BSDL. The opcodes used for ARM CoreSight, FPGA configuration, or internal ILAs are deliberately omitted. Tools like OpenOCD must reverse-engineer or implement these proprietary DRs manually.
+
+## Practical JTAG Debugging with OpenOCD
+
+You can interact directly with the TAP controller using OpenOCD to verify a chip is alive without needing any vendor tools (Vivado/Quartus).
+
+```bash
+# 1. Start OpenOCD with a generic adapter (e.g., FT2232)
+$ openocd -f interface/ftdi/dp_busblaster.cfg
+
+# 2. OpenOCD automatically walks the chain and reads IDCODEs
+Info : JTAG tap: auto0.tap tap/device found: 0x23b560dd (mfg: 0x06e (Altera), part: 0x3b56, ver: 0x2)
+
+# 3. Connect via Telnet to issue raw commands
+$ telnet localhost 4444
+
+# Read the IDCODE manually (e.g., for TAP auto0.tap)
+> irscan auto0.tap 0x09   # (Assuming 0x09 is the IDCODE IR opcode for this chip)
+> drscan auto0.tap 32 0   # Shift 32 bits of 0 in, read 32 bits out
 ```
 
-### 2. Short Circuit Detection
+## Pitfalls & Common Mistakes
 
-Drive one pin high, all others low. If any other pin reads high, there's a short.
+### 1. Mixed Voltage Chains
+If you daisy-chain a 3.3V FPGA and a 1.8V processor on the same JTAG bus without a level shifter, the 3.3V `TDO` will permanently damage the 1.8V `TDI` input.
 
-### 3. Pull-Up / Pull-Down Verification
-
-Set all pins to input (via BSC control cell). Measure each pin's state — if a pin reads '0' when it should have a pull-up, the resistor is missing.
-
----
-
-## FPGA-Specific Notes
-
-### Intel (Cyclone V, MAX 10)
-- IR length: 10 bits
-- IEEE 1149.1 compliant; also supports IEEE 1532 (in-system configuration)
-- BSDL files include `CONFIG` and `HIGHZ` instruction opcodes
-- After configuration, boundary scan still works — BSCs remain accessible
-
-### Xilinx (7-Series, UltraScale+)
-- IR length: 6 bits (7-series), 18 bits (UltraScale+)
-- Pre-configuration: boundary scan works normally
-- Post-configuration: BSCs are controlled by the configured design unless `BSCAN` primitive is instantiated
-- Use `BSCANE2` primitive to access boundary scan from FPGA fabric
-
----
-
-## Best Practices
-
-1. **Run boundary scan as the first board bring-up step** — before loading any bitstream. Verifies power, JTAG chain, soldering.
-2. **Keep BSDL files with your board design** — version-control them alongside schematics.
-3. **Use a dedicated boundary scan tool for production** — XJTAG, Corelis, or JTAG Technologies for automated production test.
-4. **Verify IDCODE first** — if JTAG chain IDCODE read fails, nothing else will work.
-
-## Pitfalls
-
-| Pitfall | Symptom | Fix |
-|---|---|---|
-| **Wrong BSDL file** | BSC-to-pin mapping incorrect; test drives wrong pin | Verify BSDL matches exact FPGA package (e.g., F256 vs F484) |
-| **Power rail not up during test** | All pins read as 'Z' or 'X' | Ensure VCCIO for the bank under test is powered |
-| **Shared JTAG chain with other devices** | Boundary scan affects non-FPGA devices | Use BYPASS for non-target devices in chain |
-| **Configured I/O standard mismatch** | EXTEST drives wrong voltage | FPGA I/O standards are configured by bitstream; pre-config EXTEST uses default LVCMOS |
-
----
+### 2. The TRST vs. SRST Confusion
+*   `TRST` (Test Reset) resets the **JTAG TAP Controller FSM** only. It does not reset the core logic.
+*   `SRST` (System Reset) resets the **CPU / Core Logic**. 
+If your board design ties `TRST` and `SRST` together, you can never debug the CPU, because resetting the CPU will also sever your JTAG connection.
 
 ## References
 
-| Source | Path |
-|---|---|
-| IEEE 1149.1-2013 Standard for Test Access Port | IEEE |
-| Intel BSDL Support Page | Intel FPGA Documentation |
-| Xilinx BSDL and SVF File Generation (XAPP067) | Xilinx / AMD |
-| OpenOCD Boundary Scan Guide | https://openocd.org/ |
-| XJTAG Boundary Scan Tutorial | https://www.xjtag.com/ |
+- [IEEE 1149.1-2013 Standard for Test Access Port](https://standards.ieee.org/)
+- [ARM CoreSight Architecture Specification](https://developer.arm.com/)
+- [OpenOCD Boundary Scan Guide](https://openocd.org/)
+- [Xilinx `BSCANE2` Primitive Usage (UG953)](https://docs.xilinx.com/)
