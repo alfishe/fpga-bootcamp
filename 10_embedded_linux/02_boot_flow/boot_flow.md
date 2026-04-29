@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Project Home](../../README.md)
 
 # FPGA SoC Boot Flow — From Power-On to Userspace
 

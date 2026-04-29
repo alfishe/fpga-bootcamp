@@ -15,12 +15,12 @@ When a hardened CPU complex shares a die with FPGA fabric, the architecture shif
 | Intel | [Stratix 10 SoC](../../01_vendors_and_families/altera_intel/stratix_10/README.md) | Quad Cortex-A53 (64-bit ARMv8) | 14nm | 5,510K | HyperFlex routing, HBM2 option |
 | Intel | [Agilex 7 SoC](../../01_vendors_and_families/altera_intel/agilex/README.md) | Quad Cortex-A53 (ARMv8) | Intel 7 | up to ~4M | Chiplet (EMIB), PCIe 5.0, HBM2e option |
 | Intel | [Agilex 5 SoC](../../01_vendors_and_families/altera_intel/agilex/README.md) | Dual A76 + Dual A55 | Intel 7 | up to ~1.7M | Lowest power Agilex, MIPI D-PHY, cost-optimized |
-| **Xilinx** | [Zynq-7000](../../01_vendors_and_families/xilinx/7series/README.md) | Dual Cortex-A9 (32-bit ARMv7) | 28nm | 444K | **ACP** — FPGA cache-coherent access |
-| Xilinx | [Zynq MPSoC](../../01_vendors_and_families/xilinx/ultrascale_plus/README.md) | Quad A53 + Dual R5F | 16nm | 1,143K | GPU (Mali-400), video codec (VCU) |
+| **Xilinx** | [Zynq-7000](../../01_vendors_and_families/xilinx/7series/soc/README.md) | Dual Cortex-A9 (32-bit ARMv7) | 28nm | 444K | **ACP** — FPGA cache-coherent access |
+| Xilinx | [Zynq MPSoC](../../01_vendors_and_families/xilinx/ultrascale_plus/soc/README.md) | Quad A53 + Dual R5F | 16nm | 1,143K | GPU (Mali-400), video codec (VCU) |
 | Xilinx | [Zynq RFSoC](../../01_vendors_and_families/xilinx/ultrascale_plus/README.md) | Quad A53 + Dual R5F | 16nm | 930K | Direct RF ADCs/DACs on-die (→ [hybrid/](../hybrid/README.md)) |
 | Xilinx | [Versal](../../01_vendors_and_families/xilinx/versal/README.md) | Dual A72 + Dual R5F | 7nm | ~2,000K | NoC interconnect, AI Engines (→ [hybrid/](../hybrid/README.md)) |
 | **Microchip** | [SmartFusion2](../../01_vendors_and_families/microchip/smartfusion2_igloo2/README.md) | Hard Cortex-M3 | 65nm | 150K | Flash-based, FIPS 140-2 crypto, ADC |
-| Microchip | [PolarFire SoC](../../01_vendors_and_families/microchip/polarfire/README.md) | 4× U54 + 1× E51 (64-bit RISC-V) | 28nm | 460K | Only RISC-V hard-SoC FPGA, instant-on flash |
+| Microchip | [PolarFire SoC](../../01_vendors_and_families/microchip/polarfire/soc/README.md) | 4× U54 + 1× E51 (64-bit RISC-V) | 28nm | 460K | Only RISC-V hard-SoC FPGA, instant-on flash |
 | **Gowin** | [GW1NSR](../../01_vendors_and_families/gowin/littlebee/README.md) | Hard PicoRV32 | 55nm | 4.6K | $7 SoC FPGA, lowest cost |
 
 ---

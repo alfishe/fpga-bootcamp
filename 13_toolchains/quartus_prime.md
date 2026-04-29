@@ -1,8 +1,34 @@
 [← 13 Toolchains Home](README.md) · [← Project Home](../../README.md)
 
-# Intel Quartus Prime — Design Suite for Cyclone, Arria, Stratix, Agilex
+# Altera Quartus Prime — Design Suite for Cyclone, Arria, Stratix, Agilex
 
-Quartus Prime is Intel/Altera's design environment for all FPGA families from MAX 10 through Agilex. The "Prime" branding (since v15.1) distinguishes it from the older "Quartus II" (v13.1 and earlier, Cyclone IV and prior).
+Quartus Prime is Altera's design environment for all FPGA families from MAX 10 through Agilex. The "Prime" branding (since v15.1) distinguishes it from the older "Quartus II" (v13.1 and earlier, Cyclone IV and prior).
+
+> [!NOTE]
+> **Company status (2025–2026):** Altera is now an independent company. Intel acquired Altera in 2015 for ~$16.7B, operated it as the Programmable Solutions Group (PSG), then spun it back out. Altera officially became independent in January 2025. In September 2025, Silver Lake acquired a 51% stake ($8.75B), with Intel retaining 49%. The tools retain "Intel Quartus Prime" branding during the transition, but the company behind them is now **Altera Corporation** (altera.com).
+
+---
+
+## Altera Independence Timeline
+
+| Date | Event |
+|---|---|
+| **2015** | Intel acquires Altera for ~$16.7B, rebrands as Intel PSG |
+| **Late 2023** | Intel announces plan to spin out PSG as a standalone business |
+| **Feb 2024** | Altera brand revived; Sandra Rivera appointed CEO |
+| **Jan 2025** | Altera officially independent — unfurls Altera flag at San Jose HQ |
+| **May 2025** | Raghib Hussain succeeds Rivera as CEO |
+| **Sep 2025** | Silver Lake closes 51% acquisition ($8.75B); Intel retains 49% |
+| **2026** | Altera operates as world's largest pure-play independent FPGA company |
+
+**What this means for users:**
+- **Tooling unchanged** — Quartus Prime still works the same way, same executables, same commands
+- **Download site** — now at [altera.com](https://www.altera.com) (redirects from intel.com FPGA pages still work)
+- **Licensing** — existing Intel FPGA licenses remain valid; new licenses via Altera
+- **Device families** — all existing families (Cyclone V through Agilex) continue unchanged
+- **Foundry** — Altera can now use multiple foundries (Intel + TSMC), not locked to Intel fabs
+
+> **Key takeaway for knowledge base references:** Throughout this knowledge base, "Intel/Altera" or "Intel PSG" refers to the same FPGA lineage. Pre-2025 documentation uses Intel branding; post-2025 uses Altera. The silicon is the same.
 
 ---
 
@@ -68,8 +94,11 @@ Output: `.qsys` file → generates HDL + IP constraint files.
 
 ## References
 
-| Source |
-|---|
-| Quartus Prime Handbook (all volumes) |
-| Intel Quartus Prime Pro Edition User Guide |
-| Platform Designer User Guide |
+| Source | Link |
+|---|---|
+| Altera Website (post-independence) | [altera.com](https://www.altera.com) |
+| Quartus Prime Software Download | [altera.com/download](https://www.altera.com/download) |
+| Quartus Prime Handbook (all volumes) | Intel FPGA documentation (archived at intel.com, migrating to altera.com) |
+| Platform Designer User Guide | Altera documentation |
+| Altera Independence Press Release (Jan 2025) | [Altera Newsroom](https://www.altera.com/newsroom/news/press-release/altera-standalone-2025) |
+| Silver Lake Investment Press Release (Sep 2025) | [Altera Newsroom](https://www.altera.com/newsroom/news/press-release/altera-silver-lake) |

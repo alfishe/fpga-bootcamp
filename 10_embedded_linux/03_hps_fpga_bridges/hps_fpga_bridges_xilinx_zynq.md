@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Common Overview](hps_fpga_bridges.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Common Overview](hps_fpga_bridges.md) · [← Project Home](../../README.md)
 
 # Xilinx Zynq / MPSoC / Versal — PS-PL Interface Programming
 
@@ -206,6 +206,6 @@ for (int i = 0; i < MAX_FRAMES; i++) {
 |---|---|
 | [hps_fpga_bridges.md](hps_fpga_bridges.md) | Vendor-agnostic common overview |
 | [../02_architecture/soc/hps_fpga_xilinx_zynq.md](../02_architecture/soc/hps_fpga_xilinx_zynq.md) | Hardware-level PS-PL interface architecture |
-| [boot_flow_xilinx_zynq.md](boot_flow_xilinx_zynq.md) | Xilinx boot flow deep dive |
+| [boot_flow_xilinx_zynq.md](../02_boot_flow/boot_flow_xilinx_zynq.md) | Xilinx boot flow deep dive |
 | [Xilinx UG585](https://docs.amd.com/) | Zynq-7000 Technical Reference Manual |
 | [Xilinx UG1085](https://docs.amd.com/) | Zynq UltraScale+ MPSoC TRM |

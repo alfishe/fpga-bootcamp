@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Project Home](../../README.md)
 
 # Build Systems & OTA Updates — Buildroot, Yocto & Field Upgrades
 
@@ -249,5 +249,5 @@ reboot
 | Xilinx MultiBoot | UG585 Chapter 6: Boot and Configuration |
 | Xilinx Secure Boot | UG1085 Chapter 11: Security |
 | Linux FPGA Manager | `Documentation/fpga/` in kernel source |
-| [boot_flow.md](boot_flow.md) | Boot sequence — where build artifacts fit in the boot chain |
-| [device_tree_and_overlays.md](device_tree_and_overlays.md) | DT overlays for runtime FPGA reconfiguration |
+| [boot_flow.md](../02_boot_flow/boot_flow.md) | Boot sequence — where build artifacts fit in the boot chain |
+| [device_tree_and_overlays.md](../04_drivers_and_dma/device_tree_and_overlays.md) | DT overlays for runtime FPGA reconfiguration |

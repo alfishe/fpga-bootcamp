@@ -74,6 +74,8 @@ LEs are **4-LUT + FF** (like Lattice ECP5, Gowin LittleBee). No HBM on FPGA-only
 | Power | ~5W | ~1.5W |
 | Toolchain | Quartus Lite (free) | Libero SoC (free for MPFS) |
 
+> 📖 **Deep Dive:** [PolarFire SoC RISC-V Architecture](soc/README.md) — MSS block diagrams, 5-core RISC-V cluster (U54×4 + E51), coherent-by-default AXI4 switch, FIC0/FIC1/FIC2 fabric interfaces, HSS boot flow, RISC-V PLIC interrupt architecture, and vs-ARM comparison table.
+
 ---
 
 ## RT PolarFire — Radiation-Tolerant for Space

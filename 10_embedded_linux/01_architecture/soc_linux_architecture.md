@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Project Home](../../README.md)
 
 # SoC FPGA Architecture — The Linux Kernel's View
 
@@ -162,10 +162,10 @@ Power-On
     └─► Application runs (mmap FPGA registers, DMA transfers)
 ```
 
-For the full boot sequence per vendor, see [boot_flow.md](boot_flow.md) and the vendor deep-dives:
-- [boot_flow_intel_soc.md](boot_flow_intel_soc.md)
-- [boot_flow_xilinx_zynq.md](boot_flow_xilinx_zynq.md)
-- [boot_flow_microchip_soc.md](boot_flow_microchip_soc.md)
+For the full boot sequence per vendor, see [boot_flow.md](../02_boot_flow/boot_flow.md) and the vendor deep-dives:
+- [boot_flow_intel_soc.md](../02_boot_flow/boot_flow_intel_soc.md)
+- [boot_flow_xilinx_zynq.md](../02_boot_flow/boot_flow_xilinx_zynq.md)
+- [boot_flow_microchip_soc.md](../02_boot_flow/boot_flow_microchip_soc.md)
 
 ---
 
@@ -265,7 +265,7 @@ CPU (Producer)              FPGA (Consumer)
 
 On non-coherent platforms, you must explicitly synchronize: `dma_sync_single_for_device()` after CPU writes and `dma_sync_single_for_cpu()` before CPU reads.
 
-See [hps_fpga_bridges.md](hps_fpga_bridges.md) for complete kernel code examples for all four paths.
+See [hps_fpga_bridges.md](../03_hps_fpga_bridges/hps_fpga_bridges.md) for complete kernel code examples for all four paths.
 
 ---
 
@@ -292,5 +292,5 @@ See [hps_fpga_bridges.md](hps_fpga_bridges.md) for complete kernel code examples
 | PolarFire SoC User Guide | FI, MSS-to-FPGA |
 | Linux kernel: `Documentation/fpga/` | FPGA Manager, fpga-region, fpga-bridge |
 | Linux kernel: `Documentation/devicetree/bindings/fpga/` | DT bindings |
-| [boot_flow.md](boot_flow.md) | Full boot sequence across all FPGA SoC vendors |
-| [hps_fpga_bridges.md](hps_fpga_bridges.md) | Bridge programming, DMA, coherency in detail |
+| [boot_flow.md](../02_boot_flow/boot_flow.md) | Full boot sequence across all FPGA SoC vendors |
+| [hps_fpga_bridges.md](../03_hps_fpga_bridges/hps_fpga_bridges.md) | Bridge programming, DMA, coherency in detail |

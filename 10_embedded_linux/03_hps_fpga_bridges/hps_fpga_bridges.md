@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Project Home](../../README.md)
 
 # HPS ↔ FPGA Interaction — Bridges, Memory Maps, Interrupts & DMA
 
@@ -413,6 +413,6 @@ For hardware-level bridge architecture (block diagrams, signal-level details, cl
 | Linux DMA Engine API | `Documentation/driver-api/dmaengine/` |
 | Linux IRQ subsystem | `Documentation/core-api/irq/` |
 | `ioremap` semantics | `Documentation/driver-api/io-mapping.rst` |
-| [soc_linux_architecture.md](soc_linux_architecture.md) | SoC FPGA architecture from Linux's view |
-| [kernel_drivers_and_dma.md](kernel_drivers_and_dma.md) | Driver patterns and DMA buffer strategies |
-| [device_tree_and_overlays.md](device_tree_and_overlays.md) | Device tree for FPGA SoCs |
+| [soc_linux_architecture.md](../01_architecture/soc_linux_architecture.md) | SoC FPGA architecture from Linux's view |
+| [kernel_drivers_and_dma.md](../04_drivers_and_dma/kernel_drivers_and_dma.md) | Driver patterns and DMA buffer strategies |
+| [device_tree_and_overlays.md](../04_drivers_and_dma/device_tree_and_overlays.md) | Device tree for FPGA SoCs |

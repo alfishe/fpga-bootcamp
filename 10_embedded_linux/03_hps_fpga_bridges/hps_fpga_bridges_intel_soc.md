@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Common Overview](hps_fpga_bridges.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Common Overview](hps_fpga_bridges.md) · [← Project Home](../../README.md)
 
 # Intel SoC FPGA — HPS-FPGA Bridge Programming
 
@@ -194,5 +194,5 @@ For Stratix 10/Agilex with CCU instantiated, coherent DMA eliminates these sync 
 |---|---|
 | [hps_fpga_bridges.md](hps_fpga_bridges.md) | Vendor-agnostic common overview |
 | [../02_architecture/soc/hps_fpga_intel_soc.md](../02_architecture/soc/hps_fpga_intel_soc.md) | Hardware-level bridge architecture |
-| [boot_flow_intel_soc.md](boot_flow_intel_soc.md) | Intel boot flow deep dive |
+| [boot_flow_intel_soc.md](../02_boot_flow/boot_flow_intel_soc.md) | Intel boot flow deep dive |
 | [Intel SoC FPGA Linux Documentation](https://rocketboards.org/) | Official Intel Linux for SoC FPGA |

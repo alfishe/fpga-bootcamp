@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Boot Flow Overview](boot_flow.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Boot Flow Overview](boot_flow.md) · [← Project Home](../../README.md)
 
 # Xilinx Zynq Boot Flow — Deep Dive
 

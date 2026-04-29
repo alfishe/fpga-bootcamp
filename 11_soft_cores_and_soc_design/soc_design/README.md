@@ -2,7 +2,7 @@
 
 # 11-E — SoC Architecture & Design
 
-Building a complete system-on-chip — the art of connecting CPU cores, memory, peripherals, and accelerators into a coherent, performant51 74→system that boots and runs software. This is the capstone of the soft-core track.
+Building a complete system-on-chip — the art of connecting CPU cores, memory, peripherals, and accelerators into a coherent, performant system that boots and runs software. This is the capstone of the soft-core track.
 
 ## Index
 

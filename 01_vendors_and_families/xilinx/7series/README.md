@@ -56,6 +56,8 @@ Zynq-7000 is the Xilinx counterpart to Cyclone V SoC. Same dual Cortex-A9 ARM co
 
 **ACP is the key architectural advantage of Zynq-7000.** The Accelerator Coherency Port lets FPGA logic maintain cache-coherent access to the Cortex-A9 L2 cache — no flush/invalidate dance needed. Cyclone V SoC has no equivalent: FPGA can only access HPS DDR through F2S bridges which bypass L1/L2 caches entirely.
 
+> 📖 **Deep Dive:** [Zynq-7000 SoC Architecture](soc/README.md) — PS-PL block diagrams, full AXI port inventory (9 interfaces), ACP coherency walkthrough, DMA architecture, multi-stage boot flow, and Cyclone V vs Zynq-7000 decision matrix.
+
 ---
 
 ## 7-Series vs Intel Cyclone V — Side by Side

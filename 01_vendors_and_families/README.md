@@ -4,6 +4,17 @@
 
 **Start here if you have hardware in hand.** This section anchors on Intel/Altera Cyclone V and the MiSTer project as the primary entry point before expanding to all major vendors. Each vendor folder contains per-family subdirectories with standalone README architecture guides, feature matrices, and device-specific gotchas — mirroring the chipset-family structure found throughout this knowledge base.
 
+## Quick Navigation
+
+| If you have... | Go to... |
+|---|---|
+| A DE10-Nano, MiSTer, or any Cyclone V board | [altera_intel/cyclone_v/](altera_intel/cyclone_v/README.md) — the anchor family |
+| A Zynq board (ZedBoard, Zybo, PYNQ, Cora) | [xilinx/7series/](xilinx/7series/README.md) — Zynq-7000 lives here |
+| An iCE40 or ECP5 board (TinyFPGA, ULX3S, OrangeCrab) | [lattice/](lattice/README.md) — open-source toolchain friendly |
+| A Tang Nano or Sipeed board | [gowin/](gowin/README.md) — budget-friendly ecosystem |
+| An Icicle Kit or SmartFusion2 board | [microchip/](microchip/README.md) — RISC-V + flash FPGA |
+| An Efinix, QuickLogic, or specialty board | [others/](others/README.md) — niche and emerging vendors |
+
 ## Index
 
 | Folder | Coverage |

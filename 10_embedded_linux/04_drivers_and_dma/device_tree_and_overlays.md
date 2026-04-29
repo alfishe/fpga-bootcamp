@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Project Home](../../README.md)
 
 # Device Tree & FPGA Manager — Describing Hardware to Linux
 
@@ -372,6 +372,6 @@ PolarFire SoC uses the System Controller (MSS) for FPGA configuration. DT bindin
 | Intel SOCFPGA DT binding | `altr,socfpga-fpga-mgr.txt` in kernel bindings |
 | Xilinx Zynq DT binding | `xlnx,zynq-devcfg-1.0` binding in kernel source |
 | `dtc` compiler source | `scripts/dtc/` in kernel source, or install `device-tree-compiler` |
-| [soc_linux_architecture.md](soc_linux_architecture.md) | SoC architecture overview — memory maps, bridge topology |
-| [boot_flow.md](boot_flow.md) | Boot sequence — where FPGA config and DT loading fit in |
-| [hps_fpga_bridges.md](hps_fpga_bridges.md) | Bridge programming from Linux — the driver side of DT devices |
+| [soc_linux_architecture.md](../01_architecture/soc_linux_architecture.md) | SoC architecture overview — memory maps, bridge topology |
+| [boot_flow.md](../02_boot_flow/boot_flow.md) | Boot sequence — where FPGA config and DT loading fit in |
+| [hps_fpga_bridges.md](../03_hps_fpga_bridges/hps_fpga_bridges.md) | Bridge programming from Linux — the driver side of DT devices |

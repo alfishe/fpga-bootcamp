@@ -47,6 +47,8 @@ Zynq MPSoC is the generational leap from Zynq-7000 (and Cyclone V SoC) to 64-bit
 | eMMC | SD 3.0 | eMMC 5.1 / SD 3.0 |
 | Boot security | AES only | RSA (4K) + AES-GCM + SHA-3, secure key storage (eFuse/BBRAM) |
 
+> 📖 **Deep Dive:** [Zynq MPSoC Architecture](soc/README.md) — PS-PL block diagrams, CCI-400 cache coherent interconnect, HPC coherent ports (128-bit/9.6 GB/s), APU+RPU heterogeneous processing, PMU-orchestrated boot flow, power domains, and Zynq-7000 vs MPSoC comparison.
+
 ---
 
 ## Best Practices

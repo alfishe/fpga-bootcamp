@@ -2,7 +2,7 @@
 
 # 06-D — DDR Memory Controllers
 
-DDR memory is196→in nearly every non-trivial FPGA design. This folder covers the vendor IP blocks that interface FPGAs to external DDR3/DDR4/LPDDR4 SDRAM, their calibration sequences, and the pin planning constraints they impose.
+DDR memory is in nearly every non-trivial FPGA design. This folder covers the vendor IP blocks that interface FPGAs to external DDR3/DDR4/LPDDR4 SDRAM, their calibration sequences, and the pin planning constraints they impose.
 
 ## Index
 

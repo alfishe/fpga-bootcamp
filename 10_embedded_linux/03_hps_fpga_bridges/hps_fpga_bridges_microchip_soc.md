@@ -1,4 +1,4 @@
-[← Section Home](README.md) · [← Common Overview](hps_fpga_bridges.md) · [← Project Home](../README.md)
+[← Section Home](../README.md) · [← Common Overview](hps_fpga_bridges.md) · [← Project Home](../../README.md)
 
 # Microchip SoC FPGA — MSS-Fabric Interface Programming
 
@@ -180,5 +180,5 @@ The Linux RISC-V kernel handles PLIC setup automatically through device tree. Th
 |---|---|
 | [hps_fpga_bridges.md](hps_fpga_bridges.md) | Vendor-agnostic common overview |
 | [../02_architecture/soc/hps_fpga_microchip_soc.md](../02_architecture/soc/hps_fpga_microchip_soc.md) | Hardware-level MSS-Fabric interface architecture |
-| [boot_flow_microchip_soc.md](boot_flow_microchip_soc.md) | Microchip boot flow deep dive |
+| [boot_flow_microchip_soc.md](../02_boot_flow/boot_flow_microchip_soc.md) | Microchip boot flow deep dive |
 | [PolarFire SoC documentation](https://www.microchip.com/en-us/products/fpgas-and-plds/system-on-chip-fpgas/polarfire-soc-fpgas) | Official Microchip docs |

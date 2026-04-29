@@ -192,6 +192,7 @@ For topics that commonly generate questions (timing closure, CDC, DDR calibratio
 - Use for architecture diagrams, data flow, state machines, and system relationships
 - Apply consistent styling: `fill:#e8f4fd,stroke:#2196f3` for hard IP blocks, `fill:#fff9c4,stroke:#f9a825` for soft logic
 - Keep diagrams readable — no more than ~15 nodes per diagram
+- **Syntax Constraint**: To prevent parser errors, always quote node labels containing special characters like parentheses, slashes, or brackets. For example, `id["Label (Extra Info)"]` instead of `id[Label (Extra Info)]`.
 
 ### Alerts
 

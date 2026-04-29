@@ -1,131 +1,159 @@
 [← 08 Debug And Tools Home](README.md) · [← Project Home](../../README.md)
 
-# ILA vs SignalTap — On-Chip Logic Analyzers
+# Integrated Logic Analyzers — ILA and SignalTap
 
-When your FPGA design doesn't behave and simulation can't reproduce the bug, on-chip logic analyzers let you see internal signals in real-time. Xilinx ILA (Integrated Logic Analyzer) and Intel SignalTap II do the same job but with different architectures, resource costs, and workflows.
+When your FPGA design synthesizes without error but misbehaves on actual hardware, and simulation cannot reproduce the bug (often due to unmodeled external asynchronous events), you need an **On-Chip Logic Analyzer**. 
 
----
-
-## Architecture Comparison
-
-| Feature | Xilinx ILA (Vivado) | Intel SignalTap II (Quartus) |
-|---|---|---|
-| **IP name** | ILA (Integrated Logic Analyzer) | SignalTap II Logic Analyzer |
-| **Trigger engine** | Configurable: basic (=, !=, <, >), advanced (edges, ranges, counters) | Configurable: basic, advanced (edges, ranges), state-based (12 levels) |
-| **Max signals** | 1,024 per ILA core | 2,048 per instance |
-| **Max sample depth** | 131,072 per ILA core | 128K per instance |
-| **Clock** | Any FPGA net (no dedicated clock pin needed) | Any FPGA net |
-| **Storage** | Block RAM (BRAM/URAM) | Block RAM (M10K/M20K) |
-| **JTAG bandwidth** | Up to 30 MB/s (HS2/HS3 cable) | Up to 6 MB/s (USB Blaster II) |
-| **Compression** | No | Yes (run-length encoding, ~2–10× effective depth) |
-| **Trigger-in/out** | Yes — can route between ILAs | Yes — trigger in/out between instances |
-| **Tcl control** | `run_hw_ila` / `wait_on_hw_ila` | `quartus_stp --script` |
+Xilinx ILA (Integrated Logic Analyzer) and Intel SignalTap II are the industry standards. They synthesize actual memory (BRAM) and trigger logic directly into your fabric to capture real-time waveforms and extract them back to your PC via JTAG.
 
 ---
 
-## When to Use Each
+## System Architecture
 
-| Scenario | Recommendation |
-|---|---|
-| Quick debug during development (GUI) | SignalTap — simpler setup, faster configure-upload cycle |
-| Automated regression testing (Tcl) | ILA — better Tcl API for `wait_on_hw_ila` in CI |
-| Very wide bus debugging (512+ bits) | ILA — handles 1,024 signals per core |
-| Very deep trace capture (100K+ samples) | SignalTap — compression gives 2–10× effective depth |
-| Multi-FPGA debugging | ILA — Xilinx HS3 can daisy-chain |
-| Low-BRAM designs | Either — both consume the same BRAM per sample |
+An Integrated Logic Analyzer is not magic; it is simply an IP core synthesized out of standard FPGA logic (LUTs and Flip-Flops) that saves data into standard Block RAMs. It communicates with the host PC by hijacking the JTAG boundary scan chain using a Debug Hub.
+
+```mermaid
+graph TD
+    subgraph Host PC
+        A[Vivado / Quartus GUI]
+        B[Tcl Console]
+        A --- B
+    end
+    
+    subgraph FPGA Silicon
+        C[JTAG TAP Controller]
+        D(("Debug Hub / sld_hub"))
+        E["ILA Core / SignalTap Instance"]
+        F[("Block RAM / M20K")]
+        G[Fabric Clock Domain]
+        H[User Logic Signals]
+        
+        C --- D
+        D --- E
+        E --- F
+        E ---|Samples| H
+        G -.->|Clock| E
+    end
+
+    A <===>|JTAG Cable| C
+    
+    style A fill:#e8f4fd,stroke:#2196f3
+    style C fill:#e8f4fd,stroke:#2196f3
+    style D fill:#fff9c4,stroke:#f9a825
+    style E fill:#fff9c4,stroke:#f9a825
+    style F fill:#e8f4fd,stroke:#2196f3
+```
+
+### The Golden Rule of ILAs
+
+> [!WARNING]
+> **CDC: Requires Synchronizer**
+> An ILA is a synchronous digital circuit. The clock you provide to the ILA **MUST** be exactly synchronous to the signals you are probing. If you probe signals from a 100MHz domain using an ILA clocked at 50MHz, or from an unrelated asynchronous domain, you will capture garbage, cause setup/hold violations, and introduce metastability into your trace.
 
 ---
 
-## Resource Cost
+## Vendor Differences & Open-Source Analogies
+
+While they serve the same purpose, the architectures have distinct differences:
+
+| Feature | Xilinx ILA (Vivado) | Intel SignalTap II (Quartus) | Open-Source Analogy (LiteScope) |
+|---|---|---|---|
+| **Max Signals** | 1,024 per core | 2,048 per instance | Configurable (LUT limited) |
+| **Storage** | Raw BRAM / URAM | BRAM (M10K/M20K) | Block RAM |
+| **Compression** | No (1 bit = 1 BRAM cell) | **Yes** (Run-length encoding) | No |
+| **Bridge Type** | `dbg_hub` (JTAG USER instructions) | `sld_hub` (JTAG USER instructions) | UART / Ethernet / PCIe |
+| **CLI Workflow** | `run_hw_ila` (Tcl) | `quartus_stp` (Tcl) | `litescope_cli` (Python) |
+
+### The SignalTap Compression Advantage
+Because Xilinx ILAs lack compression, capturing 128 signals for 32,000 clock cycles requires exactly 4 megabits of BRAM. Intel's SignalTap uses a clever run-length compression algorithm in hardware. If your monitored signals rarely toggle (e.g., waiting for an I2C packet), SignalTap only stores the transitions and the delta-time between them. This can yield a **2× to 10× effective depth increase** for bursty signals.
+
+### The Open-Source Alternative: LiteScope
+For open-source flows (Yosys/nextpnr) or custom soft-cores, you don't have access to Vivado ILA. Instead, the community uses **LiteScope** (part of the LiteX ecosystem). Unlike proprietary ILAs that mandate a JTAG adapter, LiteScope can extract captured traces over a standard UART serial port, Ethernet, or even PCIe.
+
+---
+
+## Automated CI/CD Cookbook (Headless ILA)
+
+Interactive GUI debugging is fine for development, but in a CI/CD pipeline, hardware regression tests must run headlessly. Below is a complete Tcl script that configures a Xilinx ILA to wait for an AXI `TVALID` pulse, captures the waveform, and exports it to a `.vcd` file without ever opening the Vivado GUI.
+
+```tcl
+# headless_ila_capture.tcl
+# Run with: vivado -mode batch -source headless_ila_capture.tcl
+
+# 1. Connect to Hardware Server
+open_hw_manager
+connect_hw_server -url localhost:3121
+current_hw_target [get_hw_targets */xilinx_tcf/Digilent/*]
+set_property PARAM.FREQUENCY 15000000 [get_hw_targets current]
+open_hw_target
+
+# 2. Program the Device
+set device [lindex [get_hw_devices xc7z020_1] 0]
+set_property PROGRAM.FILE {build/top.bit} $device
+set_property PROBES.FILE {build/top.ltx} $device
+program_hw_devices $device
+
+# 3. Configure the ILA Trigger
+set ila [get_hw_ilas hw_ila_1]
+set trig [create_hw_probe_trigger -ila $ila]
+
+# Trigger on AXI Stream TVALID rising edge
+add_hw_probe_trigger_condition $trig [get_hw_probes m_axis_tvalid] -edge rising
+set_hw_probe_trigger $ila $trig
+
+# 4. Arm and Wait (Blocks until trigger fires or timeout)
+puts "Arming ILA and waiting for trigger..."
+run_hw_ila $ila
+wait_on_hw_ila $ila
+
+# 5. Extract and Export Data
+puts "Trigger fired! Downloading capture..."
+upload_hw_ila_data $ila
+write_hw_ila_data -force capture.ila [current_hw_ila_data]
+
+# Convert to standard VCD for viewing in GTKWave
+write_hw_ila_vcd -force capture.vcd [current_hw_ila_data]
+puts "Capture saved to capture.vcd!"
+```
+
+---
+
+## Resource Cost & Floorplanning
+
+ILAs are notorious for causing timing failures in nearly-full designs because they fan out across the chip to monitor signals, creating routing congestion.
 
 | Parameter | Formula |
 |---|---|
-| **BRAM blocks** | ceil(signal_width × sample_depth / BRAM_data_width) |
+| **BRAM blocks** | `ceil(signal_width × sample_depth / BRAM_data_width)` |
 | **Logic (trigger)** | ~50–200 LUTs per trigger condition |
-| **Logic (glue)** | ~100–300 LUTs for JTAG-to-ILA bridge |
+| **Logic (glue)** | ~100–300 LUTs for the JTAG bridge (`dbg_hub`) |
 
-**Example:** Capture 128 signals × 8,192 samples = 1,048,576 bits = 33 M10K blocks (32K each) or ~98 BRAM36 blocks (36K each). On a 110K LE Cyclone V (557 M10K), this is ~6% of BRAM.
-
-**Practical limit:** On most designs, you can fit 1–2 ILAs at 128 signals × 8K depth before BRAM becomes scarce (aim for <10% BRAM usage for debug).
-
----
-
-## SignalTap Quick Start
-
-```
-1. In Quartus: Tools → SignalTap II Logic Analyzer
-2. Add nodes: drag signals from Node Finder or post-fit netlist
-3. Set clock: any free-running clock in your design
-4. Set trigger: basic (=, rising edge, etc.) or advanced (state machine)
-5. Set sample depth: 1K–128K (compression ON by default)
-6. Recompile (incremental if SignalTap-friendly constraints were used)
-7. Program device → Run Analysis → trigger fires → waveform captured
-```
-
-### SignalTap-Friendly Design
-
-For incremental recompilation (adding/removing signals without full P&R):
-1. Enable "Incremental Compilation" in Quartus project settings
-2. Reserve BRAM for SignalTap (Design Partitions → Reserve resources)
-3. Use `(* preserve *)` or `(* keep *)` attributes on signals you'll debug
-4. Don't optimize away signals during synthesis (`(* noprune *)` for wires)
+> [!TIP]
+> **Rule of Thumb:** Keep ILA BRAM usage below 10% of total chip capacity. If your design is highly congested, consider locking the ILA to a specific `pblock` (Xilinx) or LogicLock region (Intel) to prevent the auto-router from spreading the ILA logic across the entire die.
 
 ---
 
-## ILA Quick Start (Vivado)
+## Pitfalls & Common Mistakes
 
-```tcl
-# Instantiate ILA in HDL or block design
-ila_0: ila
-  port map (
-    clk    => debug_clk,
-    probe0 => debug_signal_0,  -- up to 1024 bits total
-    probe1 => debug_signal_1
-  );
+### 1. The CDC Trigger Trap
+*   **The Mistake**: You connect signals from a 100MHz clock and a 200MHz clock to the same ILA, and supply the ILA with the 200MHz clock.
+*   **The Result**: The 100MHz signals will be oversampled, and because there is no synchronizer on the debug inputs, setup/hold violations will occur on the 100MHz nets, causing sporadic trigger failures and garbage data.
+*   **The Fix**: Instantiate *two separate ILAs*. One clocked at 100MHz monitoring the 100MHz nets, and one clocked at 200MHz monitoring the 200MHz nets.
 
-# In Vivado Tcl after programming:
-run_hw_ila [get_hw_ilas -of_objects [get_hw_devices xc7z020_1]]
-wait_on_hw_ila [get_hw_ilas]
-display_hw_ila_data [upload_hw_ila_data [get_hw_ilas]]
-```
+### 2. Synthesis Optimization Deleting Nets
+*   **The Mistake**: You write your RTL, add an ILA core, and wire it up to an internal state machine variable. After compilation, Vivado complains the net doesn't exist.
+*   **The Result**: The synthesis engine realized your internal state machine variable wasn't driving any real outputs, so it optimized it away. The ILA probe is left dangling.
+*   **The Fix**: You must explicitly preserve the signal. In Xilinx, use the `(* MARK_DEBUG = "TRUE" *)` Verilog attribute. In Intel, use `(* preserve *)`.
 
-### ILA Advanced Triggers
-
-```tcl
-# Set trigger: debug_signal_0 == 0xDEAD && debug_signal_1 rising edge
-set ila [get_hw_ilas]
-set trig [create_hw_probe_trigger -ila $ila]
-add_hw_probe_trigger_condition $trig probe0 == 32'hDEAD
-add_hw_probe_trigger_condition $trig probe1 -edge rising
-set_hw_probe_trigger $ila $trig
-```
-
----
-
-## Best Practices
-
-1. **Synth-preserve your debug nets** — synthesis can optimize away signals you added to ILA. Use `(* DONT_TOUCH = "TRUE" *)` or `(* KEEP = "TRUE" *)`.
-2. **Use a dedicated debug clock** — sampling ILA on the same clock as the logic you're debugging. Never use a divided or gated clock.
-3. **Lock BRAM placement for reproducibility** — if you remove ILA and timing changes, it's a different build. Use pblocks to lock ILA BRAM location.
-4. **Tcl scripts for CI** — capture ILA/SignalTap traces in CI regression: script the trigger, upload, and save to VCD for post-processing.
-
-## Pitfalls
-
-| Pitfall | Symptom | Fix |
-|---|---|---|
-| **Signal optimized away** | ILA shows constant 'X' or '0' | Add `(* KEEP *)` or `(* MARK_DEBUG *)` attribute |
-| **ILA clock too fast** | ILA reports clock period violations | ILA max clock is fabric-limited (typically 200–300 MHz); check datasheet |
-| **JTAG bandwidth bottleneck** | Upload takes minutes for 128K samples | Reduce sample count; use trigger to capture only region of interest |
-| **Post-P&R signal naming changed** | Can't find signal in ILA setup | Use `(* MARK_DEBUG = "TRUE" *)` in HDL to preserve original name |
-| **BRAM contention** | Design no longer fits with ILA | Reduce signal count or depth; use external logic analyzer for wide signals |
+### 3. Starving the Design of BRAM
+*   **The Mistake**: Requesting a 131,072-depth trace on a 256-bit bus on a small Artix-7 FPGA.
+*   **The Result**: The tools will fail during Place & Route because the ILA requires 100% of the available BRAM, leaving none for your actual design.
+*   **The Fix**: Use advanced trigger sequences (state-machine triggers) to only capture the *exact* window of failure, drastically reducing the required sample depth.
 
 ---
 
 ## References
 
-| Source | Path |
-|---|---|
-| Vivado ILA IP (PG172) | Xilinx / AMD |
-| Quartus SignalTap II User Guide | Intel FPGA Documentation |
-| Vivado Tcl Command Reference (`run_hw_ila`) | Xilinx UG835 |
-| Quartus Tcl Scripting (`quartus_stp`) | Intel FPGA Documentation |
+*   [Xilinx UG908: Vivado Programming and Debugging](https://docs.xilinx.com/)
+*   [Intel Quartus Prime Standard Edition User Guide: Debug Tools](https://www.intel.com/content/www/us/en/docs/programmable/683705/current/introduction.html)
+*   [LiteScope GitHub Repository](https://github.com/enjoy-digital/litescope)
