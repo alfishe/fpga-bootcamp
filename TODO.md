@@ -5,6 +5,14 @@
 
 ---
 
+## Phase 6: IP & Cores (`06_ip_and_cores/`)
+
+| # | Task | File | Status |
+|---|---|---|---|
+| 6.1 | Chip-to-chip interfaces (PCIe, CXL, CCIX, UCIe) | `06_ip_and_cores/external_interfaces/chip_to_chip_interfaces.md` | ⏳ STUB |
+| 6.2 | Parallel buses (68000, Zorro, ISA, PCI) | `06_ip_and_cores/external_interfaces/parallel_buses.md` | ⏳ STUB |
+| 6.3 | High-speed serial interfaces — USB soft IP and hardened | `06_ip_and_cores/external_interfaces/high_speed_serial_interfaces.md` | ⏳ STUB |
+
 ## Phase 8 Additions (`08_debug_and_tools/`)
 
 | # | Task | File | Status |
