@@ -1,7 +1,7 @@
 # TODO.md — FPGA Knowledge Base Build Plan
 
 > Auto-generated plan. Update statuses as work progresses. See [AGENTS.md](AGENTS.md) for quality standards.
-> **Last synced:** 2026-04-25 — gap analysis + quality pass. All previous phases COMPLETE.
+> **Last synced:** 2026-05-04 — Tier 3 Open HW deep dives (MiSTer, OpenTitan, OSSC, LiteX). All previous phases COMPLETE.
 
 ---
 
@@ -96,30 +96,36 @@
 
 | # | Task | File | Lines | Status |
 |---|---|---|---|---|
-| G.11 | VexRiscv — SpinalHDL Linux-capable core | `11_soft_cores_and_soc_design/riscv_cores/vexriscv.md` | 66 | EXPAND |
-| G.12 | PicoRV32 — minimal RISC-V | `11_soft_cores_and_soc_design/riscv_cores/picorv32.md` | 71 | EXPAND |
-| G.13 | NEORV32 — well-documented core | `11_soft_cores_and_soc_design/riscv_cores/neorv32.md` | 59 | EXPAND |
-| G.14 | SERV — bit-serial RISC-V | `11_soft_cores_and_soc_design/riscv_cores/serv.md` | 58 | EXPAND |
-| G.15 | Ibex/CV32E — OpenTitan core | `11_soft_cores_and_soc_design/riscv_cores/ibex_cv32e.md` | 48 | EXPAND |
-| G.16 | High-Perf RISC-V — BOOM/Rocket/CVA6 | `11_soft_cores_and_soc_design/riscv_cores/high_perf_riscv_cores.md` | 49 | EXPAND |
-| G.17 | Chipyard/Rocket Chip — SoC generators | `11_soft_cores_and_soc_design/soc_design/chipyard_rocket_chip.md` | 64 | EXPAND |
+| G.11 | VexRiscv — SpinalHDL Linux-capable core | `11_soft_cores_and_soc_design/riscv_cores/vexriscv.md` | 414 | COMPLETE |
+| G.12 | PicoRV32 — minimal RISC-V | `11_soft_cores_and_soc_design/riscv_cores/picorv32.md` | 370 | COMPLETE |
+| G.13 | NEORV32 — well-documented core | `11_soft_cores_and_soc_design/riscv_cores/neorv32.md` | 343 | COMPLETE |
+| G.14 | SERV — bit-serial RISC-V | `11_soft_cores_and_soc_design/riscv_cores/serv.md` | 307 | COMPLETE |
+| G.15 | Ibex/CV32E — OpenTitan core | `11_soft_cores_and_soc_design/riscv_cores/ibex_cv32e.md` | 326 | COMPLETE |
+| G.16 | High-Perf RISC-V — BOOM/Rocket/CVA6 | `11_soft_cores_and_soc_design/riscv_cores/high_perf_riscv_cores.md` | 287 | COMPLETE |
+| G.17 | Chipyard/Rocket Chip — SoC generators | `11_soft_cores_and_soc_design/soc_design/chipyard_rocket_chip.md` | 311 | COMPLETE |
 
 ### Thin Articles — Priority Tier 3 (Open HW, 42–65 lines)
 
 | # | Task | File | Lines | Status |
 |---|---|---|---|---|
-| G.18 | MiSTer — retro computing platform | `12_open_source_open_hardware/retro_computing/mister.md` | 70 | EXPAND |
-| G.19 | OSSC — open source scan converter | `12_open_source_open_hardware/video_display/ossc.md` | 65 | EXPAND |
-| G.20 | LiteX Core Ecosystem | `12_open_source_open_hardware/litex/litex_core_ecosystem.md` | 70 | EXPAND |
-| G.21 | OpenTitan — root of trust | `12_open_source_open_hardware/initiatives/opentitan.md` | 54 | EXPAND |
-| G.22 | LiteX Overview — Python SoC builder | `12_open_source_open_hardware/litex/litex_overview.md` | 92 | EXPAND |
+| G.18 | MiSTer — retro computing platform | `12_open_source_open_hardware/retro_computing/mister.md` | 446 | COMPLETE |
+| G.19 | OSSC — open source scan converter | `12_open_source_open_hardware/video_display/ossc.md` | 290 | COMPLETE |
+| G.20 | LiteX Core Ecosystem | `12_open_source_open_hardware/litex/litex_core_ecosystem.md` | 468 | COMPLETE |
+| G.21 | OpenTitan — root of trust | `12_open_source_open_hardware/initiatives/opentitan.md` | 297 | COMPLETE |
+| G.22 | LiteX Overview — Python SoC builder | `12_open_source_open_hardware/litex/litex_overview.md` | 517 | COMPLETE |
 
 ### Quality Issues Found
 
-- 25 articles still contain `## Planned Content` / `## Original Stub Description` sections
+- 13 articles still contain `## Planned Content` / `## Original Stub Description` sections (down from 18)
 - 0 broken cross-references detected in expanded articles
-- All recently expanded articles (07, 09, 11) are clean — no stale stubs
-- Stubs remaining are in: 04_legacy_hdl, 07_protocol_checkers, 11_soft_cores, 12_open_source_open_hardware
+- All recently expanded articles (07, 09, 11, RISC-V cores) are clean — no stale stubs
+- Stubs remaining are in: 04_legacy_hdl, 12_open_source_open_hardware
+
+### New Article (2026-05-04)
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| N.1 | Arduino + FPGA Boards — MCU/FPGA hybrids | `12_open_source_open_hardware/open_boards/arduino_fpga_boards.md` | 472 | COMPLETE |
 
 ---
 

@@ -8,5 +8,5 @@ LiteX is the most complete open-source SoC builder for FPGAs — a Python/Migen 
 
 | File | Topic |
 |---|---|
-| [litex_overview.md](litex_overview.md) | LiteX deep dive: Migen FHDL, Python-based SoC generation, supported boards (ULX3S, Arty, DE10-Nano, KC705...), CPU options (VexRiscv, PicoRV32, Rocket, Microwatt, SERV...), BIOS, Linux-capable configurations |
-| [litex_core_ecosystem.md](litex_core_ecosystem.md) | Core ecosystem catalog: **LiteDRAM** (cross-platform DDR/SDRAM), **LiteEth** (Ethernet MAC + UDP/IP), **LitePCIe** (endpoint, DMA), **LiteSATA**, **LiteSDCard**, **LiteSPI**, **LiteICLink** — compatibility matrix across FPGA families |
+| [litex_overview.md](litex_overview.md) | LiteX deep dive: Migen FHDL, Python SoC builder API, Wishbone bus architecture, auto-generated CSR/memory maps, CPU options (VexRiscv, PicoRV32, Rocket, Microwatt, SERV...), BIOS boot flow, Linux on LiteX, Verilator simulation, 50+ supported boards |
+| [litex_core_ecosystem.md](litex_core_ecosystem.md) | Core ecosystem: **LiteDRAM** (auto-calibrating DDR/SDRAM, compatibility matrix), **LiteEth** (Ethernet MAC + hardware UDP/IP), **LitePCIe** (endpoint + DMA), **LiteSATA**, **LiteSDCard**, **LiteSPI**, **LiteICLink**, **LiteScope** (logic analyzer) — per-core architecture, resource usage, integration examples |

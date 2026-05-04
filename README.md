@@ -199,7 +199,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | Folder | Coverage |
 |---|---|
 | [retro_computing/](12_open_source_open_hardware/retro_computing/) | **MiSTer** (DE10-Nano, framework, 100+ cores, SDRAM add-ons), **MiST**, **Analogue openFPGA**, **SiDi / ZX-Uno / Replay / MARS / MiSTeX** |
-| [open_boards/](12_open_source_open_hardware/open_boards/) | **ULX3S** (ECP5), **OrangeCrab** (ECP5), **iCEBreaker** (iCE40), **TinyFPGA BX**, **ButterStick**, **Tang Nano** (Gowin), repurposed boards (Colorlight i5/i9) |
+| [open_boards/](12_open_source_open_hardware/open_boards/) | **ULX3S** (ECP5), **OrangeCrab** (ECP5), **iCEBreaker** (iCE40), **TinyFPGA BX**, **ButterStick**, **Tang Nano** (Gowin), repurposed boards (Colorlight i5/i9), **Arduino+FPGA boards** (MKR Vidor 4000, Alorium XLR8/Snō, Spartan Edge Accelerator, QuickLogic EOS S3) |
 | [cores_catalog/](12_open_source_open_hardware/cores_catalog/) | **RISC-V core shopping guide** (VexRiscv, PicoRV32, NEORV32, SERV, BOOM, Rocket, CVA6, Ibex, XiangShan), **non-RISC-V cores**, **peripheral core collections** |
 | [memory_controllers/](12_open_source_open_hardware/memory_controllers/) | **Open SDRAM controllers** (stffrdhrn/sdram-controller, LiteDRAM), **DDR1/2/3/4** (WangXuan95, ultraembedded, oprecomp), **HyperRAM/QSPI PSRAM/SRAM** |
 | [video_display/](12_open_source_open_hardware/video_display/) | **OSSC** (Open Source Scan Converter, Lattice ECP3, zero-lag line multiplication), **OSSC Pro**, **RetroTINK** line, **GBS-Control**, **Project F** display controller, open HDMI/DVI TX cores |
