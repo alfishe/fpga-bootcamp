@@ -145,6 +145,8 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [testbench_patterns.md](07_verification/testbench_patterns.md) | Self-checking testbenches, reference models, scoreboards, coverage collection, constrained-random |
 | [formal_verification.md](07_verification/formal_verification.md) | SymbiYosys: assertions (assert/assume/cover), bounded model checking, k-induction, cover properties |
 | [cocotb.md](07_verification/cocotb.md) | Python-based coroutine testbenches: setup, writing tests in Python for Verilog/VHDL, async/await patterns |
+| [verilator.md](07_verification/verilator.md) | Verilator deep dive: C++ testbench authoring, tracing, coverage, linting, multi-threaded sim, CI/CD |
+| [ghdl.md](07_verification/ghdl.md) | GHDL deep dive: VHDL-2008 simulation, PSL assertions, cocotb integration, synthesis to Yosys |
 | [uvm_overview.md](07_verification/uvm_overview.md) | UVM basics for FPGA: agents, drivers, monitors, sequencers, scoreboards, factory override, TLM ports |
 | [protocol_checkers.md](07_verification/protocol_checkers.md) | AXI, Avalon, Wishbone protocol assertion VIPs and bus functional models (BFMs) |
 

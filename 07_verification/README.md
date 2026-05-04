@@ -14,5 +14,7 @@ Making sure your design works before it hits silicon. Starts with the **language
 | [testbench_patterns.md](testbench_patterns.md) | Self-checking testbenches, reference models, scoreboards, coverage collection, constrained-random |
 | [formal_verification.md](formal_verification.md) | SymbiYosys: assertions (assert/assume/cover), bounded model checking, k-induction, cover properties |
 | [cocotb.md](cocotb.md) | Python-based coroutine testbenches: setup, writing tests in Python for Verilog/VHDL, async/await patterns |
+| [verilator.md](verilator.md) | Verilator deep dive: C++ testbench authoring, tracing (VCD/FST), coverage, linting, multi-threaded sim, cocotb integration, CI/CD |
+| [ghdl.md](ghdl.md) | GHDL deep dive: VHDL-2008 simulation, analyze/elaborate/run flow, textio, PSL assertions, cocotb integration, synthesis to Yosys |
 | [uvm_overview.md](uvm_overview.md) | UVM basics for FPGA: agents, drivers, monitors, sequencers, scoreboards, factory override, TLM ports |
 | [protocol_checkers.md](protocol_checkers.md) | AXI, Avalon, Wishbone protocol assertion VIPs and bus functional models (BFMs) |
