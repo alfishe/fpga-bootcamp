@@ -57,12 +57,12 @@
 | 7.4 | Verilator — C++ testbench, tracing, coverage, linting, CI/CD | `07_verification/verilator.md` | COMPLETE |
 | 7.5 | GHDL — VHDL-2008 sim, PSL, cocotb, Yosys synthesis | `07_verification/ghdl.md` | COMPLETE |
 
-## Phase 09: Board Design Expansion (`09_board_design/`)
+## Phase 09: Boards & Board Design Expansion (`09_boards_and_board_design/`)
 
 | # | Task | File | Status |
 |---|---|---|---|
-| 9.1 | Power Integrity — PDN tool walkthrough, multi-rail sequencing, simulation | `09_board_design/power_integrity.md` | COMPLETE |
-| 9.2 | High-Speed Signals — SI simulation, eye diagrams, loss budgets | `09_board_design/high_speed_signals.md` | COMPLETE |
+| 9.1 | Power Integrity — PDN tool walkthrough, multi-rail sequencing, simulation | `09_boards_and_board_design/power_integrity.md` | COMPLETE |
+| 9.2 | High-Speed Signals — SI simulation, eye diagrams, loss budgets | `09_boards_and_board_design/high_speed_signals.md` | COMPLETE |
 
 ## Phase 11: SoC Design Expansion (`11_soft_cores_and_soc_design/soc_design/`)
 
@@ -124,7 +124,7 @@
 
 | # | Task | File | Lines | Status |
 |---|---|---|---|---|
-| N.1 | Arduino + FPGA Boards — MCU/FPGA hybrids | `12_open_source_open_hardware/open_boards/arduino_fpga_boards.md` | 472 | COMPLETE |
+| N.1 | Arduino + FPGA Boards — MCU/FPGA hybrids | `09_boards_and_board_design/arduino_fpga_boards.md` | 472 | COMPLETE |
 
 ### Tier 4: Core Catalogs & Networking
 
@@ -153,8 +153,8 @@
 | # | Task | File | Lines | Status |
 |---|---|---|---|---|
 | T6.1 | Hobbyist & Dev Boards | `12_open_source_open_hardware/open_boards/hobbyist_boards.md` | ~200 | COMPLETE |
-| T6.2 | High-End Boards | `12_open_source_open_hardware/open_boards/high_end_boards.md` | ~230 | COMPLETE |
-| T6.3 | Repurposed Boards | `12_open_source_open_hardware/open_boards/repurposed_boards.md` | ~150 | COMPLETE |
+| T6.2 | High-End Boards | `09_boards_and_board_design/high_end_boards.md` | ~230 | COMPLETE |
+| T6.3 | Repurposed Boards | `09_boards_and_board_design/repurposed_boards.md` | ~150 | COMPLETE |
 | T6.4 | SDRAM Controllers | `12_open_source_open_hardware/memory_controllers/sdram_controllers.md` | ~230 | COMPLETE |
 | T6.5 | DDR Controllers | `12_open_source_open_hardware/memory_controllers/ddr_controllers.md` | ~225 | COMPLETE |
 | T6.6 | Specialized Memory | `12_open_source_open_hardware/memory_controllers/specialized_memory.md` | ~320 | COMPLETE |

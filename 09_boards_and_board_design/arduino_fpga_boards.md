@@ -1,4 +1,4 @@
-[← Open Boards Home](README.md) · [← Section Home](../README.md) · [← Project Home](../../../README.md)
+[← Board Design](README.md) · [← Project Home](../README.md)
 
 # Arduino + FPGA Boards — MCU/FPGA Hybrids for the Arduino Ecosystem
 

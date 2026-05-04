@@ -223,7 +223,7 @@ FPGA doesn't work?
 |---|---|---|
 | [CDC Coding](../04_hdl_and_synthesis/cdc_coding.md) | This KB | Clock domain crossing patterns |
 | [Timing Closure](../05_timing_and_constraints/timing_closure.md) | This KB | Methodology for fixing timing violations |
-| [Power Integrity](../09_board_design/power_integrity.md) | This KB | PDN design, decoupling, sequencing |
-| [High-Speed Signals](../09_board_design/high_speed_signals.md) | This KB | Signal integrity, crosstalk, eye diagrams |
-| [Configuration Interfaces](../09_board_design/configuration_interfaces.md) | This KB | Flash selection, config modes, fallback |
+| [Power Integrity](../09_boards_and_board_design/power_integrity.md) | This KB | PDN design, decoupling, sequencing |
+| [High-Speed Signals](../09_boards_and_board_design/high_speed_signals.md) | This KB | Signal integrity, crosstalk, eye diagrams |
+| [Configuration Interfaces](../09_boards_and_board_design/configuration_interfaces.md) | This KB | Flash selection, config modes, fallback |
 | [Bring-Up Checklist](bring_up_checklist.md) | This KB | Systematic bring-up sequence |

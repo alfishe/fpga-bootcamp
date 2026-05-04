@@ -59,7 +59,7 @@ I2C is **open-drain**, making it the easiest bus to level-shift:
 - **TXS0102/TXS0108** — Auto-direction, handles I2C pull-ups correctly
 - **BSS138 + pull-ups** — Cheap FET-based solution for prototypes
 
-See [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) for detailed circuit examples.
+See [IO Voltage Levels & Level Translation](../../09_boards_and_board_design/io_voltage_levels.md) for detailed circuit examples.
 
 ---
 
@@ -203,4 +203,4 @@ CAN transceivers are **always external** — no FPGA has a built-in CAN PHY.
 | TI SCPS206 — PCA9306 Datasheet | TI | I2C level translator with enable |
 | Microchip AN734 — CAN Basics | Microchip | CAN protocol fundamentals, bit timing calculation |
 | Maxim AN126 — 1-Wire Communication | Maxim/ADI | 1-Wire timing, parasitic power, CRC |
-| [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) | This KB | Level translation for 5V I2C/SPI to 3.3V/1.8V FPGAs |
+| [IO Voltage Levels & Level Translation](../../09_boards_and_board_design/io_voltage_levels.md) | This KB | Level translation for 5V I2C/SPI to 3.3V/1.8V FPGAs |

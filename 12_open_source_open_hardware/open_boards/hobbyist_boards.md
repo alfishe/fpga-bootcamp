@@ -25,7 +25,7 @@ The hobbyist FPGA board market exploded after 2018, driven by three forces: the 
 | **Tang Nano 20K** | Gowin GW2AR-18 | 20K | 64 MB PSRAM | 32 MB SPI | ~$25 | 🟡 Gowin EDU (Apicula maturing) | More LUTs, still ultra-cheap, HDMI |
 | **Tang Console 60K** | Gowin GW5A-60 | 60K | — | USB drive | ~$40 | 🟡 Gowin EDU | Purpose-built retro gaming, HDMI, USB controllers |
 | **Tang Console 138K** | Gowin GW5A-138 | 138K | — | USB drive | ~$60 | 🟡 Gowin EDU | Maximum retro core compatibility |
-| **Colorlight i5** | Lattice ECP5 LFE5U-25F | 25K | 32 MB SDRAM | — | ~$15 | ✅ Yosys + nextpnr + Trellis | Repurposed LED controller — see [repurposed_boards.md](repurposed_boards.md) |
+| **Colorlight i5** | Lattice ECP5 LFE5U-25F | 25K | 32 MB SDRAM | — | ~$15 | ✅ Yosys + nextpnr + Trellis | Repurposed LED controller — see [repurposed_boards.md](../../09_boards_and_board_design/repurposed_boards.md) |
 
 ---
 
@@ -214,6 +214,25 @@ Sipeed's Tang Console (released 2025) is a dedicated FPGA retro gaming console b
 
 > **Tang Console vs Tang Nano 20K for retro gaming**: The Console's BL616 MCU handles USB host, core switching, and on-screen display — tasks that would consume FPGA fabric on a bare Nano 20K. The proper TLVDS HDMI output fixes the Nano's signal integrity issues. If your goal is playing retro games rather than learning FPGA design, the Console is the better choice.
 
+### Tang Console Projects (TangCore Distribution)
+
+The **TangCore** distribution (by nand2mario) is the primary software for the Tang Console. It runs on the BL616 MCU and manages core switching, USB host, and on-screen display — the FPGA only handles the emulation core itself.
+
+| Core | System | Key Features | Console 60K | Console 138K |
+|---|---|---|---|---|
+| **NESTang** | Nintendo Entertainment System | Cycle-accurate, extensive mapper support, 720p HDMI | ✅ | ✅ |
+| **SNESTang** | Super Nintendo | LoROM/HiROM/ExHiROM, DSP-1/2/3/4, S-RTC, OBC-1 chips | ✅ | ✅ |
+| **GBATang** | Game Boy Advance | Open-source BIOS, full 32 MB gamepak, high compatibility | ✅ | ✅ |
+| **MDTang** | Sega Genesis/Mega Drive | Accurate Genesis/Mega Drive emulation | ✅ | ✅ |
+| **SMSTang** | Sega Master System | SMS emulation via TangCore | ✅ | ✅ |
+| **486Tang** | Intel 486 PC | Experimental x86 PC emulator (new) | ✅ | ✅ |
+
+| Repository | License | Notes |
+|---|---|---|
+| **nand2mario/tangcore** | Apache 2.0 (firmware); cores vary | Unified distribution; BL616 MCU manages core switching via JTAG |
+
+> **TangCore architecture**: Unlike standalone cores (which run directly on the FPGA with their own I/O handling), TangCore splits responsibilities — the BL616 MCU handles USB host, core selection menu, and JTAG programming, while the FPGA runs only the emulation core. This gives the Console its signature fast core switching: the MCU reprograms the FPGA via JTAG when you select a different system.
+
 ### TinyFPGA BX — Minimalist USB
 
 | Project | Category | Description | Repository / Source |
@@ -267,7 +286,7 @@ flowchart TD
 ### When NOT to Use
 
 - **Production products** — hobbyist boards lack the reliability testing, temperature ratings, and supply-chain guarantees of vendor evaluation boards
-- **PCIe designs** — no hobbyist board has PCIe connectivity; see [High-End Boards](high_end_boards.md)
+- **PCIe designs** — no hobbyist board has PCIe connectivity; see [High-End Dev Boards](../../09_boards_and_board_design/high_end_boards.md)
 - **High-speed transceiver work** — ECP5 and iCE40 lack multi-gigabit transceivers; need Artix-7 GTP or Ultrascale+ GTH
 - **Large designs (>85K LUTs)** — no hobbyist open-toolchain board exceeds 85K LUTs
 
@@ -334,6 +353,6 @@ flowchart TD
 - [LiteX Boards](https://github.com/litex-hub/litex-boards) — SoC targets for all boards
 - [FemtoRV Tutorial](https://github.com/BrunoLevy/learn-fpga) — RISC-V learning path for ULX3S and iCEBreaker
 - [nand2mario Retro Projects](https://nand2mario.github.io/projects/) — Tang Nano retro gaming cores
-- [Arduino FPGA Boards](arduino_fpga_boards.md) — MCU + FPGA hybrid boards
-- [Repurposed Boards](repurposed_boards.md) — commercial hardware repurposed for FPGA dev
-- [High-End Boards](high_end_boards.md) — Alveo, ZCU, KRIA
+- [Arduino FPGA Boards](../../09_boards_and_board_design/arduino_fpga_boards.md) — MCU + FPGA hybrid boards
+- [Repurposed Boards](../../09_boards_and_board_design/repurposed_boards.md) — commercial hardware repurposed for FPGA dev
+- [High-End Dev Boards](../../09_boards_and_board_design/high_end_boards.md) — Alveo, ZCU, KRIA, Intel Agilex

@@ -25,7 +25,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | **IP & Cores** | Bus protocols (AXI4/Wishbone/Avalon/APB), DDR controllers (MIG/UniPHY), PCIe blocks, transceivers, vendor IP ecosystems, IP packaging & reuse (FuseSoC, IP-XACT), licensing |
 | **Verification** | Simulation (ModelSim, XSim, Verilator), formal verification (SymbiYosys), UVM, cocotb, testbench patterns |
 | **Debug & Tools** | ILA/SignalTap, OpenOCD, JTAG boundary scan, logic analyzers, remote debugging, Tcl scripting |
-| **Board Design** | High-speed signal integrity, power integrity, BGA escape routing, thermal design, configuration interfaces |
+| **Board Design** | High-speed signal integrity, power integrity, BGA escape routing, thermal design, configuration interfaces, **vendor dev boards** |
 | **Embedded Linux** | Device tree overlays, U-Boot porting, kernel drivers for FPGA fabric, Buildroot/Yocto, FPGA Manager, remote update |
 | **Soft Cores & SoC Design** | RISC-V ISA deep dive, MicroBlaze, Nios II/V, open RISC-V cores (VexRiscv, PicoRV32, NEORV32, SERV, Ibex, BOOM, Rocket, CVA6), SoC architecture: bus matrix design, memory map planning, interrupt routing, DMA, multi-core coherency, Chipyard |
 | **Open Source & Open Hardware** | Retro computing platforms (MiSTer, MiST, Analogue openFPGA), open development boards (ULX3S, OrangeCrab, iCEBreaker, Tang Nano), CPU core catalogs, memory controllers, video/display (OSSC), networking & PCIe, GPU compute, notable initiatives (OpenTitan, PULP, FOSSi, CHIPS Alliance), LiteX ecosystem |
@@ -161,14 +161,18 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | └ [tcl_scripting.md](08_debug_and_tools/tcl_scripting.md) | Automating Vivado/Quartus workflows with Tcl |
 | └ [commercial_jtag_tools.md](08_debug_and_tools/commercial_jtag_tools.md) | Ecosystem overview: PCBA testing (XJTAG, Corelis) vs High-End Trace (Lauterbach, ARM DSTREAM) |
 
-### 09 — Board Design
+### 09 — Boards & Board Design
 | File | Topic |
 |---|---|
-| [high_speed_signals.md](09_board_design/high_speed_signals.md) | Signal integrity: impedance control, length matching, differential pairs, vias, insertion loss, crosstalk |
-| [power_integrity.md](09_board_design/power_integrity.md) | Power rails & sequencing, decoupling capacitor selection, PDN design, IR drop, current transients |
-| [bga_routing.md](09_board_design/bga_routing.md) | BGA escape routing strategies, layer stackup design, via types (through, blind, buried, microvia) |
-| [thermal_design.md](09_board_design/thermal_design.md) | Junction temperature estimation, heat sink selection, airflow, power dissipation models, thermal vias |
-| [configuration_interfaces.md](09_board_design/configuration_interfaces.md) | Flash selection (QSPI, eMMC, NAND), config pin strapping, fallback/multi-boot, remote update |
+| [high_speed_signals.md](09_boards_and_board_design/high_speed_signals.md) | Signal integrity: impedance control, length matching, differential pairs, vias, insertion loss, crosstalk |
+| [power_integrity.md](09_boards_and_board_design/power_integrity.md) | Power rails & sequencing, decoupling capacitor selection, PDN design, IR drop, current transients |
+| [bga_routing.md](09_boards_and_board_design/bga_routing.md) | BGA escape routing strategies, layer stackup design, via types (through, blind, buried, microvia) |
+| [thermal_design.md](09_boards_and_board_design/thermal_design.md) | Junction temperature estimation, heat sink selection, airflow, power dissipation models, thermal vias |
+| [configuration_interfaces.md](09_boards_and_board_design/configuration_interfaces.md) | Flash selection (QSPI, eMMC, NAND), config pin strapping, fallback/multi-boot, remote update |
+| [io_voltage_levels.md](09_boards_and_board_design/io_voltage_levels.md) | IO bank voltages, 5V tolerance, level translation techniques, legacy system interfacing, multi-VCCO power design |
+| [high_end_boards.md](09_boards_and_board_design/high_end_boards.md) | **Alveo**, **Zynq UltraScale+** dev kits, **KRIA** SOMs, **Intel Agilex/Stratix 10** DKs — PCIe, HBM, ARM SoC, $250–$8,000 |
+| [arduino_fpga_boards.md](09_boards_and_board_design/arduino_fpga_boards.md) | **MKR Vidor 4000**, **Alorium XLR8/Snō**, **Spartan Edge Accelerator**, **QuickLogic EOS S3** — MCU+FPGA hybrids |
+| [repurposed_boards.md](09_boards_and_board_design/repurposed_boards.md) | **Colorlight i5/i9**, **EBAZ4205**, **Pano Logic G2**, **MS Catapult v2**, **Elgato Cam Link 4K** — commercial hardware at open-source prices |
 
 ### 10 — Embedded Linux
 | Article | Topic |
@@ -199,7 +203,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | Folder | Coverage |
 |---|---|
 | [retro_computing/](12_open_source_open_hardware/retro_computing/) | **MiSTer** (DE10-Nano, framework, 100+ cores, SDRAM add-ons), **MiST**, **Analogue openFPGA**, **SiDi / ZX-Uno / Replay / MARS / MiSTeX** |
-| [open_boards/](12_open_source_open_hardware/open_boards/) | **ULX3S** (ECP5), **OrangeCrab** (ECP5), **iCEBreaker** (iCE40), **TinyFPGA BX**, **ButterStick**, **Tang Nano** (Gowin), repurposed boards (Colorlight i5/i9), **Arduino+FPGA boards** (MKR Vidor 4000, Alorium XLR8/Snō, Spartan Edge Accelerator, QuickLogic EOS S3) |
+| [open_boards/](12_open_source_open_hardware/open_boards/) | **Community open-hardware boards** (ULX3S, OrangeCrab, iCEBreaker, TinyFPGA BX, ButterStick, Tang Nano/Console) — see also [vendor dev boards & repurposed boards in 09](09_boards_and_board_design/) |
 | [cores_catalog/](12_open_source_open_hardware/cores_catalog/) | **RISC-V core shopping guide** (VexRiscv, PicoRV32, NEORV32, SERV, BOOM, Rocket, CVA6, Ibex, XiangShan), **non-RISC-V cores**, **peripheral core collections** |
 | [memory_controllers/](12_open_source_open_hardware/memory_controllers/) | **Open SDRAM controllers** (stffrdhrn/sdram-controller, LiteDRAM), **DDR1/2/3/4** (WangXuan95, ultraembedded, oprecomp), **HyperRAM/QSPI PSRAM/SRAM** |
 | [video_display/](12_open_source_open_hardware/video_display/) | **OSSC** (Open Source Scan Converter, Lattice ECP3, zero-lag line multiplication), **OSSC Pro**, **RetroTINK** line, **GBS-Control**, **Project F** display controller, open HDMI/DVI TX cores |

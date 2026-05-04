@@ -1,8 +1,8 @@
 [← 12 Open Source Open Hardware Home](../README.md) · [← Memory Controllers Home](README.md) · [← Project Home](../../../README.md)
 
-# Open DDR Controllers — DDR1/2/3/4/5 for FPGA
+# Open DDR & LPDDR Controllers — DDR1/2/3/4/5 & LPDDR for FPGA
 
-Open-source DDR SDRAM controllers for FPGA — from simple DDR1 on Artix-7 to DDR4 on Kintex-7. DDR controllers are significantly harder to implement than SDRAM because they transfer data on both clock edges, require source-synchronous capture with DQS strobes, and need per-bit read calibration (training) to compensate for PCB skew. DDR5 remains beyond the reach of soft controllers — it requires hardened PHY blocks found only in Versal / Agilex 7 FPGAs.
+Open-source DDR and LPDDR SDRAM controllers for FPGA — from simple DDR1 on Artix-7 to LPDDR4 on Kintex-7. DDR controllers are significantly harder to implement than SDRAM because they transfer data on both clock edges, require source-synchronous capture with DQS strobes, and need per-bit read calibration (training) to compensate for PCB skew. DDR5 and LPDDR5 remain beyond the reach of soft controllers — they require hardened PHY blocks found only in Versal Gen2 (DDR5 + LPDDR5/5X up to 8533 Mb/s) and Agilex 7 M-Series (DDR5 + LPDDR5).
 
 ---
 
@@ -203,6 +203,69 @@ DDR5 (3200–6400 MT/s, 1.1 V) is a fundamental architectural shift from DDR4. N
 
 > **Antmicro's DDR5 effort**: Antmicro is extending their open-source Rowhammer testing framework to DDR5. They have built a custom Kintex-7 board with a DDR5 DIMM slot and are developing an open PHY. This is a research/verification platform, not a production controller. The 1.1 V POD11 I/O is at the absolute limit of what Series-7 FPGAs can drive.
 
+### LPDDR — Low-Power DDR for Embedded & SoC
+
+LPDDR (Low-Power Double Data Rate) is the mobile/embedded variant of DDR, designed for smartphones, tablets, and — critically for FPGA — SoC platforms like Zynq UltraScale+ and Intel Agilex. LPDDR uses less power, fewer pins, and smaller packages than standard DDR, making it the default choice for FPGA SoCs where the memory is soldered directly to the PCB.
+
+#### LPDDR vs DDR — Key Architectural Differences
+
+| Parameter | DDR1/2/3/4/5 | LPDDR1/2/3/4/5 |
+|---|---|---|
+| **Target** | Desktop, server, DIMM slots | Mobile, embedded, PoP/BGA on PCB |
+| **Channel width** | 64-bit (x8/x16 chips in parallel on DIMM) | 16-bit or 32-bit per channel |
+| **CMD/ADDR** | Separate pins | **Multiplexed CA bus** (10-bit DDR, LPDDR2+) |
+| **Pin count** | 40–80+ per DIMM | 20–30 per chip |
+| **I/O signaling** | SSTL (DDR1/2/3), POD (DDR4/5) | SSTL (LPDDR1), HVSTL (LPDDR2/3), POD (LPDDR4/4X/5) |
+| **Vdd/Vddq** | Same as DDR counterparts | Lower (see table below) |
+| **Topology** | DIMM, multi-drop | Point-to-point, PoP (Package-on-Package) |
+| **Power modes** | Self-refresh only | Self-refresh + **deep sleep** + **power-down** |
+| **Write leveling** | Required (DDR3+) | **Not required** (point-to-point, no fly-by skew) |
+| **Open soft controller?** | DDR1–3 yes, DDR4 experimental | LPDDR4 via Antmicro/LiteDRAM; others hard PHY only |
+
+> **Why LPDDR skips write leveling**: Standard DDR3+ uses a fly-by daisy-chain topology that introduces clock-to-DQS skew at each DRAM chip, requiring write leveling to compensate. LPDDR uses point-to-point connections (one DRAM chip per channel), so there is no skew to compensate for. This makes the LPDDR PHY simpler than the equivalent DDR generation's PHY.
+
+> **The CA bus trade-off**: LPDDR2+ multiplexes command and address onto a 10-bit CA bus transmitted at DDR rate. This saves ~30 pins compared to standard DDR's parallel address bus, but the controller must serialize commands and meet tighter timing on the CA bus. The CA bus is also bidirectional in some LPDDR5 modes.
+
+#### LPDDR Generation Comparison
+
+| Parameter | LPDDR1 | LPDDR2 | LPDDR3 | LPDDR4 | LPDDR4X | LPDDR5 | LPDDR5X |
+|---|---|---|---|---|---|---|---|
+| **Vdd1/Vdd2** | 1.8 V | 1.2 / 1.8 V | 1.2 / 1.8 V | 1.1 / 1.8 V | 0.6 / 1.1 V | 1.05 / 1.8 V | 0.55 / 1.1 V |
+| **Transfer rate** | 200–400 MT/s | 400–1066 MT/s | 800–2133 MT/s | 1600–4266 MT/s | 1600–4266 MT/s | 3200–6400 MT/s | 4800–8533 MT/s |
+| **Prefetch** | 2n | 4n | 8n | 8n (dual channel) | 8n (dual channel) | 16n | 16n |
+| **Channel width** | 16/32-bit | 16/32-bit | 16/32-bit | 16-bit × 2 ch | 16-bit × 2 ch | 16-bit × 2 ch | 16-bit × 2 ch |
+| **CA bus** | Separate pins | 10-bit DDR CA | 10-bit DDR CA | 6-bit CA per ch | 6-bit CA per ch | 7-bit CA per ch | 7-bit CA per ch |
+| **Banks** | 4 | 4–8 | 8 | 8 per ch (2 BG) | 8 per ch (2 BG) | 8 per ch (4 BG) | 8 per ch (4 BG) |
+| **ODT** | No | No | Yes (DRAM-side) | Yes (DRAM + host) | Yes (DRAM + host) | Yes | Yes |
+| **Packaging** | PoP / BGA | PoP / BGA | PoP / BGA | BGA | BGA | BGA | BGA |
+| **Open soft PHY?** | 🟡 Limited | 🟡 Limited | 🟡 Experimental | ✅ Antmicro/LiteDRAM | ✅ Same as LPDDR4 | ❌ Hard PHY only | ❌ Hard PHY only |
+
+#### FPGA SoC LPDDR Support
+
+| FPGA SoC | LPDDR Generation | Controller Type | Notes |
+|---|---|---|---|
+| **Zynq-7000** | LPDDR2 | Hard (PS) | PS memory controller supports LPDDR2 via MIO |
+| **Zynq UltraScale+** | LPDDR4 | Hard (PS) | PS DDR controller supports both DDR4 and LPDDR4; PL has no soft LPDDR4 IP |
+| **Zynq UltraScale+ RFSoC** | LPDDR4 | Hard (PS) | Same as ZU+ MPSoC |
+| **Intel Cyclone V SoC** | LPDDR2 | Hard (HPS) | HPS SDRAM controller supports DDR2/DDR3/LPDDR2 |
+| **Intel Arria 10 SoC** | LPDDR3 | Hard (HPS) | HPS EMIF supports DDR3/LPDDR3 |
+| **Intel Agilex 7** | LPDDR4/4X | Hard (HPS) | EMIF hard PHY |
+| **Intel Agilex 5** | LPDDR4/5 | Hard (HPS + FPGA EMIF) | First mid-range FPGA with LPDDR5 support |
+| **Gowin GW2AR-18** | PSRAM (LPDDR-like) | Hard IP | Tang Nano 20K's PSRAM uses Gowin hard IP; no open controller |
+
+> **Zynq PS vs PL for LPDDR**: On Zynq UltraScale+, the PS (Processing System) has a hardened DDR/LPDDR4 memory controller, but the PL (Programmable Logic) does **not** have a soft LPDDR4 IP. AMD/Xilinx has confirmed they have no plans to develop a PL LPDDR4 controller. If your PL design needs LPDDR4 access, you must route it through the PS via AXI HP ports, or use Antmicro's open-source LiteDRAM LPDDR4 PHY (research-grade).
+
+#### Open-Source LPDDR Controllers
+
+| Controller | LPDDR Gen | FPGA | Status | Repository |
+|---|---|---|---|---|
+| **Antmicro LPDDR4 PHY + LiteDRAM** | LPDDR4 | Kintex-7 | ✅ Working (research/verification) | antmicro/lpddr4-test-board |
+| **Antmicro Rowhammer Tester** | LPDDR4 | Kintex-7 | ✅ Working (security testing) | antmicro/rowhammer-tester |
+| **LiteDRAM (experimental)** | LPDDR4 | ECP5, Artix-7 | 🟡 Experimental | enjoy-digital/litedram |
+| **(No open soft controller)** | LPDDR5 | — | ❌ Hard PHY only (Agilex 5) | — |
+
+> **LPDDR4 vs DDR4 for FPGA designs**: If you're designing a custom PCB with a Zynq UltraScale+, LPDDR4 uses ~30 fewer pins than DDR4 (multiplexed CA bus vs parallel address), supports PoP stacking (saving PCB area), and consumes less power. The trade-off is lower per-channel bandwidth (16-bit vs 64-bit) and no DIMM upgrade path. For embedded designs where the memory is soldered down, LPDDR4 is usually the better choice.
+
 ---
 
 ## LiteDRAM — The Cross-Platform DDR Controller
@@ -305,15 +368,23 @@ OpenDRAM (FanosResearch/OpenDRAM) is the newest open DDR4 controller, published 
 
 DDR5 on FPGA is exclusively the domain of vendor-hardened memory controllers. There are no open-source DDR5 soft controllers, and the architectural requirements (DFE, dual subchannels, 16n prefetch) make one unlikely for current FPGA families.
 
-| FPGA Family | DDR5 Support | Interface | Notes |
-|---|---|---|---|
-| **AMD Versal Gen2** | ✅ Hard MC | AXI NoC2 | Hardened memory controller, no soft IP |
-| **Intel Agilex 7** | ✅ Hard MC | AXI | Via Intel EMIF hard PHY |
-| **AMD Kintex UltraScale+** | ❌ No | — | Not supported; use DDR4 instead |
-| **AMD Artix-7 / Kintex-7** | ❌ No | — | I/O voltage floor is 1.1 V (barely DDR5); no DFE support |
-| **Lattice ECP5** | ❌ No | — | Nowhere near the I/O speed required |
+| FPGA Family | DDR5 | LPDDR5 | LPDDR5X | Max DDR5 Rate | Interface | Notes |
+|---|---|---|---|---|---|---|
+| **AMD Versal Premium Gen2** | ✅ Hard MC | ✅ Hard MC | ✅ Hard MC | 6400 Mb/s | AXI NoC2 | DDR5 component/DIMM + LPDDR5/5X; 2-rank RDIMM limited to 4000 Mb/s |
+| **AMD Versal Prime Gen2** | ✅ Hard MC | ✅ Hard MC | ✅ Hard MC | 6400 Mb/s | AXI NoC2 | Same DDRMC5E as Premium Gen2 |
+| **AMD Versal AI Edge Gen2** | ✅ Hard MC | ✅ Hard MC | ✅ Hard MC | 6400 Mb/s | AXI NoC2 | Same DDRMC5E; LPDDR5X up to 8533 Mb/s |
+| **Intel Agilex 7 M-Series** | ✅ Hard MC | ✅ Hard MC | — | 5600 Mb/s | AXI | 2× 40-bit channels (32 data + 8 ECC); also HBM2E (16/32 GB) |
+| **Intel Agilex 7 F/I-Series** | ❌ DDR4 only | ❌ | — | — | AXI | EMIF supports DDR4 only; no DDR5 on F-Series or I-Series |
+| **Intel Agilex 5 E-Series** | ❌ DDR4 only | ✅ Hard MC | — | — | AXI | First mid-range FPGA with LPDDR5; DDR4 @ 2667, LPDDR4 @ 4267 Mb/s |
+| **AMD Kintex UltraScale+** | ❌ No | ❌ No | ❌ No | — | — | Not supported; use DDR4 instead |
+| **AMD Artix-7 / Kintex-7** | ❌ No | ❌ No | ❌ No | — | — | I/O voltage floor is 1.1 V (barely DDR5); no DFE support |
+| **Lattice ECP5** | ❌ No | ❌ No | ❌ No | — | — | Nowhere near the I/O speed required |
 
-> **If you need DDR5 on FPGA**: You must use a Versal Gen2 or Agilex 7 device with the vendor's hardened memory controller. There is no open-source or soft-IP path. For open toolchains, DDR3 on ECP5 remains the highest generation achievable.
+> **If you need DDR5 on FPGA**: You must use a Versal Gen2 or Agilex 7 M-Series device with the vendor's hardened memory controller. There is no open-source or soft-IP path. For open toolchains, DDR3 on ECP5 remains the highest generation achievable.
+
+> **Agilex 7 DDR5 is M-Series only**: The Agilex 7 F-Series and I-Series development kits only support DDR4 — only the newer M-Series (with HBM2E) adds DDR5 support. Don't assume all Agilex 7 devices support DDR5.
+
+> **Versal Gen2 LPDDR5X at 8533 Mb/s**: AMD's Versal Gen2 DDRMC5E supports LPDDR5X at up to 8533 Mb/s on single-rank components — the fastest external memory interface available on any FPGA. This is particularly relevant for designs that need maximum bandwidth without the PCB complexity of DIMM slots.
 
 ---
 
@@ -325,7 +396,7 @@ flowchart TD
     B -->|"DDR1/2"| C{"FPGA family?"}
     B -->|"DDR3"| D{"Using LiteX?"}
     B -->|"DDR4"| E{"Need fully open stack?"}
-    B -->|"DDR5"| F["Vendor IP only<br/>Versal Gen2 or Agilex 7"]
+    B -->|"DDR5"| F["Vendor IP only<br/>Versal Gen2 or Agilex 7 M-Series"]
     C -->|"Spartan-3 / Cyclone III"| G["DDR2_CONTROLLER or OpenCores DDR2"]
     C -->|"Artix-7 / ECP5"| H["Use DDR3 instead — better supported"]
     D -->|"Yes"| I["LiteDRAM<br/>Auto-calibrated, production-grade"]

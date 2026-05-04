@@ -39,7 +39,7 @@ Speed (log scale)
 |---|---|
 | **Hard IP vs. Soft Core** | Hard IP = dedicated silicon (low power, guaranteed timing). Soft core = RTL in fabric (flexible, consumes LUTs/FFs) |
 | **PHY vs. Controller** | PHY = physical layer (analog front-end, SerDes). Controller = digital protocol logic (packet handling, state machines) |
-| **Voltage Translation** | External buses often use different voltages than the FPGA IO bank. See [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) |
+| **Voltage Translation** | External buses often use different voltages than the FPGA IO bank. See [IO Voltage Levels & Level Translation](../../09_boards_and_board_design/io_voltage_levels.md) |
 | **Pin Count** | Parallel buses (MIPI, LVDS, DDR) need many pins. Serial buses (PCIe, USB3) need fewer pins but dedicated transceivers |
 | **IP Licensing** | Vendor IP for complex protocols (PCIe, HDMI, MIPI) often requires separate license fees beyond the FPGA tool license |
 

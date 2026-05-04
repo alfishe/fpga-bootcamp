@@ -141,7 +141,7 @@ PCI in an FPGA is a **soft core** — no vendor provides hardened PCI blocks any
 
 ## Level Translation for All Legacy Buses
 
-Every legacy bus uses **5V TTL**. Modern FPGAs do not tolerate 5V. See [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) for:
+Every legacy bus uses **5V TTL**. Modern FPGAs do not tolerate 5V. See [IO Voltage Levels & Level Translation](../../09_boards_and_board_design/io_voltage_levels.md) for:
 - **SN74LVC16T245** — 16-bit bidirectional translator (perfect for 68000/Zorro data bus)
 - **TXS0108E** — Auto-direction for control signals
 - **BSS138 + resistor networks** — Cheap prototype solution
@@ -204,5 +204,5 @@ Control signals (/AS, /UDS, /LDS, R/W, /DTACK):
 | Amiga Hardware Reference Manual (3rd Ed.) | Commodore/Addison-Wesley | Zorro II/III, autoconfig, DMA, Gary/Alice/Bridgette |
 | ISA System Architecture (MindShare) | Addison-Wesley | PC/AT bus timing, DMA, interrupts |
 | PCI Local Bus Specification 2.3 | PCI-SIG | PCI protocol, electrical, configuration space |
-| [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) | This KB | 5V→3.3V translation for all legacy buses |
+| [IO Voltage Levels & Level Translation](../../09_boards_and_board_design/io_voltage_levels.md) | This KB | 5V→3.3V translation for all legacy buses |
 | [Zorro Bus](../../amiga/01_hardware/common/zorro_bus.md) | Amiga KB | Amiga-specific Zorro implementation details |

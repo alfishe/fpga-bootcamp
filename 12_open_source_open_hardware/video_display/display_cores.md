@@ -154,6 +154,12 @@ Pixel Data (8-bit) + Control Signals
 | **Xilinx Artix-7** | OSERDES2 + LVDS I/O | 1080p | Well-documented, TMDS_33 I/O standard |
 | **Xilinx Kintex-7** | OSERDES2 + TMDS_33 | 1080p+ | Same as Artix-7 with more speed |
 | **Intel Cyclone V** | LVDS I/O + serializer | 1080p | Used in MiSTer and Analogue Pocket |
+| **Gowin GW1NR / GW2AR** | ELVDS (OSER10/OSER5 + emulated LVDS) | 720p | Tang Nano 9K/20K; ⚠️ ELVDS not true TLVDS — some monitors incompatible |
+| **Gowin GW5A** | TLVDS (hard LVDS I/O) | 1080p | Tang Console 60K/138K; proper TLVDS fixes Nano signal issues |
+
+> **Gowin ELVDS vs TLVDS for HDMI**: The Tang Nano 9K (GW1NR-9) and 20K (GW2AR-18) use **ELVDS** (Emulated LVDS) for their HDMI TMDS pairs because Sipeed's PCB routing doesn't connect to the true TLVDS-capable pins. ELVDS works for most displays at 720p but can cause signal integrity issues with picky monitors. The newer Tang Console (GW5A-60/138K) has proper **TLVDS** routing and supports 1080p reliably. If you're targeting the Tang Nano boards, always test with your specific monitor. See [Hobbyist Boards](../open_boards/hobbyist_boards.md) for the full Tang ecosystem details.
+
+> **Gowin HDMI open-source status**: Gowin provides a proprietary HDMI/DVI TX IP core in Gowin EDA, but there is no mature open-source TMDS serializer for Gowin FPGAs yet. Community projects on Tang Nano boards typically use the Gowin IP or hand-crafted OSER10-based serializers. The [Apicula](https://github.com/YosysHQ/apicula) project is working toward open bitstream support but does not yet cover the high-speed I/O primitives needed for TMDS.
 
 ### TMDS Encoder (Verilog)
 

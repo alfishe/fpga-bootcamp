@@ -1,4 +1,4 @@
-[← 12 Open Source Open Hardware Home](../README.md) · [← Open Boards Home](README.md) · [← Project Home](../../../README.md)
+[← Boards & Board Design](README.md) · [← Project Home](../README.md)
 
 # Repurposed FPGA Boards — Commercial Hardware at Open-Source Prices
 
@@ -334,5 +334,5 @@ flowchart TD
 - [awesome-fpga-boards (GitHub)](https://github.com/iDoka/awesome-fpga-boards) — curated list of repurposable FPGA boards
 - [LiteX Boards — Colorlight targets](https://github.com/litex-hub/litex-boards)
 - [Project Trellis](https://github.com/YosysHQ/prjtrellis) — ECP5 bitstream tools
-- [Hobbyist Boards](hobbyist_boards.md) — purpose-built dev boards
-- [High-End Boards](high_end_boards.md) — Alveo, ZCU, KRIA
+- [Hobbyist Boards](../12_open_source_open_hardware/open_boards/hobbyist_boards.md) — community-designed open-hardware boards
+- [High-End Dev Boards](high_end_boards.md) — Alveo, ZCU, KRIA, Intel Agilex

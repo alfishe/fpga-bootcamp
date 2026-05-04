@@ -153,7 +153,7 @@ Exceeding SSO limits causes ground bounce — the internal ground reference shif
 |---|---|
 | Using LVDS for a 10 MHz SPI clock | Overkill. LVCMOS33 at 10 MHz works fine. LVDS adds common-mode and termination complexity |
 | Using SSTL for a GPIO LED | SSTL requires VREF and termination. LVCMOS33 is simpler and works identically at low speed |
-| Connecting 3.3V peripheral to 1.8V HP bank | HR bank needed for >1.8V. Use voltage level translator if no HR bank is available → see [IO Voltage Levels & Level Translation](../../09_board_design/io_voltage_levels.md) |
+| Connecting 3.3V peripheral to 1.8V HP bank | HR bank needed for >1.8V. Use voltage level translator if no HR bank is available → see [IO Voltage Levels & Level Translation](../../09_boards_and_board_design/io_voltage_levels.md) |
 | Routing a 10G MGT through general IO | Impossible. MGTs have dedicated analog pins and quad locations |
 
 ---
