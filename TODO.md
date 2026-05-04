@@ -1,7 +1,7 @@
 # TODO.md — FPGA Knowledge Base Build Plan
 
 > Auto-generated plan. Update statuses as work progresses. See [AGENTS.md](AGENTS.md) for quality standards.
-> **Last synced:** 2026-05-04 — Tier 3 Open HW deep dives (MiSTer, OpenTitan, OSSC, LiteX). All previous phases COMPLETE.
+> **Last synced:** 2026-05-04 — Tier 4–7 + Legacy HDL deep dives complete. All gap analysis articles now at Deep tier quality.
 
 ---
 
@@ -116,16 +116,64 @@
 
 ### Quality Issues Found
 
-- 13 articles still contain `## Planned Content` / `## Original Stub Description` sections (down from 18)
+- 0 articles still contain `## Planned Content` / `## Original Stub Description` sections (down from 13)
 - 0 broken cross-references detected in expanded articles
-- All recently expanded articles (07, 09, 11, RISC-V cores) are clean — no stale stubs
-- Stubs remaining are in: 04_legacy_hdl, 12_open_source_open_hardware
+- All gap analysis articles are now at Deep tier quality — no stale stubs remain
 
-### New Article (2026-05-04)
+### New Articles (2026-05-04)
 
 | # | Task | File | Lines | Status |
 |---|---|---|---|---|
 | N.1 | Arduino + FPGA Boards — MCU/FPGA hybrids | `12_open_source_open_hardware/open_boards/arduino_fpga_boards.md` | 472 | COMPLETE |
+
+### Tier 4: Core Catalogs & Networking
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| T4.1 | RISC-V Cores Catalog | `12_open_source_open_hardware/cores_catalog/riscv_cores_catalog.md` | ~200 | COMPLETE |
+| T4.2 | Ethernet Cores | `12_open_source_open_hardware/networking/ethernet_cores.md` | ~250 | COMPLETE |
+| T4.3 | PCIe Cores | `12_open_source_open_hardware/networking/pcie_cores.md` | 234 | COMPLETE |
+| T4.4 | Peripheral Core Catalog | `12_open_source_open_hardware/cores_catalog/peripheral_cores_catalog.md` | ~350 | COMPLETE |
+| T4.5 | GPU Cores | `12_open_source_open_hardware/gpu_compute/gpu_cores.md` | ~220 | COMPLETE |
+| T4.6 | ML Accelerators | `12_open_source_open_hardware/gpu_compute/ml_accelerators.md` | ~270 | COMPLETE |
+| T4.7 | USB Cores | `12_open_source_open_hardware/networking/usb_cores.md` | ~260 | COMPLETE |
+
+### Tier 5: Retro & Display
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| T5.1 | Analogue Pocket + openFPGA | `12_open_source_open_hardware/retro_computing/analogue_openfpga.md` | ~240 | COMPLETE |
+| T5.2 | Display Cores (VGA/DVI/HDMI) | `12_open_source_open_hardware/video_display/display_cores.md` | ~310 | COMPLETE |
+| T5.3 | RetroTINK & Open Scalers | `12_open_source_open_hardware/video_display/retrotink_and_scalers.md` | ~210 | COMPLETE |
+| T5.4 | Other Retro Platforms | `12_open_source_open_hardware/retro_computing/other_retro_platforms.md` | ~220 | COMPLETE |
+| T5.5 | MiST — Original Retro Platform | `12_open_source_open_hardware/retro_computing/mist.md` | ~220 | COMPLETE |
+
+### Tier 6: Boards & Memory
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| T6.1 | Hobbyist & Dev Boards | `12_open_source_open_hardware/open_boards/hobbyist_boards.md` | ~200 | COMPLETE |
+| T6.2 | High-End Boards | `12_open_source_open_hardware/open_boards/high_end_boards.md` | ~230 | COMPLETE |
+| T6.3 | Repurposed Boards | `12_open_source_open_hardware/open_boards/repurposed_boards.md` | ~150 | COMPLETE |
+| T6.4 | SDRAM Controllers | `12_open_source_open_hardware/memory_controllers/sdram_controllers.md` | ~230 | COMPLETE |
+| T6.5 | DDR Controllers | `12_open_source_open_hardware/memory_controllers/ddr_controllers.md` | ~225 | COMPLETE |
+| T6.6 | Specialized Memory | `12_open_source_open_hardware/memory_controllers/specialized_memory.md` | ~320 | COMPLETE |
+
+### Tier 7: Initiatives
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| T7.1 | PULP Platform | `12_open_source_open_hardware/initiatives/pulp_platform.md` | ~150 | COMPLETE |
+| T7.2 | FOSSi & CHIPS Alliance | `12_open_source_open_hardware/initiatives/fossi_chips_alliance.md` | ~140 | COMPLETE |
+| T7.3 | Open-Source EDA Tooling | `12_open_source_open_hardware/initiatives/open_source_eda.md` | ~190 | COMPLETE |
+
+### Legacy HDL
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| L.1 | ABEL | `04_hdl_and_synthesis/legacy_hdl/abel.md` | ~140 | COMPLETE |
+| L.2 | AHDL | `04_hdl_and_synthesis/legacy_hdl/ahdl.md` | ~140 | COMPLETE |
+| L.3 | PALASM | `04_hdl_and_synthesis/legacy_hdl/palasm.md` | ~160 | COMPLETE |
 
 ---
 

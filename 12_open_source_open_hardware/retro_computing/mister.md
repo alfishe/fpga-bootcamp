@@ -436,9 +436,8 @@ The N64 and Saturn cores push the fabric to near-full utilization — 6th-genera
 
 ## References
 
-- [Main_MiSTer (HPS Binary)](https://github.com/MiSTer-devel/Main_MiSTer) — the Linux-side C++ manager binary
-- [MiSTer FPGA Wiki](https://github.com/MiSTer-devel/Wiki_MiSTer/wiki) — official setup guides, core lists, INI reference
-- [MiSTer-devel GitHub Organization](https://github.com/MiSTer-devel) — all official repos
+- [MiSTer FPGA Wiki](https://github.com/MiSTer-devel/Wiki_MiSTer/wiki)
+- [MiSTer-devel GitHub Organization](https://github.com/MiSTer-devel)
 - [Template_MiSTer (Core Development Framework)](https://github.com/MiSTer-devel/Template_MiSTer)
 - [MiSTer Knowledge Base (Companion)](https://github.com/alfishe/mister-knowledgebase)
 - [DE10-Nano Overview](../open_boards/hobbyist_boards.md)

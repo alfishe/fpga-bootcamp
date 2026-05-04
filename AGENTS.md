@@ -192,7 +192,48 @@ For topics that commonly generate questions (timing closure, CDC, DDR calibratio
 - Use for architecture diagrams, data flow, state machines, and system relationships
 - Apply consistent styling: `fill:#e8f4fd,stroke:#2196f3` for hard IP blocks, `fill:#fff9c4,stroke:#f9a825` for soft logic
 - Keep diagrams readable — no more than ~15 nodes per diagram
-- **Syntax Constraint**: To prevent parser errors, always quote node labels containing special characters like parentheses, slashes, or brackets. For example, `id["Label (Extra Info)"]` instead of `id[Label (Extra Info)]`.
+
+#### Rendering Rules (MANDATORY)
+
+Mermaid's parser is strict about special characters in labels and edge text. Violating these rules produces silent rendering failures or cryptic `got 'PS'` / `got 'PE'` parse errors.
+
+**Rule 1 — Quote node labels with special characters**: Always use `id["Label text"]` (double-quoted inside brackets) when a node label contains **parentheses `()`**, **brackets `[]`**, **angle brackets `<>`**, **slashes `/`**, **plus signs `+`**, **en-dashes `–`**, or **dollar signs `$`**.
+
+```mermaid
+# BAD — parse error on parentheses:
+Q2 -->|Large (30K+ LUTs)| ROCKET[Rocket / CVA6]
+
+# GOOD — double-quoted labels:
+Q2 -->|"Large (30K+ LUTs)"| ROCKET["Rocket / CVA6"]
+```
+
+**Rule 2 — Quote edge labels with special characters**: Edge labels (the `|...|` syntax) must also be double-quoted when they contain any of the same special characters.
+
+```mermaid
+# BAD — parse error:
+A -->|$15| B
+A -->|Large (30K+ LUTs)| C
+
+# GOOD:
+A -->|"$15"| B
+A -->|"Large (30K+ LUTs)"| C
+```
+
+**Rule 3 — Safe characters do not need quoting**: Plain text with only alphanumeric characters, spaces, hyphens, colons, commas, periods, and `<br/>` tags can be left unquoted. When in doubt, quote — it never hurts.
+
+**Rule 4 — Diamond decision nodes**: The `{"Question?"}` syntax for diamond nodes is safe without extra quoting as long as the question mark is the only special character. If the question text contains parentheses or other specials, wrap in double quotes: `{"Need open toolchain?"}`.
+
+**Common special characters that MUST be quoted**:
+
+| Character | Example that breaks | Quoted fix |
+|---|---|---|
+| `(` `)` | `\|Large (30K+)\|` | `\|"Large (30K+)"\|` |
+| `[` `]` | `[Core [v2]]` | `["Core [v2]"]` |
+| `/` | `[Rocket / CVA6]` | `["Rocket / CVA6"]` |
+| `+` | `\|30K+ LUTs\|` | `\|"30K+ LUTs"\|` |
+| `$` | `\|$15\|` | `\|"$15"\|` |
+| `–` (en-dash) | `[5–15 V]` | `["5–15 V"]` |
+| `<` `>` | `[< 500 LUTs]` | `["< 500 LUTs"]` |
 
 ### Alerts
 
