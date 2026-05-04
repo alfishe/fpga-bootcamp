@@ -1,7 +1,7 @@
 # TODO.md — FPGA Knowledge Base Build Plan
 
 > Auto-generated plan. Update statuses as work progresses. See [AGENTS.md](AGENTS.md) for quality standards.
-> **Last synced:** 2026-04-25 — matched against actual filesystem content.
+> **Last synced:** 2026-04-25 — gap analysis + quality pass. All previous phases COMPLETE.
 
 ---
 
@@ -54,6 +54,8 @@
 | 7.1 | UVM for FPGA — class hierarchy, testbench example, build/run | `07_verification/uvm_overview.md` | COMPLETE |
 | 7.2 | Formal Verification — AXI protocol proof, JasperGold, multi-tool | `07_verification/formal_verification.md` | COMPLETE |
 | 7.3 | Cocotb — real testbench examples, Makefile, sim integration | `07_verification/cocotb.md` | COMPLETE |
+| 7.4 | Verilator — C++ testbench, tracing, coverage, linting, CI/CD | `07_verification/verilator.md` | COMPLETE |
+| 7.5 | GHDL — VHDL-2008 sim, PSL, cocotb, Yosys synthesis | `07_verification/ghdl.md` | COMPLETE |
 
 ## Phase 09: Board Design Expansion (`09_board_design/`)
 
@@ -70,6 +72,54 @@
 | 11.2 | Multi-Core Coherency — ACP vs CCI vs ACE, cache stashing | `11_soft_cores_and_soc_design/soc_design/multi_core_coherency.md` | COMPLETE |
 | 11.3 | Memory Map Design — address decoder patterns, AXI address filtering | `11_soft_cores_and_soc_design/soc_design/memory_map_design.md` | COMPLETE |
 | 11.4 | Interrupt Routing — GIC, PLIC, NVIC, FPGA IRQ mapping | `11_soft_cores_and_soc_design/soc_design/interrupt_routing.md` | COMPLETE |
+
+---
+
+## Gap Analysis Results (2026-04-25)
+
+### Thin Articles (< 80 lines, non-README) — Priority Tier 1 (Core Technical)
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| G.1 | Protocol Checkers — AXI/Avalon/WB VIPs and BFM | `07_verification/protocol_checkers.md` | 581 | COMPLETE |
+| G.2 | Bus Matrix Design — topologies, arbitration | `11_soft_cores_and_soc_design/soc_design/bus_matrix_design.md` | 307 | COMPLETE |
+| G.3 | RISC-V ISA — instruction set, extensions | `11_soft_cores_and_soc_design/riscv/riscv_isa.md` | 298 | COMPLETE |
+| G.4 | RISC-V Privileged — modes, CSRs, Sv32/39 | `11_soft_cores_and_soc_design/riscv/riscv_privileged.md` | 264 | COMPLETE |
+| G.5 | MicroBlaze — Xilinx soft core | `11_soft_cores_and_soc_design/vendor_soft/microblaze.md` | 235 | COMPLETE |
+| G.6 | Nios II/V — Intel soft core | `11_soft_cores_and_soc_design/vendor_soft/nios_family.md` | 204 | COMPLETE |
+| G.7 | Gowin EDA — toolchain | `13_toolchains/gowin_eda.md` | 210 | COMPLETE |
+| G.8 | Diamond/Radiant — Lattice toolchain | `13_toolchains/diamond_radiant.md` | 210 | COMPLETE |
+| G.9 | Open-Source Flow — Yosys + nextpnr + F4PGA | `13_toolchains/open_source_flow.md` | 317 | COMPLETE |
+| G.10 | Common Failures — typical FPGA bugs | `15_case_studies/common_failures.md` | 229 | COMPLETE |
+
+### Thin Articles — Priority Tier 2 (RISC-V Cores, 42–71 lines)
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| G.11 | VexRiscv — SpinalHDL Linux-capable core | `11_soft_cores_and_soc_design/riscv_cores/vexriscv.md` | 66 | EXPAND |
+| G.12 | PicoRV32 — minimal RISC-V | `11_soft_cores_and_soc_design/riscv_cores/picorv32.md` | 71 | EXPAND |
+| G.13 | NEORV32 — well-documented core | `11_soft_cores_and_soc_design/riscv_cores/neorv32.md` | 59 | EXPAND |
+| G.14 | SERV — bit-serial RISC-V | `11_soft_cores_and_soc_design/riscv_cores/serv.md` | 58 | EXPAND |
+| G.15 | Ibex/CV32E — OpenTitan core | `11_soft_cores_and_soc_design/riscv_cores/ibex_cv32e.md` | 48 | EXPAND |
+| G.16 | High-Perf RISC-V — BOOM/Rocket/CVA6 | `11_soft_cores_and_soc_design/riscv_cores/high_perf_riscv_cores.md` | 49 | EXPAND |
+| G.17 | Chipyard/Rocket Chip — SoC generators | `11_soft_cores_and_soc_design/soc_design/chipyard_rocket_chip.md` | 64 | EXPAND |
+
+### Thin Articles — Priority Tier 3 (Open HW, 42–65 lines)
+
+| # | Task | File | Lines | Status |
+|---|---|---|---|---|
+| G.18 | MiSTer — retro computing platform | `12_open_source_open_hardware/retro_computing/mister.md` | 70 | EXPAND |
+| G.19 | OSSC — open source scan converter | `12_open_source_open_hardware/video_display/ossc.md` | 65 | EXPAND |
+| G.20 | LiteX Core Ecosystem | `12_open_source_open_hardware/litex/litex_core_ecosystem.md` | 70 | EXPAND |
+| G.21 | OpenTitan — root of trust | `12_open_source_open_hardware/initiatives/opentitan.md` | 54 | EXPAND |
+| G.22 | LiteX Overview — Python SoC builder | `12_open_source_open_hardware/litex/litex_overview.md` | 92 | EXPAND |
+
+### Quality Issues Found
+
+- 25 articles still contain `## Planned Content` / `## Original Stub Description` sections
+- 0 broken cross-references detected in expanded articles
+- All recently expanded articles (07, 09, 11) are clean — no stale stubs
+- Stubs remaining are in: 04_legacy_hdl, 07_protocol_checkers, 11_soft_cores, 12_open_source_open_hardware
 
 ---
 
