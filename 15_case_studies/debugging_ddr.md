@@ -2,9 +2,10 @@
 
 # Debugging DDR Calibration — DQS Gating, Read/Write Leveling, and Bit Deskew
 
-## Overview
-
 DDR (Double Data Rate) memory calibration is an initialization sequence performed by hard or soft memory controller IP (like Xilinx MIG or Intel EMIF) immediately after FPGA configuration. It exists because standard PCB manufacturing tolerances, temperature variations, and fly-by routing topologies create unpredictable picosecond-level skews between clock, command, and data lines. The controller must dynamically measure these skews and apply tap delays to precisely center the data strobes (DQS) within the data eyes (DQ). Understanding this sequence is essential because a calibration failure prevents the entire SoC or FPGA from booting or accessing external memory.
+
+> [!NOTE]
+> For memory hierarchy and DDR bandwidth budgeting, see [Memory Hierarchy](../../02_architecture/soc/memory_hierarchy.md). For DDR IP comparison across vendors, see [DDR IP](../../06_ip_and_cores/ddr/README.md). For power integrity affecting DDR, see [Power Integrity](../../09_boards_and_board_design/power_integrity.md).
 
 ## Architecture / The Calibration Sequence
 
@@ -34,11 +35,12 @@ graph TD
 
 ## Vendor Context & Cross-Platform Comparison
 
-| Feature | Xilinx MIG (Memory Interface Generator) | Intel EMIF (External Memory Interface) | Open Source (LiteDRAM) |
-|---|---|---|---|
-| **Diagnostic Output** | Generates `init_calib_complete` and `dbg_pi_phase_locked`. Accessible via Vivado Hardware Manager. | Uses the EMIF Debug Toolkit. Generates detailed margin reports per byte lane. | Prints calibration status and tap delays directly to the UART console during BIOS boot. |
-| **Calibration Execution** | Hardened PHY microblaze/state machine runs the calibration. | Nios II soft processor (or hard logic on Agilex) runs the calibration sequence. | Built-in software sequence executed by the LiteX CPU before jumping to the payload. |
-| **Failure Granularity** | `dbg_calib_err_num` indicates the exact phase (e.g., Phase 2 = DQS Gate). | Provides visual eye diagrams and margin graphs indicating exactly which bit failed. | Console outputs pass/fail for each byte lane during memory training. |
+| Feature | Xilinx MIG (Memory Interface Generator) | Intel EMIF (External Memory Interface) | Lattice DDR | Open Source (LiteDRAM) |
+|---|---|---|---|---|
+| **Diagnostic Output** | Generates `init_calib_complete` and `dbg_pi_phase_locked`. Accessible via Vivado Hardware Manager. | Uses the EMIF Debug Toolkit. Generates detailed margin reports per byte lane. | Limited — check `calib_done` pin. | Prints calibration status and tap delays directly to the UART console during BIOS boot. |
+| **Calibration Execution** | Hardened PHY microblaze/state machine runs the calibration. | Nios II soft processor (or hard logic on Agilex) runs the calibration sequence. | State machine in fabric. | Built-in software sequence executed by the LiteX CPU before jumping to the payload. |
+| **Failure Granularity** | `dbg_calib_err_num` indicates the exact phase (e.g., Phase 2 = DQS Gate). | Provides visual eye diagrams and margin graphs indicating exactly which bit failed. | Limited to pass/fail. | Console outputs pass/fail for each byte lane during memory training. |
+| **Supported Memory** | DDR2/3, DDR4, LPDDR2/3/4 | DDR2/3, DDR4, LPDDR2/3/4, QDR II+ | DDR2/3, LPDDR2/3 | DDR3 (verified), DDR4 (experimental) |
 
 ## Pitfalls & Common Mistakes
 
@@ -90,6 +92,54 @@ puts "Failed at stage: $err_stage"
 get_property C_CALIB_ERR_LANE [get_hw_migs *]
 ```
 
+## Diagnostic Checklist: Calibration Failed, Now What?
+
+When `init_calib_complete` stays low, follow this systematic checklist:
+
+### Step 1: Check Clocks
+```
+Is the reference clock stable?  → Measure with oscilloscope
+Is the PLL locked?             → Check PLL_LOCKED output
+Is the fabric clock running?   → Check BUFG output
+```
+
+### Step 2: Check Reset Sequencing
+```
+Is sys_rst held long enough?   → Minimum 200 µs after PLL lock
+Is the reset de-asserted cleanly? → No glitches on reset line
+```
+
+### Step 3: Check Power Rails
+```
+VDD (FPGA core) stable?        → 1.0V ± 5% (7-Series), 0.85V (UltraScale+)
+VDDQ (DDR I/O) stable?         → 1.5V (DDR3), 1.2V (DDR4)
+VTT (Termination) present?     → Half of VDDQ, sink/source capable
+VREF tracking VDDQ/2?          → Use TPS51200 or equivalent
+```
+
+### Step 4: Check Pin Constraints
+```
+Are DQ/DQS pins in correct byte groups?  → Check XDC/QSF pin assignments
+Is the byte group mapping correct?         → Compare against vendor pinout table
+```
+
+### Step 5: Check PCB Layout
+```
+DQ-to-DQS length match within lane?  → ±10 mils typical
+Clock-to-DQS length match?            → Per vendor design guide
+Address/command fly-by length match?   → Sequential delay per DRAM chip
+Impedance control (50Ω single-ended)? → Check stackup and trace width
+```
+
+### Step 6: Read Calibration Error Code
+```
+Xilinx:  Read dbg_calib_err_num via Tcl or ILA
+Intel:   Run EMIF Debug Toolkit eye diagram
+LiteDRAM: Check UART console output
+```
+
+---
+
 ## When to Use Hardware vs Software Calibration
 
 | Criterion | Hardware PHY Calibration (MIG/EMIF) | Software Calibration (LiteDRAM) |
@@ -101,13 +151,32 @@ get_property C_CALIB_ERR_LANE [get_hw_migs *]
 ## Best Practices for DDR Bring-Up
 
 1. **Verify Clocks First:** Before looking at the DDR PHY, ensure the reference clock feeding the controller is locked and jitter-free.
-2. **Check Reset Sequencing:** Ensure the `sys_rst` is held long enough for PLLs to lock.
+2. **Check Reset Sequencing:** Ensure the `sys_rst` is held long enough for PLLs to lock (minimum 200 µs after power rails are stable).
 3. **Use the Vendor Spreadsheets:** Never guess memory timing parameters. Use the vendor-provided Excel spreadsheets or IP wizards and input the exact values from the Micron/Samsung/SK Hynix datasheet.
 4. **Validate Power Rails:** Use an oscilloscope to ensure VDD, VDDQ, VTT, and VREF are stable during the initial burst of current when calibration starts.
+5. **Run the vendor's example design first** — before modifying anything, verify that the unmodified MIG/EMIF example design calibrates on your board.
+6. **Check solder joint quality** — BGA solder defects on DDR chips cause intermittent calibration failures that look like software bugs. Use X-ray inspection on production boards.
+
+---
+
+## Debugging by Symptom
+
+| Symptom | Likely Cause | Debug Action |
+|---|---|---|
+| `init_calib_complete` never goes high | Clock or reset issue | Check PLL lock, reset timing, power rails |
+| Fails at DQS Gate training | Trace length mismatch | Check PCB length matching for DQS/Clock |
+| Fails at Write Leveling | Clock-to-DQS skew too large | Verify fly-by routing, check address/cmd lengths |
+| Fails at Read Leveling (specific bit) | Stuck-at fault on DQ line | Check solder joint, check for PCB short/open |
+| Passes calibration, data errors in use | VREF noise or timing margin too small | Measure VREF with scope, increase margin by slowing clock |
+| Intermittent failures (temperature-dependent) | Thermal drift on VREF or clock | Add thermal monitoring, check VREF regulator stability |
+| Works on one board, fails on another | Manufacturing variation | Check impedance control, verify stackup consistency |
 
 ## References
 
 - [UG583: UltraScale Architecture PCB Design User Guide](https://docs.xilinx.com/)
+- [UG586: 7 Series FPGAs Memory Interface Solutions User Guide](https://docs.xilinx.com/)
 - [Intel External Memory Interfaces (EMIF) Handbook](https://www.intel.com/)
 - [LiteDRAM GitHub Repository](https://github.com/enjoy-digital/litedram)
-- [Overview of FPGA Configuration](02_architecture/infrastructure/configuration.md)
+- [Memory Hierarchy](../../02_architecture/soc/memory_hierarchy.md) — DDR bandwidth budgeting
+- [Power Integrity](../../09_boards_and_board_design/power_integrity.md) — PDN design for DDR
+- [DDR IP](../../06_ip_and_cores/ddr/README.md) — Vendor DDR controller comparison

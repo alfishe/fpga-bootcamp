@@ -2,7 +2,10 @@
 
 # Hard Processor Integration — CPU-FPGA Coupling Models
 
-How hardened CPU cores are physically integrated with FPGA fabric on the same die. Covers the architectural tradeoffs between ARM Cortex-A, Cortex-R, Cortex-M, RISC-V, and soft processor implementations, and how each vendor chooses different coupling strategies.
+How hardened CPU cores are physically integrated with FPGA fabric on the same die determines everything about your SoC architecture: boot sequence, interconnect topology, coherency model, and software development flow. This article covers the architectural tradeoffs between ARM Cortex-A, Cortex-R, Cortex-M, RISC-V, and soft processor implementations, and how each vendor chooses different coupling strategies.
+
+> [!NOTE]
+> For AXI bridge details and bandwidth budgets, see [AXI Bridges & Interconnect](axi_bridges_and_interconnect.md). For memory topology and DDR contention, see [Memory Hierarchy](memory_hierarchy.md). For boot architecture, see [Boot Architecture](boot_architecture.md).
 
 ---
 
@@ -81,11 +84,63 @@ How hardened CPU cores are physically integrated with FPGA fabric on the same di
 
 ---
 
+## Coupling Model Decision Guide
+
+```mermaid
+graph TD
+    A[Need Linux?] -->|"Yes"| B{Hard CPU available?}
+    A -->|"No"| C{Need determinism?}
+    B -->|"Yes"| D[Use hard CPU: Cortex-A9/A53/RISC-V]
+    B -->|"No"| E[VexRiscv with MMU: only realistic soft-Linux]
+    C -->|"Yes"| F{Hard Cortex-M/R5 available?}
+    C -->|"No"| G[Soft CPU: Nios II, MicroBlaze, PicoRV32]
+    F -->|"Yes"| H[Use hard Cortex-M3 or R5F]
+    F -->|"No"| G
+    D --> I{Need real-time + Linux?}
+    I -->|"Yes"| J[MPSoC: A53 + R5F lockstep]
+    I -->|"No"| K[Single-domain: Cyclone V, Zynq-7000]
+```
+
+---
+
+## Boot Architecture Comparison
+
+| Device | Boot ROM | Boot Processor | FPGA Load | Linux Boot
+|---|---|---|---|---|
+| Cyclone V SoC | HPS Boot ROM | Cortex-A9 | Preloader loads RBF from Flash | U-Boot → Linux
+| Zynq-7000 | Boot ROM | Cortex-A9 | FSBL loads bitstream from Flash | U-Boot → Linux
+| Zynq MPSoC | PMU ROM | PMU → Cortex-R5 → Cortex-A53 | FSBL loads bitstream | U-Boot → Linux
+| PolarFire SoC | eNVM | E51 monitor → U54 cluster | HSS loads bitstream | U-Boot → Linux
+| SmartFusion2 | eNVM | Cortex-M3 | Fabric configured from eNVM | No Linux (bare-metal only)
+
+---
+
 ## Best Practices
 
 1. **Don't default to soft CPU if a hard one is available** — hard CPU saves ~2K LEs and runs at 4–8× the clock speed.
 2. **Pair hard CPU + soft CPU** — MPSoC's dual R5F + quad A53 is the canonical pattern: real-time cores handle deterministic tasks, application cores run Linux.
 3. **Soft CPU for debug/control, hard CPU for compute** — simple Nios II for JTAG UART + register peek/poke; hard Cortex-A9 for video processing.
+4. **Consider RISC-V for open ISA** — PolarFire SoC's hard U54 cluster avoids ARM licensing concerns; see [PolarFire SoC IP](../../06_ip_and_cores/vendor_ip/microchip_ip.md)
+5. **Use the vendor's BSP** — never write a custom boot loader from scratch; use Xilinx PetaLinux, Intel GSRD, or Microchip SoftConsole as your starting point
+
+---
+
+## Pitfalls
+
+### 1. Hard CPU Clock Must Be Stable Before FPGA Access
+On all SoC devices, the hard CPU must complete its PLL configuration and clock setup before the FPGA fabric can be accessed. If your FPGA logic tries to read HPS registers during early boot, the bridge may not be ready.
+
+**Fix:** In your FPGA RTL, wait for a `fpga_mgr` or `h2f_reset` signal from the HPS before attempting any bridge transactions.
+
+### 2. Soft CPU Cannot Run Linux Realistically
+Soft CPUs run at 50–250 MHz with limited memory. Running Linux on a soft CPU is technically possible (VexRiscv with MMU) but performance is poor — expect 10–50× slower than a hard Cortex-A9.
+
+**Fix:** Use soft CPUs for bare-metal control only. If you need Linux, use a device with a hard CPU.
+
+### 3. PolarFire SoC RISC-V Boot is Complex
+The 5-core RISC-V cluster requires a multi-stage boot (eNVM → E51 monitor → U54 cores → Linux). This is significantly more complex than ARM's single-stage U-Boot.
+
+**Fix:** Use Microchip's Hart Software Services (HSS) and SoftConsole examples. Do not attempt to write a custom RISC-V boot loader.
 
 ---
 
@@ -95,6 +150,11 @@ How hardened CPU cores are physically integrated with FPGA fabric on the same di
 |---|---|
 | Cyclone V SoC HPS TRM | Intel FPGA documentation |
 | Zynq-7000 TRM (UG585) | AMD/Xilinx documentation |
+| Zynq MPSoC TRM (UG1085) | AMD/Xilinx documentation |
 | PolarFire SoC User Guide (UG0820) | Microchip documentation |
 | Nios II Processor Reference Guide | Intel FPGA documentation |
 | MicroBlaze Processor Reference Guide (UG984) | AMD/Xilinx documentation |
+| [AXI Bridges & Interconnect](axi_bridges_and_interconnect.md) | This repository |
+| [Memory Hierarchy](memory_hierarchy.md) | This repository |
+| [Boot Architecture](boot_architecture.md) | This repository |
+| [Soft Cores & SoC Design](../../11_soft_cores_and_soc_design/README.md) | This repository |

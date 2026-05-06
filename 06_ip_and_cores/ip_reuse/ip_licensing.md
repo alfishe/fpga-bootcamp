@@ -2,7 +2,10 @@
 
 # IP Licensing Landscape — Vendor, Open-Source, and Hybrid
 
-FPGA IP licensing is a minefield. You're mixing vendor-proprietary soft IP (with node-locked or seat-locked licenses), open-source HDL cores (with permissive or copyleft terms), and your own RTL — all in one bitstream. Understanding the legal and practical implications of each license type is non-negotiable for commercial products.
+FPGA IP licensing is a minefield. You're mixing vendor-proprietary soft IP (with node-locked or seat-locked licenses), open-source HDL cores (with permissive or copyleft terms), and your own RTL — all in one bitstream. Understanding the legal and practical implications of each license type is non-negotiable for commercial products. A single GPL-licensed core in a proprietary bitstream can create unquantifiable legal risk.
+
+> [!NOTE]
+> For IP packaging and delivery methods, see [Intel IP Packaging](intel_packaging.md) and [Xilinx IP Packaging](xilinx_packaging.md). For open-source hardware catalogs with license annotations, see [Core Catalogs](../../12_open_source_open_hardware/cores_catalog/README.md).
 
 ---
 
@@ -103,6 +106,66 @@ Can I combine IP-A (row) with IP-B (column) in the same bitstream?
 3. **Never use GPL or CERN OHL-S in a commercial product** — untested legal territory
 4. **Audit your IP manifest before tape-out / production** — one GPL core can taint the entire bitstream (legally, at minimum)
 5. **Check vendor IP license terms annually** — terms change. What was included last year may be paid this year.
+6. **Maintain an IP manifest file** — create a `.ip_manifest.yml` or spreadsheet listing every IP core, its version, source (vendor/open-source/in-house), and license
+7. **Use Solderpad or Apache 2.0 for your own open-source releases** — both include patent grants, critical for corporate adoption
+
+---
+
+## Pitfalls
+
+### 1. The GPL "Derived Work" Ambiguity
+The GPL's concept of "derived work" has never been tested in court for FPGA bitstreams. A conservative reading suggests that any GPL-licensed HDL core in your design makes your entire bitstream a derived work, requiring you to release all source RTL.
+
+**Fix:** Avoid GPL-licensed HDL cores in commercial products. If you must use one (e.g., mor1kx OpenRISC), isolate it behind a well-defined bus interface and consult legal counsel about the "aggregation exception."
+
+### 2. IEEE 1735 Encryption Expiry
+IEEE 1735-encrypted IP is tied to a specific tool version. When you upgrade Vivado or Quartus, the encryption keys may change, and old encrypted IP may no longer decrypt.
+
+**Fix:** Keep the exact tool version used during IP integration in your CI/CD pipeline. Pin tool versions in your build scripts.
+
+### 3. Vendor IP "Free with Tool" Can Become Paid
+Xilinx and Intel periodically move IP from "included" to "paid license" categories. A design that compiled last year may fail synthesis this year because an IP block now requires a license.
+
+**Fix:** Check the IP catalog license status after every tool upgrade. Keep a license server running if you depend on paid IP.
+
+---
+
+## IP Manifest Template
+
+For every FPGA project, maintain an IP manifest:
+
+```yaml
+# ip_manifest.yml — Track all IP cores in your design
+project: my_fpga_design
+date: 2026-05-04
+
+ip_cores:
+  - name: DDR4_MIG
+    vendor: Xilinx
+    version: 2.2
+    license: Free (included with Vivado)
+    source: Vendor IP
+    
+  - name: VexRiscv
+    vendor: SpinalHDL
+    version: 1.9.0
+    license: MIT
+    source: Open-source (GitHub)
+    url: https://github.com/SpinalHDL/VexRiscv
+    
+  - name: PCIe_DMA
+    vendor: Xilinx
+    version: 4.1
+    license: Paid (requires Xilinx license server)
+    source: Vendor IP
+    license_server: 27000@license01.local
+    
+  - name: custom_crc32
+    vendor: In-house
+    version: 1.0
+    license: Proprietary
+    source: Internal
+```
 
 ---
 
@@ -112,3 +175,6 @@ Can I combine IP-A (row) with IP-B (column) in the same bitstream?
 - [Solderpad Hardware Licence](https://solderpad.org/licenses/)
 - [FOSSi Foundation: Licensing for Open Source Silicon](https://fossi-foundation.org/)
 - IEEE 1735-2014: Recommended Practice for Encryption of Electronic Design Intellectual Property
+- [Open-Source Core Catalogs](../../12_open_source_open_hardware/cores_catalog/README.md) — License-annotated core listings
+- [Intel IP Packaging](intel_packaging.md) — IEEE 1735 encryption details
+- [Xilinx IP Packaging](xilinx_packaging.md) — DCP and encrypted IP delivery

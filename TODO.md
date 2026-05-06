@@ -1,7 +1,7 @@
 # TODO.md — FPGA Knowledge Base Build Plan
 
 > Auto-generated plan. Update statuses as work progresses. See [AGENTS.md](AGENTS.md) for quality standards.
-> **Last synced:** 2026-05-04 — Wave 8: New articles + thin article expansions. 13 new tasks.
+> **Last synced:** 2026-05-04 — Wave 9: Thin article expansions (68–150 lines). 12 tasks.
 
 ---
 
@@ -206,6 +206,25 @@
 | W8.11 | Expand: Other ISA Cores — remove Planned Content stub, add depth | `11_soft_cores_and_soc_design/other_isa/other_isa_cores.md` | 43→256 | COMPLETE |
 | W8.12 | Expand: Other ISA Cores Catalog — remove Planned Content stub | `12_open_source_open_hardware/cores_catalog/other_isa_cores_catalog.md` | 56→95 | COMPLETE |
 | W8.13 | Expand: Gowin Vendor IP | `06_ip_and_cores/vendor_ip/gowin_ip.md` | 52→214 | COMPLETE |
+
+---
+
+## Wave 9: Thin Article Expansions (2026-05-04)
+
+| # | Task | File | Lines Before | Lines After | Status |
+|---|---|---|---|---|---|
+| W9.1 | Expand: Lattice IP — IPexpress/Clarity, MIPI, Lattice vs Gowin, pitfalls | `06_ip_and_cores/vendor_ip/lattice_ip.md` | 68 | 219 | COMPLETE |
+| W9.2 | Expand: Microchip IP — SmartDesign, AMBA fabric, crypto, space IP, pitfalls | `06_ip_and_cores/vendor_ip/microchip_ip.md` | 73 | 205 | COMPLETE |
+| W9.3 | Expand: Ethernet MAC — protocol stack, TEMAC instantiation, RGMII pitfalls | `06_ip_and_cores/other_hard_ip/ethernet_mac.md` | 98 | 192 | COMPLETE |
+| W9.4 | Expand: AXI Bridges — Zynq MPSoC bandwidth, deadlock avoidance, pitfalls | `02_architecture/soc/axi_bridges_and_interconnect.md` | 103 | 197 | COMPLETE |
+| W9.5 | Expand: Signal Processing IP — FFT architecture, DDS vs BRAM LUT, CORDIC vs DSP, pitfalls | `06_ip_and_cores/other_hard_ip/signal_processing_ip.md` | 104 | 209 | COMPLETE |
+| W9.6 | Expand: Hardware Acceleration — CXL vs PCIe table, quantified performance, best practices | `16_advanced_topics/hardware_acceleration.md` | 94 | 137 | COMPLETE |
+| W9.7 | Expand: FPGA as a Service — shell comparison, instance selection, pitfalls | `16_advanced_topics/fpga_as_a_service.md` | 109 | 170 | COMPLETE |
+| W9.8 | Expand: Memory Hierarchy — BRAM/URAM/LUTRAM decision, bandwidth formula, OCM, pitfalls | `02_architecture/soc/memory_hierarchy.md` | 112 | 224 | COMPLETE |
+| W9.9 | Expand: Video/Audio IP — DDR bandwidth budget, I2S hand-code, VDMA lockup pitfall | `06_ip_and_cores/other_hard_ip/video_audio_ip.md` | 112 | 183 | COMPLETE |
+| W9.10 | Expand: Hard Processor Integration — decision flowchart, boot comparison, pitfalls | `02_architecture/soc/hard_processor_integration.md` | 100 | 159 | COMPLETE |
+| W9.11 | Expand: Debugging DDR — diagnostic checklist, symptom table, vendor comparison | `15_case_studies/debugging_ddr.md` | 113 | 183 | COMPLETE |
+| W9.12 | Expand: IP Licensing — GPL pitfall, manifest template, IEEE 1735 pitfalls | `06_ip_and_cores/ip_reuse/ip_licensing.md` | 114 | 178 | COMPLETE |
 
 ---
 

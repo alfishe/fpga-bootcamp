@@ -2,9 +2,12 @@
 
 # Hardware Acceleration: Solution Architecture Patterns
 
-FPGAs excel at highly parallel, custom data-path workloads that do not fit well into the standard Von Neumann architecture of CPUs. While GPUs dominate batched, memory-bound matrix math via PCIe "Look-aside" coprocessing, FPGAs are fundamentally designed for **"Data in Motion."**
+FPGAs excel at highly parallel, custom data-path workloads that do not fit well into the standard Von Neumann architecture of CPUs. While GPUs dominate batched, memory-bound matrix math via PCIe "Look-aside" coprocessing, FPGAs are fundamentally designed for **"Data in Motion"** — processing streams in-line, at wire speed, with deterministic latency.
 
 This document provides a rigorous engineering analysis of five distinct domains where hardware acceleration is mandatory, detailing the system topologies, interconnect data flows, and integration frameworks required by Solution Architects.
+
+> [!NOTE]
+> For FPGA vs GPU vs TPU compute comparison, see [FPGA vs GPU vs TPU](fpga_vs_gpu_vs_tpu.md). For cloud-based FPGA acceleration, see [FPGA as a Service](fpga_as_a_service.md). For HLS-based acceleration development, see [HLS Overview](../../04_hdl_and_synthesis/hls/hls_overview.md).
 
 ---
 
@@ -18,15 +21,24 @@ Instead of the traditional "store-then-compute" model, the FPGA sits directly in
 *   **The AXI4-Stream Interface:** Unlike memory-mapped interfaces (AXI4-MM) that require physical memory addresses, AXI4-Stream acts as a continuous unidirectional FIFO. The FPGA processes the signal "on the fly."
 
 ### Engineering Deep Dive: Line Buffering & Clock Domains
-In broadcast video (48 Gbps for uncompressed 8K), moving full frames to external DRAM destroys throughput. Architects utilize **Line Buffers**. By storing only the previous 3-4 horizontal lines of pixels in ultra-fast, on-chip Block RAM (BRAM), the FPGA fabric can apply 2D spatial filters (like Sobel edge detection) completely internally. 
+In broadcast video (48 Gbps for uncompressed 8K), moving full frames to external DRAM destroys throughput. Architects utilize **Line Buffers**. By storing only the previous 3-4 horizontal lines of pixels in ultra-fast, on-chip Block RAM (BRAM), the FPGA fabric can apply 2D spatial filters (like Sobel edge detection) completely internally.
 
 The primary engineering challenge is **Clock Domain Crossing (CDC)**. The high-speed transceivers (SerDes) recovering the optical signal may operate at a jittery 300+ MHz, while the complex DSP filter logic core operates at a stable 150 MHz. Asynchronous FIFOs must bridge these domains within the FPGA to prevent metastability without dropping packets.
+
+### Quantified Performance
+
+| Workload | Data Rate | FPGA Throughput | CPU Throughput | Speedup |
+|---|---|---|---|---|
+| 5G O-RAN fronthaul | 25 Gbps | 1× (wire speed) | Cannot process at line rate | ∞ |
+| 8K video (SMPTE ST 2110) | 48 Gbps | 1× (wire speed) | Cannot process at line rate | ∞ |
+| 1G SDR channelization | 1 Gbps | 1× (wire speed) | ~200 Mbps (SIMD) | 5× |
+| Radar pulse compression | 10 Gbps | 1× (wire speed) | ~1 Gbps (GPU offload) | 10× |
 
 ---
 
 ## 2. Network & Infrastructure Offload (SmartNICs/DPUs)
 
-Hyperscalers (like AWS Nitro) rely on SmartNICs because standard x86 CPUs spend up to 40% of their cycles managing network interrupts, Open vSwitch (OVS) routing, and NVMe-over-Fabrics (NVMe-oF). 
+Hyperscalers (like AWS Nitro) rely on SmartNICs because standard x86 CPUs spend up to 40% of their cycles managing network interrupts, Open vSwitch (OVS) routing, and NVMe-over-Fabrics (NVMe-oF).
 
 ### Architecture Pattern: Inline Kernel Bypass & Hardware Virtualization
 The FPGA terminates the physical network connection and presents virtualized interfaces directly to guest VMs, bypassing the host hypervisor entirely.
@@ -76,19 +88,49 @@ In Web3 (Zero-Knowledge Proofs / zk-SNARKs), algorithms like Multi-Scalar Multip
 The semiconductor industry relies entirely on programmable logic to boot software on chips that have not yet been manufactured.
 
 ### Architecture Pattern: Massively Distributed State Machines
-When Apple or NVIDIA designs a billion-gate SoC, the RTL is partitioned across a massive mainframe (like Synopsys ZeBu or Cadence Palladium) containing thousands of high-end FPGAs. 
+When Apple or NVIDIA designs a billion-gate SoC, the RTL is partitioned across a massive mainframe (like Synopsys ZeBu or Cadence Palladium) containing thousands of high-end FPGAs.
 *   **Engineering Deep Dive: Time-Division Multiplexing (TDM)**
     The architectural challenge is physical I/O. If a GPU subsystem requires 50,000 internal wires to communicate with the memory controller, but the physical FPGA only has 2,000 transceiver pins, the design cannot be routed. Architects use TDM: the emulation compiler multiplexes thousands of internal logic signals over a single high-speed physical wire, running the FPGAs at a fraction of their target speed (1–10 MHz). This provides exactly accurate clock-cycle behavior, allowing driver development months before TSMC delivers the silicon.
 
 ---
 
-## 6. Synthesis: The Future of Interconnects (CXL)
+## 6. The Future: Compute Express Link (CXL)
 
 The traditional model of hardware acceleration—where the FPGA sits on a PCIe bus as a "Look-aside" coprocessor—is bottlenecked by the latency of DMA drivers and isolated memory pools. The host CPU must explicitly copy data into the FPGA's DDR4 over PCIe, wait for an interrupt, and copy the results back.
 
 ### Compute Express Link (CXL)
-The future of solution architecture is defined by **CXL**, an open standard running over the PCIe Gen 5/6 physical layer. 
+The future of solution architecture is defined by **CXL**, an open standard running over the PCIe Gen 5/6 physical layer.
 
-CXL introduces **hardware-level cache coherency** between the host CPU and the FPGA accelerator. With CXL.cache and CXL.mem protocols, the FPGA and the Intel/AMD CPU share a single unified memory address space. An FPGA can deference a pointer created by a CPU thread without any DMA driver intervention. 
+CXL introduces **hardware-level cache coherency** between the host CPU and the FPGA accelerator. With CXL.cache and CXL.mem protocols, the FPGA and the Intel/AMD CPU share a single unified memory address space. An FPGA can dereference a pointer created by a CPU thread without any DMA driver intervention.
 
 This shifts the architectural paradigm from *Networked Coprocessors* to *Disaggregated Memory Compute*, radically lowering the software friction required to integrate FPGA acceleration into enterprise architectures.
+
+### CXL vs PCIe: Quantified Impact
+
+| Metric | PCIe Gen4 (DMA) | CXL 1.1 (Coherent) | Improvement |
+|---|---|---|---|
+| Round-trip latency (CPU→FPGA→CPU) | ~2–5 µs | ~0.5–1 µs | 4–5× |
+| Memory model | Separate address spaces | Unified address space | Zero-copy sharing |
+| Cache coherency | Software-managed flushes | Hardware auto-snoop | Transparent to software |
+| Programming model | Explicit DMA + interrupts | Load/store (pointer dereference) | Simplified |
+
+---
+
+## Best Practices
+
+1. **Profile before accelerating** — measure the CPU/GPU baseline with profiling tools (perf, nvprof) before committing to FPGA; the speedup may not justify the development cost
+2. **Streaming > store-then-compute** — FPGAs deliver the most value when data flows through them at wire speed, not when they act as co-processors that read from DRAM
+3. **Use HLS for algorithm exploration** — write C/C++ first, verify correctness, then incrementally apply HLS pragmas for pipeline parallelism; see [HLS Overview](../../04_hdl_and_synthesis/hls/hls_overview.md)
+4. **Reserve FPGA resources for the critical path** — offload control plane and housekeeping to the hard CPU; use FPGA fabric only for the data plane
+5. **Quantify latency, not just throughput** — for real-time systems (HFT, ADAS), worst-case latency matters more than average throughput
+
+---
+
+## References
+
+- [FPGA vs GPU vs TPU](fpga_vs_gpu_vs_tpu.md) — Compute platform comparison
+- [FPGA as a Service](fpga_as_a_service.md) — Cloud FPGA deployment
+- [HLS Overview](../../04_hdl_and_synthesis/hls/hls_overview.md) — C/C++ to RTL acceleration
+- [AXI Bridges & Interconnect](../../02_architecture/soc/axi_bridges_and_interconnect.md) — CPU-FPGA communication
+- CXL Consortium: CXL 3.0 Specification
+- Intel IPU / SmartNIC Architecture White Paper
