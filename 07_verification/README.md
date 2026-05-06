@@ -18,3 +18,5 @@ Making sure your design works before it hits silicon. Starts with the **language
 | [ghdl.md](ghdl.md) | GHDL deep dive: VHDL-2008 simulation, analyze/elaborate/run flow, textio, PSL assertions, cocotb integration, synthesis to Yosys |
 | [uvm_overview.md](uvm_overview.md) | UVM basics for FPGA: agents, drivers, monitors, sequencers, scoreboards, factory override, TLM ports |
 | [protocol_checkers.md](protocol_checkers.md) | AXI, Avalon, Wishbone protocol assertion VIPs and bus functional models (BFMs) |
+| [coverage_methodology.md](coverage_methodology.md) | Coverage methodology: code coverage (statement/branch/MCDC/toggle/FSM), functional coverage (covergroups, cross coverage), assertion coverage, coverage-driven verification (CDV), coverage closure |
+

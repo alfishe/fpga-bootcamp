@@ -15,3 +15,6 @@ This section covers the specialized, high-performance edge cases where FPGAs exc
 | [advanced_hls_patterns.md](advanced_hls_patterns.md) | C++ to RTL mastery: `PIPELINE` vs `UNROLL`, DSP inference, and pipeline stall analysis. |
 | [fpga_as_a_service.md](fpga_as_a_service.md) | Cloud FPGAs: AWS F2 (AMD Virtex UltraScale+ HBM), Azure NP-Series, and Alibaba F3, including April 2026 pricing. |
 | [fpga_vs_gpu_vs_tpu.md](fpga_vs_gpu_vs_tpu.md) | Compute Architecture Comparison: When to use an FPGA vs a GPU vs an ASIC/TPU for AI and high-performance computing. |
+| [safety_critical_design.md](safety_critical_design.md) | Safety-critical FPGA design: DO-254, IEC 61508, ISO 26262 certification frameworks, SEU mitigation (TMR, scrubbing, EDAC), vendor safety offerings, verification requirements |
+| [efpga_embedded_cores.md](efpga_embedded_cores.md) | eFPGA: Embedded FPGA IP cores inside ASICs — Flex Logix, Menta, NanoXpore, Adaptive Compute, QuickLogic — architecture, design flow, vendor comparison |
+| [power_optimization.md](power_optimization.md) | FPGA power optimization: clock gating (BUFGCE, CE), operand isolation, DVFS, BRAM sleep mode, IO power, vendor power analysis tools |

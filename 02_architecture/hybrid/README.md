@@ -9,6 +9,7 @@ Beyond CPU + FPGA, some architectures integrate specialized compute engines (AI 
 | File | Topic |
 |---|---|
 | [rf_direct_sampling.md](rf_direct_sampling.md) | RF ADC/DAC integration: Xilinx RFSoC architecture, direct RF sampling (4-6.5 GSPS), JESD204B/C elimination, Nyquist zones |
+| [analog_mixed_signal.md](analog_mixed_signal.md) | Analog/mixed-signal FPGA: SmartFusion2 ACE (12-bit ADC+DAC+comparators), IGLOO2, MachXO3 ADC, PolarFire monitors |
 | [ai_engine_arrays.md](ai_engine_arrays.md) | AI compute integration: Xilinx Versal AI Engine (VLIW SIMD, 400-tile arrays), Intel Agilex AI Tensor Blocks, Achronix MLP |
 | [hbm_integration.md](hbm_integration.md) | High-Bandwidth Memory: HBM2/HBM2e stack integration, Intel Stratix 10 MX / Agilex M-Series, Xilinx Virtex UltraScale+ HBM, bandwidth vs DDR5 |
 

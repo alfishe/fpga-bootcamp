@@ -9,6 +9,7 @@ The end-to-end pipeline that turns HDL source code into a configured FPGA. Cover
 | File | Topic |
 |---|---|
 | [overview.md](overview.md) | End-to-end design flow: RTL → synthesis → place & route → bitstream → configuration |
+| [incremental_design.md](incremental_design.md) | Incremental & hierarchical design: OOC synthesis, partitions, team flows, incremental implementation |
 | [project_structure.md](project_structure.md) | Recommended directory layout, revision control for HDL, IP versioning, constraint files |
 | [synthesis.md](synthesis.md) | Synthesis engine behavior, optimization strategies, resource sharing, retiming, FSM extraction |
 | [netlist.md](netlist.md) | Netlist formats across all vendors: EDIF, structural Verilog, VQM/QDB/QXP (Intel), DCP (Xilinx), NGO (Lattice), RTLIL/JSON (Yosys) — generation, inspection, cross-vendor flows, ECO |

@@ -97,6 +97,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | File | Topic |
 |---|---|
 | [overview.md](03_design_flow/overview.md) | End-to-end design flow: RTL → synthesis → place & route → bitstream → configuration |
+| [incremental_design.md](03_design_flow/incremental_design.md) | **Incremental & hierarchical design**: OOC synthesis, partitions, team flows, incremental implementation |
 | [project_structure.md](03_design_flow/project_structure.md) | Recommended directory layout, revision control for HDL, IP versioning, constraint files |
 | [synthesis.md](03_design_flow/synthesis.md) | Synthesis engine behavior, optimization strategies, resource sharing, retiming, FSM extraction |
 | [netlist.md](03_design_flow/netlist.md) | Netlist formats across all vendors: EDIF, structural Verilog, VQM/QDB/QXP (Intel), DCP (Xilinx), NGO (Lattice), RTLIL/JSON (Yosys) — cross-vendor interchange, ECO, inspection |
@@ -115,6 +116,8 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [vendor_pragmas.md](04_hdl_and_synthesis/vendor_pragmas.md) | Xilinx attributes, Altera synthesis directives, Gowin pragmas, keep/dont_touch, async_reg |
 | [cdc_coding.md](04_hdl_and_synthesis/cdc_coding.md) | HDL patterns for clock domain crossing: 2-FF synchronizer, handshake, async FIFO, MCP |
 | [state_machines.md](04_hdl_and_synthesis/state_machines.md) | Safe FSM encoding: one-hot vs binary vs Gray, reset strategies, unreachable state recovery |
+| [sim_syn_mismatches.md](04_hdl_and_synthesis/sim_syn_mismatches.md) | **Simulation vs synthesis mismatches**: incomplete sensitivity, blocking vs non-blocking, casex, width truncation, latch inference, sign extension, vendor linting |
+| [design_patterns.md](04_hdl_and_synthesis/design_patterns.md) | **FPGA design patterns**: edge detector, pulse synchronizer, debouncer, round-robin arbiter, pipeline with backpressure, rate limiter, one-shot, shift register, gray-code counter |
 
 ### 05 — Timing & Constraints
 | File | Topic |
@@ -129,6 +132,8 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 ### 06 — IP & Cores
 | Folder | Coverage |
 |---|---|
+| [fifo_ip/](06_ip_and_cores/fifo_ip/) | **FIFO IP**: async/sync FIFO configuration, FWFT (first-word fall-through), programmable thresholds, data count accuracy, vendor comparison (Xilinx FIFO Generator, Intel DCFIFO, Lattice, Gowin, Microchip) |
+| [clocking_ip/](06_ip_and_cores/clocking_ip/) | **Clock management IP**: PLL/MMCM/PLL configuration, dynamic reconfiguration (DRP), instantiation, reset/lock management, vendor comparison (Xilinx Clocking Wizard, Intel ALTPLL/IOPLL, Lattice ECP5 PLL, Gowin PLL, Microchip Clock Conditioner) |
 | [bus_protocols/](06_ip_and_cores/bus_protocols/) | **AXI4 family** (AXI4, AXI4-Lite, AXI4-Stream: channels, handshake, burst, ordering), **Wishbone, Avalon, APB/AHB** (comparison matrix) |
 | [vendor_ip/](06_ip_and_cores/vendor_ip/) | Xilinx IP Integrator, Intel Platform Designer (Qsys), Lattice Clarity, Microchip SmartDesign, Gowin IP generator |
 | [interconnect/](06_ip_and_cores/interconnect/) | AXI Interconnect deep dive: crossbar vs shared bus, address decoding, QoS arbitration, deadlock, data width/clock converters |
@@ -149,6 +154,7 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | [ghdl.md](07_verification/ghdl.md) | GHDL deep dive: VHDL-2008 simulation, PSL assertions, cocotb integration, synthesis to Yosys |
 | [uvm_overview.md](07_verification/uvm_overview.md) | UVM basics for FPGA: agents, drivers, monitors, sequencers, scoreboards, factory override, TLM ports |
 | [protocol_checkers.md](07_verification/protocol_checkers.md) | AXI, Avalon, Wishbone protocol assertion VIPs and bus functional models (BFMs) |
+| [coverage_methodology.md](07_verification/coverage_methodology.md) | **Coverage methodology**: code, functional, and assertion coverage; coverage-driven verification (CDV) |
 
 ### 08 — Debug & Tools
 | File | Topic |
@@ -251,3 +257,6 @@ FPGA documentation is fragmented across thousands of datasheets, archaic PDF use
 | └ [advanced_hls_patterns.md](16_advanced_topics/advanced_hls_patterns.md) | Advanced C++ to RTL: Pragmas, DSP inference, and fixing pipeline stalls |
 | └ [fpga_as_a_service.md](16_advanced_topics/fpga_as_a_service.md) | Cloud FPGAs: AWS F2 (UltraScale+), Azure NP-Series, Alibaba F3 and 2026 pricing |
 | └ [fpga_vs_gpu_vs_tpu.md](16_advanced_topics/fpga_vs_gpu_vs_tpu.md) | Compute Architecture Comparison: Benchmarks and top use cases for FPGA vs GPU vs TPU |
+| └ [safety_critical_design.md](16_advanced_topics/safety_critical_design.md) | **Safety-critical FPGA design**: DO-254, IEC 61508, ISO 26262 certification, SEU mitigation (TMR, scrubbing, EDAC), vendor safety offerings |
+| └ [efpga_embedded_cores.md](16_advanced_topics/efpga_embedded_cores.md) | **eFPGA**: Embedded FPGA IP cores inside ASICs — Flex Logix, Menta, NanoXpore, Adaptive Compute |
+| └ [power_optimization.md](16_advanced_topics/power_optimization.md) | **FPGA power optimization**: clock gating, operand isolation, DVFS, BRAM sleep, IO power, vendor analysis tools |

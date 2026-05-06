@@ -1,7 +1,7 @@
 # TODO.md — FPGA Knowledge Base Build Plan
 
 > Auto-generated plan. Update statuses as work progresses. See [AGENTS.md](AGENTS.md) for quality standards.
-> **Last synced:** 2026-05-04 — Tier 4–7 + Legacy HDL deep dives complete. All gap analysis articles now at Deep tier quality.
+> **Last synced:** 2026-05-04 — Wave 8: New articles + thin article expansions. 13 new tasks.
 
 ---
 
@@ -174,6 +174,38 @@
 | L.1 | ABEL | `04_hdl_and_synthesis/legacy_hdl/abel.md` | ~140 | COMPLETE |
 | L.2 | AHDL | `04_hdl_and_synthesis/legacy_hdl/ahdl.md` | ~140 | COMPLETE |
 | L.3 | PALASM | `04_hdl_and_synthesis/legacy_hdl/palasm.md` | ~160 | COMPLETE |
+
+---
+
+## Wave 8: New Articles & Thin Expansions (2026-05-04)
+
+### New Articles — High Impact
+
+| # | Task | File | Status |
+|---|---|---|---|
+| W8.1 | Clock Management IP — PLL/MMCM/PLL config, dynamic reconfig, phase alignment | `06_ip_and_cores/clocking_ip/clock_management_ip.md` | COMPLETE |
+| W8.2 | FIFO IP — async/common-clock, FWFT, programmable thresholds, CDC FIFOs | `06_ip_and_cores/fifo_ip/fifo_design.md` | COMPLETE |
+| W8.3 | Simulation vs Synthesis Mismatches — sensitivity lists, blocking, casex, width | `04_hdl_and_synthesis/sim_syn_mismatches.md` | COMPLETE |
+| W8.4 | Safety-Critical FPGA Design — DO-254, IEC 61508, ISO 26262, TMR, scrubbing | `16_advanced_topics/safety_critical_design.md` | COMPLETE |
+| W8.5 | eFPGA — Embedded FPGA Cores — Flex Logix, Menta, NanoXpore, Adaptive Compute | `16_advanced_topics/efpga_embedded_cores.md` | COMPLETE |
+
+### New Articles — Medium Impact
+
+| # | Task | File | Status |
+|---|---|---|---|
+| W8.6 | FPGA Power Optimization — clock gating, operand isolation, power-aware synthesis | `16_advanced_topics/power_optimization.md` | COMPLETE |
+| W8.7 | Coverage Methodology — functional, code, coverage closure, coverage-driven verification | `07_verification/coverage_methodology.md` | COMPLETE |
+| W8.8 | Incremental & Hierarchical Design — OOC synthesis, partitioning, team flows | `03_design_flow/incremental_design.md` | COMPLETE |
+| W8.9 | Analog/Mixed-Signal FPGA — SmartFusion, MachXO analog, ADC/DAC, comparators | `02_architecture/hybrid/analog_mixed_signal.md` | COMPLETE |
+| W8.10 | FPGA Design Patterns — pipeline, arbiter, round-robin, pulse sync, edge detect | `04_hdl_and_synthesis/design_patterns.md` | COMPLETE |
+
+### Thin Article Expansions
+
+| # | Task | File | Current Lines | Status |
+|---|---|---|---|---|
+| W8.11 | Expand: Other ISA Cores — remove Planned Content stub, add depth | `11_soft_cores_and_soc_design/other_isa/other_isa_cores.md` | 43→256 | COMPLETE |
+| W8.12 | Expand: Other ISA Cores Catalog — remove Planned Content stub | `12_open_source_open_hardware/cores_catalog/other_isa_cores_catalog.md` | 56→95 | COMPLETE |
+| W8.13 | Expand: Gowin Vendor IP | `06_ip_and_cores/vendor_ip/gowin_ip.md` | 52→214 | COMPLETE |
 
 ---
 

@@ -8,6 +8,8 @@ Intellectual Property blocks — the reusable building blocks of FPGA design. Fr
 
 | Folder | Coverage |
 |---|---|
+| [fifo_ip/](fifo_ip/README.md) | FIFO IP: async/sync FIFO configuration, FWFT, programmable thresholds, data count accuracy, CDC FIFO usage |
+| [clocking_ip/](clocking_ip/README.md) | Clock management IP: PLL/MMCM/PLL configuration, dynamic reconfiguration (DRP), instantiation, reset/lock management, vendor comparison |
 | [bus_protocols/](bus_protocols/README.md) | AXI4 family (AXI4, AXI4-Lite, AXI4-Stream), Wishbone, Avalon, APB/AHB — protocol deep dives and comparison |
 | [vendor_ip/](vendor_ip/README.md) | Xilinx IP Integrator, Intel Platform Designer, Lattice Clarity, Microchip SmartDesign, Gowin IP generator |
 | [interconnect/](interconnect/README.md) | AXI Interconnect: crossbar vs shared bus, address decoding, QoS arbitration, data width/clock conversion |
