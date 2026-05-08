@@ -91,6 +91,71 @@ set_property PROGRAM.FILE {blinky.bit} [get_hw_devices xc7a35t_0]
 program_hw_devices [get_hw_devices xc7a35t_0]
 ```
 
+### Quartus First Load
+```bash
+# Program via JTAG (SRAM only)
+quartus_pgm -m JTAG -o "p;blinky.sof"
+
+# Alternative: OpenOCD SVF playback
+openocd -f board/your_board.cfg -c "init; svf blinky.svf; exit"
+```
+
+---
+
+## Phase 6: DDR & High-Speed Bring-Up
+
+After the blinky runs, systematically bring up complex peripherals:
+
+### DDR Bring-Up Sequence
+1. Load the MIG/EMIF IP with timing parameters from the DRAM datasheet
+2. Connect the memory controller's `init_calib_complete` to an LED
+3. If calibration fails, check: VREF stability, DQS-to-clock length matching, byte-lane pin grouping
+4. Run a memory test pattern (walking 1s, marching, checkerboard)
+5. Verify with a DMA engine that can sustain full bandwidth for 1 hour
+
+### PCIe Bring-Up Sequence
+1. Load the PCIe IP with the most conservative settings (Gen1 ×1)
+2. Connect `cfg_ltssm_state` to LEDs or ILA
+3. Verify the link reaches L0 state (LTSSM = 0x10)
+4. Check `lspci` on the host — device should appear
+5. Only then upgrade to Gen2/Gen3 and wider lanes
+
+### Ethernet Bring-Up Sequence
+1. Start with RGMII 10/100 Mbps (no PLL challenges)
+2. Verify link pulses with an oscilloscope
+3. Ping the FPGA's MAC from a host PC
+4. Upgrade to 1 Gbps, then 10 Gbps
+
+---
+
+## Test Equipment Checklist
+
+| Equipment | Required For | Minimum Spec |
+|---|---|---|
+| **Digital Multimeter (DMM)** | Impedance checks, voltage measurement | 4.5-digit, 0.1Ω resolution |
+| **4-ch oscilloscope** | Power sequencing, clock validation | 200 MHz, 1 GSa/s |
+| **Active probe** | Crystal oscillator probing | <1 pF input capacitance |
+| **JTAG programmer** | FPGA configuration & debug | FTDI FT2232H or vendor tool |
+| **Logic analyzer** | Debugging parallel interfaces | 16+ channels, 100 MHz |
+| **USB-UART adapter** | Serial console (U-Boot/Linux) | 3.3V TTL, 115200 baud |
+| **Thermal camera / IR probe** | Hot-spot detection | ±2°C accuracy |
+
+---
+
+## Common Bring-Up Failures & Quick Fixes
+
+| Failure | Phase | Quick Diagnostic | Fix |
+|---|---|---|---|
+| **No LED activity** | 5 | Check DONE pin status | Verify bitstream loaded; check clock input |
+| **Wrong LED blink rate** | 5 | Probe clock input | Constraint may be wrong; verify clock frequency |
+| **DDR calibration fails** | 6 | Check `init_calib_complete` LED | Verify VREF, check byte-lane grouping, scope power rails |
+| **PCIe not visible** | 6 | Read LTSSM state | Check PERST#, REFCLK, lane polarity swap |
+| **Ethernet no link** | 6 | Scope RGMII TX signals | Verify PHY reset sequence; check MDC/MDIO config |
+| **JTAG can't connect** | 4 | Check IDCODE readback | Verify power rails, check TCK/TMS pull-ups |
+| **FPGA overheats** | 2 | IR probe or thermal camera | Check VCCINT voltage; reduce toggle rate in design |
+
+---
+
 ## Pitfalls & Common Mistakes
 
 ### 1. The Hot-Plug JTAG Killer
@@ -114,6 +179,8 @@ Some power regulators have a "soft start" feature. If the ramp time is too slow 
 ### 3. Floating Configuration Pins
 Pins like `PROGRAM_B`, `INIT_B`, and `DONE` have specific pull-up/pull-down requirements. If the PCB designer left `PROGRAM_B` floating, noise will continuously reset the configuration engine.
 
+---
+
 ## Vendor Context & Tools
 
 | Vendor | JTAG Hardware Tool | Default Chain Debugger | Status Register Command |
@@ -122,6 +189,20 @@ Pins like `PROGRAM_B`, `INIT_B`, and `DONE` have specific pull-up/pull-down requ
 | **Intel** | USB-Blaster II | Quartus Programmer (JTAG Chain Debugger) | `quartus_jli -i` |
 | **Lattice** | HW-USBN-2B | Diamond Programmer | Reveal Inserter/Analyzer |
 | **Open Source** | FT2232H / Tigard | OpenOCD / xc3sprog | `openocd -c "scan_chain"` |
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| DDR calibration deep dive | [Debugging DDR](debugging_ddr.md) |
+| PCIe link training debug | [PCIe Bringup](pcie_bringup.md) |
+| JTAG & OpenOCD setup | [OpenOCD & JTAG](../08_debug_and_tools/openocd.md) |
+| FPGA configuration methods | [Configuration & Bitstream](../02_architecture/infrastructure/configuration.md) |
+| Power integrity | [Power Integrity](../09_board_and_pcb_design/power_integrity.md) |
+
+---
 
 ## Next Steps
 Once the blinky is running, proceed to [Debugging DDR Calibration](debugging_ddr.md) and [PCIe Link Training Debug](pcie_bringup.md) to bring up the complex high-speed peripherals.

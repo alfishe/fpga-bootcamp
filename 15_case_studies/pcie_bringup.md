@@ -109,8 +109,132 @@ You should connect an Integrated Logic Analyzer (ILA) to the PCIe IP core's `cfg
 | **Visibility** | Perfect visibility into LTSSM states and AXI bus transactions inside the FPGA. | Perfect visibility into the analog physical layer and TS1/TS2 ordered sets on the wire. |
 | **When to use** | 90% of debugging: checking if resets are correct, checking if link reaches L0, debugging DMA logic. | The last 10%: obscure signal integrity issues, interoperability bugs with specific host chipsets, or debugging ASPM (power management) failures. |
 
+## PCIe Configuration Space Debug
+
+Even after the link reaches L0, the host must successfully read the FPGA's configuration space:
+
+```bash
+# Check if device appears in lspci
+lspci -nn | grep 10ee   # Xilinx vendor ID
+lspci -nn | grep 1172   # Intel/Altera vendor ID
+
+# Detailed device info
+lspci -vvv -s 01:00.0   # Replace with actual bus:dev.func
+
+# Read configuration space directly
+setpci -s 01:00.0 0.l   # Vendor ID + Device ID (offset 0x00)
+setpci -s 01:00.0 8.l   # Revision ID + Class Code (offset 0x08)
+setpci -s 01:00.0 10.l  # BAR0 (offset 0x10)
+
+# Check for AER (Advanced Error Reporting) errors
+grep -i pcie /proc/interrupts
+dmesg | grep -i "AER\|pcieport"
+```
+
+### Common Configuration Space Problems
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Device appears but BAR shows 0x00000000 | BAR not sized by BIOS | Add `pci=realloc` to kernel boot args |
+| Device appears but wrong class code | IP misconfiguration | Check PCIe IP core class code setting |
+| `lspci` shows “Unassigned class” | Subsystem ID not set | Configure subsystem_vendor/subsystem_device in IP core |
+| Device disappears after warm reboot | FPGA not re-configured | Add bitstream reload in U-Boot/BIOS |
+
+---
+
+## PCIe DMA Debugging
+
+Once the link is up and BARs are assigned, the next step is DMA:
+
+### XDMA (Xilinx DMA)
+```bash
+# Load XDMA driver
+modprobe xdma
+
+# Check if DMA engine is accessible
+ls /dev/xdma*
+
+# Simple DMA test
+dma_to_device -d /dev/xdma0_h2c_0 -s 4096 -c 1
+dma_from_device -d /dev/xdma0_c2h_0 -s 4096 -c 1
+```
+
+### QDMA (Queue-based DMA)
+```bash
+# Load QDMA driver
+modprobe qdma-pf
+modprobe qdma-vf
+
+# Configure queues
+dma-ctl qdma0 q add idx 0 mode st dir h2c
+qdma0-q0 --data test.bin
+```
+
+### Common DMA Problems
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| DMA hangs (no completion) | Descriptor ring misconfigured | Check descriptor table alignment (4 KB aligned) |
+| Wrong data received | Byte ordering / endianness | Check `DMA_DATA_WIDTH` and byte-swap settings |
+| DMA works on one host but not another | IOMMU / IOTLB issues | Add `intel_iommu=off` to kernel args; check IOMMU mapping |
+| Completion timeout | PCIe completion timeout on host | Increase `pcie_completion_timeout` in kernel parameters |
+
+---
+
+## Tandem Configuration for PCIe Boot
+
+For designs where the FPGA must meet the 100 ms PERST# requirement:
+
+### Stage 1 (Tandem Boot)
+```
+1. Minimal bitstream loads first (~10 ms)
+   - Contains ONLY PCIe hard block + clocking
+   - Link trains at Gen1 immediately
+   - Host sees the device and enumerates it
+
+2. Stage 2 (Full bitstream loads via PCIe DMA)
+   - Host driver triggers full bitstream download
+   - FPGA reconfigures remaining fabric via ICAP
+   - DMA engines become active
+```
+
+| Device | Tandem IP | Stage 1 Config Time | Stage 2 Method |
+|---|---|---|---|
+| UltraScale+ | Tandem PCIe (PG238) | ~15 ms | ICAP write from host driver |
+| Zynq MPSoC | PCAP via FSBL | ~30 ms (FSBL loads PL) | PCAP from PMU firmware |
+| Agilex 7 | P-Tile self-test | ~20 ms | SDM via host mailbox |
+
+---
+
+## PCIe Power Management Debug
+
+| ASPM State | Latency | Power Savings | Common Problem |
+|---|---|---|---|
+| **L0** | Active | 0 | None (fully operational) |
+| **L0s** | <100 ns | ~50 mW per lane | RX detect failures on wake; check clock recovery |
+| **L1** | ~1–10 µs | ~200 mW total | Entry requires both sides to agree; stuck in L1 if one side can't exit |
+| **L1.2** | ~100 µs | ~500 mW | Requires CLKREQ# signal; check PCB routing |
+
+**Debug tip:** If the link drops after being idle, disable ASPM with `pcie_aspm=off` in kernel boot args. If the problem goes away, it's an ASPM issue.
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| Transceiver architecture | [Transceiver Basics](../06_ip_and_cores/transceivers/transceiver_basics.md) |
+| Board bring-up sequence | [Bring-Up Checklist](bring_up_checklist.md) |
+| Boot architecture & timing | [Boot Architecture](../02_architecture/soc/boot_architecture.md) |
+| Constraint reference | [Constraint Quickref](../14_references/constraint_quickref.md) |
+| DDR bring-up (often concurrent with PCIe) | [Debugging DDR](debugging_ddr.md) |
+
+---
+
 ## References
 
 - [PCI Express Base Specification Revision 4.0](https://pcisig.com/)
 - [Xilinx PG195: PCIe Gen3 Subsystem Product Guide](https://docs.xilinx.com/)
+- [Xilinx PG238: Tandem Configuration](https://docs.xilinx.com/)
 - [Intel L-Tile/H-Tile/P-Tile PCIe User Guides](https://www.intel.com/)
+- [Xilinx PG195: XDMA/QDMA Product Guide](https://docs.xilinx.com/)

@@ -114,6 +114,76 @@ Intel EMIB, Xilinx SSI, and TSMC CoWoS stack multiple silicon dies in one packag
 
 ---
 
+## Total Cost of Ownership (TCO) Calculator
+
+Per-unit chip cost is only one dimension. The total cost of an FPGA project includes:
+
+| Cost Category | MCU Project | FPGA Project | ASIC Project |
+|---|---|---|---|
+| **Tool licenses** | $0 (GCC, Keil free tier) | $0–$5,000/yr (Vivado ML, Quartus Lite free; Pro licenses $3–5K) | $50K–$500K/yr (Synopsys/Cadence) |
+| **Dev boards** | $10–$50 | $30–$500 (DE10-Nano: $130; ZCU102: $2,500) | N/A (FPGA prototyping board) |
+| **Design time** | 1–3 months | 3–12 months | 12–36 months |
+| **Verification time** | Weeks (manual) | 1–6 months (simulation + lab) | 6–18 months (constrained-random + formal) |
+| **PCB spins** | 1 (simple) | 1–3 (high-speed I/O is hard) | 1 (but mask revision = $1M+) |
+| **Unit cost (1K vol.)** | $1–$10 | $5–$2,000 | $0.50–$20 |
+| **Breakeven volume vs. ASIC** | N/A | 10K–100K units | >100K units |
+
+### Quick TCO Formula
+```
+TCO_FPGA = (Tool_licenses × Years) + (Dev_boards × Engineers) + (Engineering_months × Rate)
+         + (PCB_spins × Spin_cost) + (Unit_cost × Volume)
+
+TCO_ASIC = (EDA_licenses × Years) + (NRE_mask_set) + (Engineering_months × Rate)
+         + (Verification_months × Rate) + (Unit_cost × Volume)
+```
+
+**Example:** A 10K-unit product with a mid-range FPGA ($50/unit):
+- FPGA TCO: $0 tools + $500 boards + $150K engr + $20K PCB + $500K units = **$670K**
+- ASIC TCO: $200K EDA + $2M NRE + $300K engr + $200K verif + $100K units = **$2.8M**
+- FPGA wins by 4.2× at 10K volume. At 200K volume, ASIC wins by 2×.
+
+---
+
+## FPGA vs GPU for Acceleration
+
+FPGAs and GPUs compete for data center acceleration workloads. Understanding where each excels:
+
+| Criterion | FPGA | GPU (NVIDIA A100/H100) |
+|---|---|---|
+| **Latency** | Sub-microsecond (deterministic) | Milliseconds (batching overhead) |
+| **Throughput (dense math)** | Moderate (DSP-limited) | Very high (thousands of CUDA cores) |
+| **Power efficiency** | 5–20 TOPS/W (INT8) | 2–5 TOPS/W (dense FP16) |
+| **Custom data types** | Any (INT4, bfloat16, FP8, POSIT) | Fixed (FP32, FP16, INT8, bfloat16) |
+| **Custom protocols** | Any (line-rate parsing) | No (must go through PCIe/NVLink) |
+| **Programming model** | HDL / HLS (high barrier) | CUDA / OpenCL (lower barrier) |
+| **Time to solution** | 6–12 months | 1–3 months |
+
+### When FPGA Beats GPU
+- **Sub-microsecond latency**: Trading, network packet processing, real-time control
+- **Custom bit widths**: INT4/INT2 quantized neural networks, irregular sparsity
+- **Protocol offload**: SmartNIC, P4 match-action, inline crypto
+- **Streaming pipelines**: Video transcoding, genomics alignment, DSP front-ends
+
+### When GPU Beats FPGA
+- **Dense matrix math**: Training LLMs, large-batch inference
+- **Rapid prototyping**: CUDA ecosystem, mature libraries (cuDNN, TensorRT)
+- **Floating-point throughput**: FP32/FP64 scientific computing
+
+---
+
+## Emerging FPGA Markets (2025–2027)
+
+| Market | Driver | Key FPGA Feature | Representative Devices |
+|---|---|---|---|
+| **Automotive L4/L5 ADAS** | ISO 26262 ASIL-D | Hard CPUs + safety islands | Zynq UltraScale+ EG, Agilex 5 |
+| **5G O-RAN vDU** | Open RAN standardization | Massive FFT + fronthaul timing | Agilex 7, Versal Premium |
+| **Edge AI (sub-5W)** | On-device inference | INT8 DSP + hard CPU | PolarFire SoC, Artix-7 |
+| **Quantum computing control** | Pulse-level control at µs latency | Deterministic I/O, DSP | UltraScale+ RFSoC |
+| **Post-quantum crypto** | NIST PQC standards (2024) | Custom bit manipulation | Any mid-range FPGA |
+| **Digital twins / industrial IoT** | Real-time sensor fusion | Multi-protocol I/O bridges | Cyclone V SoC, ECP5 |
+
+---
+
 ## When to Migrate from FPGA to ASIC
 
 | Trigger | Action |
@@ -122,6 +192,27 @@ Intel EMIB, Xilinx SSI, and TSMC CoWoS stack multiple silicon dies in one packag
 | Power budget < 100 mW | FPGA static power (100–500 mW) is too high; ASIC can be optimized to μW |
 | Design is stable for >12 months | ASIC requires 18–24 months to fabricate; FPGA flexibility no longer needed |
 | Unit cost dominates | ASIC unit cost is 1/5–1/20 of FPGA at volume |
+
+### FPGA-to-ASIC Migration Checklist
+1. Freeze RTL — no more feature additions
+2. Replace FPGA-specific constructs: `(* ram_style = "block" *)`, `OBUF`, `BUFG`
+3. Replace vendor IP: DDR controller → ASIC PHY, PCIe hard block → soft PCIe controller
+4. Add scan chains (DFT) for production test
+5. Re-verify everything with ASIC timing (standard cell, not LUT-based)
+6. Budget $2M–$10M for mask set (7nm: $10M+, 28nm: $2M, 55nm: $200K)
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| Process technology impact | [Technology Nodes](technology_nodes.md) |
+| Vendor-by-vendor comparison | [Vendor Comparison Matrix](vendor_comparison.md) |
+| Historical evolution | [History of FPGA Technology](history.md) |
+| Per-vendor device families | [Vendors & Families](../01_vendors_and_families/README.md) |
+| Data center FPGA architectures | [Data Center FPGA](../16_advanced_topics/datacenter_fpga.md) |
+| FPGA as a Service (cloud) | [FPGA as a Service](../16_advanced_topics/fpga_as_a_service.md) |
 
 ---
 

@@ -107,9 +107,114 @@ set_input_delay -clock [get_clocks rx_clk] -max 1.200 [get_ports rgmii_rxd*] -cl
 set_input_delay -clock [get_clocks rx_clk] -min -1.200 [get_ports rgmii_rxd*] -clock_fall -add_delay
 ```
 
+## Clock Domain Crossing Constraints
+
+### Asynchronous Clock Groups
+
+```tcl
+# XDC/SDC: Declare two clock domains as asynchronous
+create_clock -name clk_100 -period 10.0 [get_ports clk_100_in]
+create_clock -name clk_50  -period 20.0 [get_ports clk_50_in]
+set_clock_groups -asynchronous -group [get_clocks clk_100] -group [get_clocks clk_50]
+```
+
+| Approach | When to Use | Risk |
+|---|---|---|
+| `set_clock_groups -asynchronous` | True async domains with synchronizers | Low — correct for CDC with 2-FF sync |
+| `set_false_path -from ... -to ...` | One-off paths (e.g., reset sync) | Medium — doesn't cover new paths added later |
+| `set_max_delay -datapath_only` | Constrain path length within CDC | Best — limits how bad the skew can get |
+
+### Generated Clock Constraints
+
+```tcl
+# PLL/MMCM output clocks must be declared as generated clocks
+create_generated_clock -name clk_200 \
+  -source [get_pins pll/clk_in] \
+  -multiply_by 2 \
+  [get_pins pll/clk_out]
+
+# Clock from serializer (e.g., DDR output)
+create_generated_clock -name clk_ddr_out \
+  -source [get_pins serdes/clk_in] \
+  -divide_by 1 \
+  [get_ports ddr_clk_p]
+```
+
+### Common Missing Constraints
+
+| Missing Constraint | Symptom | Fix |
+|---|---|---|
+| No `create_clock` on input port | Unconstrained paths, random placement | Add `create_clock` for every top-level clock input |
+| No `set_input_delay` / `set_output_delay` | I/O timing ignored by P&R | Add I/O delays based on external device datasheet |
+| No `set_clock_groups` for async domains | False timing failures across CDC | Add `-asynchronous` between truly independent clocks |
+| Missing generated clock on PLL output | Paths from PLL output are unconstrained | Add `create_generated_clock` on PLL output pin |
+| No `set_multicycle_path` for enabled logic | Failing setup on multi-cycle paths | Add MCP for logic with clock enable |
+
+---
+
+## Physical Constraints: Advanced Patterns
+
+### Differential I/O
+
+```tcl
+# XDC: Differential LVDS output pair
+set_property IOSTANDARD LVDS_25 [get_ports data_p]
+set_property IOSTANDARD LVDS_25 [get_ports data_n]
+set_property PACKAGE_PIN A1 [get_ports data_p]
+set_property PACKAGE_PIN A2 [get_ports data_n]  # Must be the negative pair pin
+
+# Intel QSF: Differential LVDS
+set_instance_assignment -name IO_STANDARD "LVDS" -to data_p
+set_location_assignment PIN_A1 -to data_p
+```
+
+### Clock-Capable I/O Constraints
+
+```tcl
+# XDC: Route clock to clock-capable pin (required for MMCM/PLL)
+set_property CLOCK_DEDICATED_ROUTE TRUE [get_nets clk_in]
+# If accidentally routed through fabric:
+# ERROR: [Place 30-574] Non-clock resource used for clock signal
+```
+
+### Multi-Voltage I/O Banks
+
+```tcl
+# XDC: Different I/O standards per bank (VADJ must be set correctly)
+set_property IOSTANDARD LVCMOS18 [get_ports {bank34_*}]  # Bank 34 = 1.8V
+set_property IOSTANDARD LVCMOS33 [get_ports {bank35_*}]  # Bank 35 = 3.3V
+```
+
+---
+
+## Gowin Constraint Syntax (SDC/CST)
+
+Gowin uses SDC for timing and CST for physical constraints:
+
+| Intent | Gowin SDC (Timing) | Gowin CST (Physical) |
+|---|---|---|
+| **Clock** | `create_clock -name sys -period 20 [ports clk]` | `IO_LOC "clk" 15;` |
+| **Pin** | N/A | `IO_PORT "led" IO_TYPE=LVCMOS33 DRIVE=8;` |
+| **False path** | `set_false_path -from [ports clk_a] -to [ports clk_b]` | N/A |
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| SDC deep dive | [SDC Basics](../05_timing_and_constraints/sdc_basics.md) |
+| Clock network design | [Clock Network Design](../02_architecture/infrastructure/clock_network_design.md) |
+| CDC design patterns | [Design Patterns](../04_hdl_and_synthesis/design_patterns.md) |
+| Vendor migration constraints | [Vendor Migration](../03_design_flow/vendor_migration.md) |
+
+---
+
 ## References
 
 - [UG903: Vivado Using Constraints](https://docs.xilinx.com/)
 - [Intel Quartus Prime Timing Analyzer Cookbook](https://www.intel.com/)
 - [Lattice Diamond Help: LPF Syntax](#)
-- [SDC Basics](05_timing_and_constraints/sdc_basics.md)
+- [SDC Basics](../05_timing_and_constraints/sdc_basics.md)
+- [Gowin SDC/CST User Guide](https://www.gowinsemi.com/)
+- [Xilinx UG912: Design Analysis and Closure](https://docs.xilinx.com/)

@@ -99,19 +99,135 @@ graph TD
     D --> I{Need real-time + Linux?}
     I -->|"Yes"| J[MPSoC: A53 + R5F lockstep]
     I -->|"No"| K[Single-domain: Cyclone V, Zynq-7000]
-```
+## CPU-FPGA Interface Mechanisms
+
+The physical coupling between hard CPU and FPGA fabric determines bandwidth, latency, and coherency. Four mechanisms exist across vendors:
+
+| Mechanism | Example | Bandwidth | Latency | Coherency |
+|---|---|---|---|---|
+| **AXI port (GP/HP/ACP)** | Zynq-7000 M_AXI_GP | 0.2–6.4 GB/s | 10–30 cycles | ACP only |
+| **Cache-coherent interconnect** | MPSoC CCI-400 | 1.2–12.8 GB/s | 5–15 cycles | Full (ACE) |
+| **Network-on-Chip (NoC)** | Versal, Agilex 7 | 10–100+ GB/s | 2–5 cycles | Full |
+| **Mailbox / scratchpad** | SmartFusion2 | <100 MB/s | 50+ cycles | None |
+
+### AXI Port Taxonomy (Zynq/MPSoC)
+
+| Port | Direction | Width | Use Case |
+|---|---|---|---|
+| **M_AXI_GP0/GP1** | PS → PL | 32-bit | CPU reads/writes FPGA registers (control plane) |
+| **S_AXI_GP0/GP1** | PL → PS | 32/64-bit | FPGA accesses PS peripherals (DMA status) |
+| **S_AXI_HP0–HP3** | PL → DDR | 32/64-bit | FPGA DMA engines stream data to/from DDR |
+| **ACP** | PL → L2 cache | 64-bit | FPGA shares cache with CPU (coherent path) |
+
+### Intel HPS Bridge Taxonomy (Cyclone V / Arria 10)
+
+| Bridge | Direction | Width | Use Case |
+|---|---|---|---|
+| **H2F** | HPS → FPGA | 32/64-bit | CPU accesses FPGA slaves (register maps) |
+| **LWH2F** | HPS → FPGA | 32-bit | Lightweight register access (low latency) |
+| **F2H** | FPGA → HPS | 32/64-bit | FPGA accesses HPS peripherals or SDRAM |
+| **F2S (×6)** | FPGA → SDRAM | 64–256-bit | FPGA DMA masters access shared DDR directly |
 
 ---
 
-## Boot Architecture Comparison
+## Address Map Design Patterns
 
-| Device | Boot ROM | Boot Processor | FPGA Load | Linux Boot
+When a hard CPU and FPGA share a memory-mapped address space, the address map must be planned before RTL coding begins.
+
+### Pattern 1: Flat Shared Address Space
+```
+0x0000_0000 ────── 0x3FFF_FFFF  Hard CPU DDR (1 GB)
+0x4000_0000 ────── 0x4FFF_FFFF  FPGA BRAM / registers (256 MB window)
+0x8000_0000 ────── 0xBFFF_FFFF  FPGA peripherals (1 GB window)
+```
+CPU accesses FPGA by reading/writing the 0x4000_xxxx range. FPGA accesses DDR via F2S/HP ports.
+
+### Pattern 2: Split Address Space with Mailbox
+```
+0x0000_0000 ────── 0x3FFF_FFFF  CPU DDR (private)
+0x4000_0000 ────── 0x7FFF_FFFF  FPGA DDR (private)
+0xFF00_0000 ────── 0xFF00_0FFF  Mailbox (shared BRAM, 4 KB)
+```
+No shared DDR — each domain owns its memory. Communication only through a small mailbox buffer. Eliminates contention but requires copying.
+
+### Pattern 3: Cache-Coherent Shared DDR (MPSoC Only)
+```
+0x0000_0000 ────── 0x7FFF_FFFF  Shared DDR (coherent via CCI-400)
+0x8000_0000 ────── 0x8FFF_FFFF  FPGA BRAM registers
+```
+Both CPU and FPGA see the same physical memory. No flush/invalidate needed. Requires ACE-Lite ports on MPSoC.
+
+---
+
+## Interrupt Routing
+
+Hard CPU interrupt routing is vendor-specific and affects real-time determinism:
+
+| Source | Cyclone V HPS | Zynq-7000 | MPSoC | PolarFire SoC |
 |---|---|---|---|---|
-| Cyclone V SoC | HPS Boot ROM | Cortex-A9 | Preloader loads RBF from Flash | U-Boot → Linux
-| Zynq-7000 | Boot ROM | Cortex-A9 | FSBL loads bitstream from Flash | U-Boot → Linux
-| Zynq MPSoC | PMU ROM | PMU → Cortex-R5 → Cortex-A53 | FSBL loads bitstream | U-Boot → Linux
-| PolarFire SoC | eNVM | E51 monitor → U54 cluster | HSS loads bitstream | U-Boot → Linux
-| SmartFusion2 | eNVM | Cortex-M3 | Fabric configured from eNVM | No Linux (bare-metal only)
+| FPGA → CPU IRQ | 64 IRQ inputs to GIC | 16 PL→PS IRQ lines | 128 PL→PS IRQ (GIC-400) | Direct to PLIC |
+| CPU → FPGA | Software-generated IRQ via MMIO | 16 PS→PL IRQ lines | 4 × GIQ to PL | Via shared register |
+| Priority | GIC (ARM Generic Interrupt Controller) | GIC-400 per-core | GIC-400 with affinity | RISC-V PLIC (53 priorities) |
+| Real-time capable | Limited (shared GIC) | FIQ for one PL IRQ | Separate R5F NVIC for low-latency | U54 hart 0 for RT |
+
+**Best practice:** Reserve a dedicated FIQ or high-priority PLIC entry for latency-critical FPGA interrupts (e.g., sample-ready from an ADC). Do not share with general-purpose Linux-handled interrupts.
+
+---
+
+## Boot Partitioning: Who Loads First?
+
+Hard CPU and FPGA boot in a defined order that varies by vendor:
+
+| Device | Boot Order | FPGA Config Method | Key Constraint |
+|---|---|---|---|
+| **Zynq-7000** | PS → PL | FSBL loads bitstream via PCAP | PL unconfigured until FSBL explicitly loads it |
+| **Zynq MPSoC** | PMU → FSBL → PL | PMU firmware can load PL early | R5F can be up before PL is ready |
+| **Cyclone V SoC** | HPS → FPGA | U-Boot SPL loads .rbf via FPP ×16 | FPGA config ~50–500 ms, HPS waits |
+| **PolarFire SoC** | E51 monitor → MSS → Fabric | Auto-loads from eNVM at power-on | Fabric ready before Linux boots |
+
+**Pattern:** If the hard CPU needs FPGA accelerators during boot, ensure the bitstream loads before the driver probes. Use U-Boot's `fpga load` command before `bootm`.
+
+---
+
+## Power Domain Interactions
+
+Hard CPU and FPGA fabric often share power rails on the same die, creating thermal and power sequencing dependencies:
+
+| Device | Power Domains | Sequencing | Thermal Coupling |
+|---|---|---|---|
+| **Zynq-7000** | PS (always on), PL (independent) | PS must be up first; PL can be powered down independently | Low — separate voltage regulators |
+| **Zynq MPSoC** | LPD, FPD, PL (3 domains) | LPD → FPD → PL; PL can be isolated | Moderate — shared package |
+| **Cyclone V SoC** | HPS + FPGA share VCC | Must power both; no independent shutdown | High — shared core rail |
+| **PolarFire SoC** | MSS + Fabric separate | Fabric auto-configures from eNVM at power-on | Low — flash-based, no config SRAM |
+
+**Thermal warning:** On Cyclone V SoC, if the FPGA fabric runs at 90% utilization with heavy switching, the shared die temperature rise can force the Cortex-A9 to throttle. Monitor `temp_sensor` output in Linux.
+
+---
+
+## DMA Architecture Between CPU and FPGA
+
+| DMA Type | Direction | Mechanism | Typical Bandwidth |
+|---|---|---|---|
+| **CPU-initiated (MMIO)** | CPU → FPGA registers | `memcpy` or `ioremap` write via M_AXI_GP / H2F | 100–800 MB/s |
+| **Scatter-gather DMA** | FPGA → DDR | FPGA DMA engine reads descriptor table from DDR, transfers data | 1.6–12.8 GB/s |
+| **ACP DMA** | FPGA → CPU L2 | FPGA writes directly into L2 cache via ACP port | 0.8–3.2 GB/s |
+| **Cache-coherent DMA** | Bidirectional | CCI-400/NoC ensures coherency automatically | 1.2–12.8 GB/s |
+
+**When to use ACP vs HP:**
+- ACP: FPGA writes small, frequently-accessed data structures that the CPU will read (e.g., status flags, ring buffer descriptors). Latency matters more than throughput.
+- HP: FPGA streams large buffers to DDR that the CPU will process later (e.g., video frames, ADC samples). Throughput matters more than coherency.
+
+---
+
+## Debug Access to Hard CPU Subsystem
+
+| Debug Task | Tool | Access Method |
+|---|---|---|
+| CPU register peek/poke | GDB via OpenOCD | JTAG → DAP → Cortex-A9 debug registers |
+| FPGA register peek/poke | SignalTap / ILA | JTAG → FPGA TAP → internal logic |
+| Shared DDR peek | GDB + `x/100x 0x10000000` | Via CPU load/store |
+| Interrupt storm diagnosis | `/proc/interrupts` | Linux running on hard CPU |
+| Bus bandwidth monitoring | Intel MPSec / Xilinx AXI Performance Monitor | Hardware counters on AXI interconnect |
 
 ---
 

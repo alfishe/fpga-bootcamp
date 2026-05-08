@@ -125,6 +125,75 @@ flowchart TD
 
 ---
 
+## Configuration Memory Technology Impact
+
+The choice between SRAM-based, flash-based, and anti-fuse configuration memory has far-reaching implications beyond just volatility:
+
+| Property | SRAM-Based | Flash-Based (SONOS/eNVM) | Anti-Fuse |
+|---|---|---|---|
+| **Config time** | 50–500 ms (bitstream load) | <1 ms (instant-on) | <1 ms (permanent) |
+| **Config volatility** | Volatile (lost at power-off) | Non-volatile | Non-volatile (one-time) |
+| **External flash needed** | Yes (SPI/QSPI flash) | No | No |
+| **SEU in config memory** | Yes — requires scrubbing | No — SONOS is radiation-immune | No — permanent connection |
+| **Reprogramming cycles** | Unlimited | 10K–100K (flash wear) | 1 (permanent) |
+| **Bitstream security** | Encrypted bitstream possible | Config stored on-die (harder to extract) | No bitstream to extract |
+| **Partial reconfiguration** | Supported | Limited (not on Microchip) | Not possible |
+| **BOM cost** | Higher (flash chip + PCB area) | Lower (no external flash) | Lower (no external flash) |
+| **Representative devices** | All Xilinx, Intel, Lattice, Gowin | Microchip PolarFire/SmartFusion2, Intel MAX 10 | Microchip (Actel) legacy |
+
+### Flash-Based FPGA Design Implications
+- **No configuration glitching:** Power cycles never cause a moment where I/O pins are floating (critical for motor drives, power supplies)
+- **Faster time-to-ready:** The FPGA is fully operational before the CPU finishes booting — useful for watchdog/safety supervisor roles
+- **Limited DFX:** You cannot partially reconfigure a flash-based FPGA; the entire fabric is programmed at once
+
+---
+
+## Process Node Selection by Application Domain
+
+| Application | Recommended Node | Rationale | Example Devices |
+|---|---|---|---|
+| **Battery-powered IoT** | 55nm / 40nm | Lowest static power; no leakage concern | Gowin LittleBee, Lattice iCE40 |
+| **Industrial control** | 28nm | Balanced power/performance; proven reliability | Cyclone V, Artix-7, ECP5 |
+| **Retro computing / MiSTer** | 28nm | Sufficient DSP + BRAM; low cost | Cyclone V SoC (DE10-Nano) |
+| **Video / broadcast** | 20nm / 16nm | High-speed transceivers + DSP density | Arria 10, Kintex UltraScale |
+| **Data center acceleration** | 7nm / Intel 7 | Maximum throughput; HBM; NoC | Versal Premium, Agilex 7 |
+| **Aerospace / radiation** | 28nm flash or 65nm | SEU immunity dominates over performance | PolarFire RT, Microchip RTG4 |
+| **Automotive ADAS** | 16nm / 14nm | ISO 26262 support + hard CPUs | Zynq UltraScale+, Agilex 5 |
+| **Software-defined radio** | 28nm / 20nm | RF ADC/DAC + hard DSP | Zynq-7000, Cyclone V SoC, RFSoC |
+
+---
+
+## Die Size and Yield Economics
+
+Process node directly impacts die size and yield, which determines device cost:
+
+| Device | Process | Die Size (approx.) | Estimated Yield | Relative Cost |
+|---|---|---|---|---|
+| iCE40 LP1K | 40nm | ~3 mm² | >99% | $1–$3 |
+| ECP5-25F | 28nm | ~12 mm² | ~95% | $10–$20 |
+| Cyclone V 5CEA2 | 28nm | ~30 mm² | ~85% | $15–$30 |
+| Artix-7 XC7A35T | 28nm | ~25 mm² | ~90% | $20–$40 |
+| Arria 10 GX 115 | 20nm | ~300 mm² | ~50% | $500–$1,500 |
+| Stratix 10 GX 2800 | 14nm | ~500 mm² (SSI, multi-die) | ~70% (per die) | $3,000–$8,000 |
+| Virtex UltraScale+ VU9P | 16nm | ~400 mm² (SSI) | ~70% (per die) | $5,000–$15,000 |
+| Versal Premium VC1902 | 7nm | ~600 mm² (chiplet) | ~75% (per die) | $10,000–$50,000 |
+
+**Key insight:** At 28nm and below, yields remain manageable because multi-die SSI/EMIB packaging allows using smaller individual dies with higher yields, connected by micro-bumps. The package cost dominates at the high end.
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| Market positioning & decision matrix | [FPGA Market Landscape](landscape.md) |
+| Vendor-by-vendor comparison | [Vendor Comparison Matrix](vendor_comparison.md) |
+| FPGA configuration & bitstream | [Configuration & Bitstream](../02_architecture/infrastructure/configuration.md) |
+| SEU mitigation & safety-critical design | [Safety-Critical Design](../16_advanced_topics/safety_critical_design.md) |
+| Power estimation methodology | [Power Estimation](../02_architecture/infrastructure/power_estimation.md) |
+
+---
+
 ## References
 
 | Source | Document |

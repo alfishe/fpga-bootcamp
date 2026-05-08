@@ -129,6 +129,72 @@ exec quartus_sta top
 
 ---
 
+## Incremental Build Strategies
+
+Full P&R runs can take hours for large designs. Incremental strategies reuse previous results:
+
+| Strategy | Vivado | Quartus | Time Savings |
+|---|---|---|---|
+| **Incremental implementation** | `read_checkpoint -incremental impl.dcp` | Quartus Rapid Recompile | 50–80% (if <5% of logic changed) |
+| **Design partitioning** | `create_partition` + OOC synthesis | Design Partitions (Quartus Pro) | Per-partition: unchanged partitions skip P&R |
+| **Dynamic Function Exchange (DFX)** | Partial reconfiguration regions | Partial Reconfiguration | Only re-route the PR region |
+| **Block-level OOC synthesis** | `synth_design -mode out_of_context` | QSYS Generate per-component | Synthesize unchanged IP once; cache DCP |
+
+### Vivado Incremental Flow Example
+```tcl
+# First run: save checkpoint
+synth_design -top top -part xc7a35t
+opt_design; place_design; route_design
+write_checkpoint -force impl.dcp
+
+# Next run: incremental (reuse placement for unchanged logic)
+synth_design -top top -part xc7a35t
+read_checkpoint -incremental impl.dcp
+opt_design; place_design; route_design
+```
+
+---
+
+## Build Time Optimization Techniques
+
+| Technique | Applies To | Impact | Effort |
+|---|---|---|---|
+| **Pipeline synthesis + P&R** | All vendors | Overlap synth with prev P&R | Medium (Tcl scripting) |
+| **Reduce utilization below 70%** | Vivado, Quartus | 2–5× faster routing | Low (floorplanning) |
+| **Use faster speed grade for development** | All | P&R converges faster | Low (device selection) |
+| **Parallel synthesis (multi-core)** | Vivado `-max_threads`, Quartus `-j` | 30–50% speedup | Low (Tcl flag) |
+| **Disable unused I/O standards** | Vivado | Faster I/O placement | Low (constraint cleanup) |
+| **Pre-placement floorplanning** | Large designs | 2–3× faster place+route | High (manual Pblocks) |
+| **Cloud burst builds** | Any | Unlimited parallelism | Medium (CI/CD setup) |
+
+---
+
+## Common Build Failures & Quick Fixes
+
+| Failure | Typical Error | Quick Fix |
+|---|---|---|
+| **Unconstrained paths** | Vivado: `Timing constraints are not met` | Add `create_clock` / `set_clock_groups` in XDC |
+| **Over-utilization** | Quartus: `Can't fit design in device` | Reduce logic or upgrade to larger device |
+| **Routing congestion** | Vivado: `Route design has unroutable nets` | Add floorplan (Pblock), reduce local utilization |
+| **Hold violation** | Vivado: `Negative Hold Slack` | Usually a false path or missing constraint; check async domains |
+| **BRAM initialization failure** | Vivado: `BRAM contents mismatch` | Check `readmemh` file path and format |
+| **PLL/MMCM lock failure** | Quartus: `Cannot locate PLL` | Verify input clock frequency matches PLL parameter range |
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| Synthesis deep dive | [Synthesis](synthesis.md) |
+| Placement and routing details | [Place & Route](place_and_route.md) |
+| Project directory layout | [Project Structure](project_structure.md) |
+| Timing constraint syntax | [SDC Basics](../05_timing_and_constraints/sdc_basics.md) |
+| CI/CD pipeline setup | [CI/CD for Hardware](../13_toolchains/cicd_hardware.md) |
+| Design patterns for faster builds | [Design Patterns](../04_hdl_and_synthesis/design_patterns.md) |
+
+---
+
 ## References
 
 | Source | Document |
@@ -137,6 +203,7 @@ exec quartus_sta top
 | Quartus Prime Pro Edition Handbook | Intel FPGA Documentation |
 | Yosys Manual | https://yosyshq.readthedocs.io/ |
 | nextpnr Documentation | https://github.com/YosysHQ/nextpnr |
+| Vivado Design Suite User Guide: Implementation (UG904) | Xilinx/AMD |
 | [Synthesis deep dive](synthesis.md) | Next article |
 | [Place & Route](place_and_route.md) | Placement and routing details |
 | [Project Structure](project_structure.md) | Directory layout and versioning |

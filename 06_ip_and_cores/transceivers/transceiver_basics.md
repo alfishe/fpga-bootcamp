@@ -130,6 +130,88 @@ Serial stream: …0101111100 0011111010 1100000101…
 
 ---
 
+## Link Training & Auto-Negotiation
+
+For protocol-aware links (PCIe, Ethernet), transceivers must negotiate speed and width:
+
+| Protocol | Link Training | Auto-Negotiation | Speed Upgrade |
+|---|---|---|---|
+| **PCIe Gen1/2** | TS1/TS2 ordered sets | Gen1 only (2.5 GT/s), then uptrain | Gen1 → Gen2 via Recovery |
+| **PCIe Gen3/4** | TS1/TS2 + 8GT/s EQ | Gen1 (2.5 GT/s), then Recovery to Gen3/4 | Requires TX/RX equalization handshake |
+| **10GBASE-KR** | AN/LT (Auto-Neg + Link Training) | KR-specific AN frame exchange | Not applicable (fixed 10.3125 Gbps) |
+| **CEI-25G** | Continuous time adaptation | No AN; fixed rate | N/A |
+
+### PCIe Equalization (Gen3/4/5)
+PCIe Gen3+ requires transmitter preset and receiver preset coordination:
+1. Link starts at Gen1 (2.5 GT/s)
+2. Transitions to Gen3 (8 GT/s) via Recovery
+3. **Phase 1:** TX sends preset values (P0–P10); RX evaluates eye
+4. **Phase 2:** RX requests preset/coefficient adjustments via TS1
+5. **Phase 3:** TX applies final coefficients; link enters L0
+
+If equalization fails, the link falls back to Gen2 (5 GT/s) or Gen1.
+
+---
+
+## Redriver vs Retimer: PCB Design Decisions
+
+When a high-speed link must traverse a long PCB trace or a cable, signal integrity degrades:
+
+| Component | Function | Latency | When to Use | Cost |
+|---|---|---|---|---|
+| **Redriver** | Analog amplification + EQ | ~0 ps (analog) | Short reach extension (<1m total), simple traces | $1–$5 |
+| **Retimer** | Full CDR + retransmit | ~20–40 ns (digital) | Long reach (>1m), cables, backplanes | $10–$30 |
+| **Direct connect** | None | 0 | Standard PCB trace <6 inches | $0 |
+
+**Rule of thumb for FPGA transceivers:**
+- PCIe Gen2/3 on same PCB: direct connect (no redriver)
+- PCIe Gen4 on same PCB: redriver if trace >8 inches
+- PCIe over cable: retimer required
+- 25G Ethernet on same PCB: direct connect if trace <6 inches
+
+---
+
+## Transceiver Quad Architecture
+
+FPGA transceivers are organized in quads (groups of 4 channels sharing resources):
+
+```
+┌──────────── Quad ────────────┐
+│  CH0  CH1  CH2  CH3           │
+│  GT→  GT→  GT→  GT→           │
+│  ┌─────────────┐             │
+│  │  QPLL / CPLL │  Shared PLL│
+│  └─────────────┘             │
+│  ┌─────────────┐             │
+│  │  REFCLK pins │  Shared ref│
+│  └─────────────┘             │
+└──────────────────────────────┘
+```
+
+| Shared Resource | Constraint |
+|---|---|
+| **QPLL (Quad PLL)** | All channels in the quad must run at the same line rate or integer multiples |
+| **CPLL (Channel PLL)** | Per-channel PLL allows independent line rates within a quad |
+| **Reference clock** | One refclk pair feeds all 4 channels; different rates require separate refclks |
+| **Power rails** | MGTAVCC, MGTAVTT, MGTVCCAUX are shared per quad |
+
+**Pitfall:** If you place two protocols with incompatible line rates (e.g., PCIe Gen3 at 8 GT/s and 10GbE at 10.3125 Gbps) in the same quad, they cannot share the QPLL. Use CPLL for one or place them in different quads.
+
+---
+
+## Debugging Transceiver Links
+
+| Symptom | Likely Cause | Debug Step |
+|---|---|---|
+| **CDR never locks** | Bad refclk (jitter/freq) | Probe refclk with spectrum analyzer; verify ppm accuracy |
+| **High BER after link up** | Insufficient TX pre-emphasis | Run IBERT eye scan; adjust TX pre-cursor/post-cursor |
+| **Link drops intermittently** | Power supply noise on MGTAVCC | Scope MGTAVCC during traffic burst; add decoupling |
+| **No comma detect** | Polarity inversion | Check `RXPOLARITY` pin; swap P/N PCB traces or set polarity bit |
+| **Elastic buffer overflow/underflow** | Clock frequency mismatch | Verify rate match FIFO settings; check refclk ppm tolerance |
+| **Link works on one board but not another** | PCB length mismatch | Run TDR on both boards; compare eye diagrams at receiver |
+
+---
+
 ## Best Practices
 
 1. **Run IBERT (Integrated Bit Error Ratio Test)** before deploying any transceiver design — verifies physical link integrity
@@ -137,6 +219,19 @@ Serial stream: …0101111100 0011111010 1100000101…
 3. **Reference clock sharing:** One quad can share one refclk. Different protocols (PCIe + 10GE) in same quad → separate refclks or use CPLL for one.
 4. **Never route transceiver refclk through FPGA fabric** — use dedicated refclk pins with direct PMA connection
 5. **Termination:** Transceivers are internally 100 Ω differential terminated. No external termination resistors needed.
+6. **Place protocols with the same line rate in the same quad** — saves QPLL resources and simplifies clocking
+7. **Always probe MGT power rails during traffic** — transceivers draw burst current; insufficient decoupling causes CDR unlocks
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| Transceiver IP configuration | [Transceiver IP](transceiver_ip.md) |
+| PCIe link training debug | [PCIe Bringup](../../15_case_studies/pcie_bringup.md) |
+| High-speed PCB design | [Section 09 — Board & PCB Design](../../09_board_and_pcb_design/README.md) |
+| Clock network design | [Clock Network Design](../../02_architecture/infrastructure/clock_network_design.md) |
 
 ---
 
@@ -146,3 +241,5 @@ Serial stream: …0101111100 0011111010 1100000101…
 - Xilinx UG578: UltraScale Architecture GTY Transceivers
 - Intel AN 794: Transceiver PHY IP Core
 - Lattice TN1278: ECP5 High-Speed I/O Interface
+- PCIe Base Specification Rev 4.0 (equalization protocol)
+- IBERT User Guide (Xilinx PG245)

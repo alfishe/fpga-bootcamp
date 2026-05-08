@@ -1,4 +1,4 @@
-[← 06 Ip And Cores Home](../README.md) · [← Vendor Ip Home](README.md) · [← Project Home](../../../README.md)
+[← 06 IP And Cores Home](../README.md) · [← Vendor IP Home](README.md) · [← Project Home](../../../README.md)]
 
 # Microchip FPGA IP — Libero SoC SmartDesign & CoreIP Catalog
 
@@ -40,18 +40,36 @@ Libero SoC → SmartDesign
 
 Microchip uses ARM AMBA buses — not Avalon (Intel) or a proprietary bus. This means ARM's IP ecosystem is directly compatible.
 
-| Bus | Use Case | Bandwidth (typical) | Width |
-|---|---|---|---|
-| **CoreAXI4** | High-performance memory-mapped (DDR, DMA, PCIe) | 32/64-bit @ 200+ MHz | 32/64 bit |
-| **CoreAHB** | Mid-performance peripherals, processor subsystem | 32-bit @ 166 MHz | 32 bit |
-| **CoreAPB3** | Low-speed register access, configuration | 32-bit @ 50 MHz | 32 bit |
-| **CoreAXI4-Stream** | Streaming data (video, DSP, inter-FPGA) | Data-width dependent | Configurable |
+| Bus | Width | Performance | Use Case | FPGA Families |
+|-----|-------|-------------|----------|---------------|
+| **CoreAXI4** | 32/64-bit | High (200+ MHz) | DDR, DMA, high-bandwidth peripherals | PolarFire, PolarFire SoC |
+| **CoreAHB** | 32-bit | Mid (100+ MHz) | General peripherals, CPU subsystem | SmartFusion2, IGLOO2, PolarFire |
+| **CoreAPB** | 8/16/32-bit | Low (50 MHz) | Register access, slow peripherals | All families |
 
-**Why AMBA matters:** Because Microchip uses standard AMBA, you can integrate ARM-validated IP (like Cortex-M3, CoreLink controllers) without protocol conversion. This is a genuine advantage over Intel's Avalon-based ecosystem.
+### Bus Hierarchy
+
+```
+                    CoreAXI4
+                   (high-perf)
+                       │
+           ┌───────────┼───────────┐
+           │           │           │
+       DDR Ctrl      DMA        PCIe
+           │
+     CoreAHB (mid-perf)
+           │
+     ┌─────┼──────┐
+     │     │      │
+   UART   SPI   Timer
+     │
+  CoreAPB (low-speed)
+     │
+   GPIO   I²C
+```
 
 ---
 
-## Key IP Categories
+## IP Catalog by Category
 
 ### Processors
 
@@ -194,7 +212,7 @@ When connecting multiple masters to the same CoreAXI interconnect, SmartDesign m
 
 ---
 
-## References
+## Cross-References
 
 - Microchip Libero SoC User Guide
 - Microchip SmartFusion2 / PolarFire IP Catalog (Microchip website)

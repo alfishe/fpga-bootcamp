@@ -119,11 +119,160 @@ jobs:
 
 ---
 
+## Jenkins Pipeline Example
+
+For teams requiring on-premises CI:
+
+```groovy
+// Jenkinsfile
+pipeline {
+    agent { label 'fpga-builder' }  // Self-hosted with Vivado/Quartus Docker
+    
+    stages {
+        stage('Lint') {
+            steps {
+                sh 'verilator --lint-only -Wall src/*.v'
+            }
+        }
+        stage('Simulate') {
+            steps {
+                sh 'make sim'  // Verilator or Icarus
+            }
+        }
+        stage('Synthesize') {
+            steps {
+                sh 'vivado -mode batch -source build.tcl -notrace'
+            }
+        }
+        stage('Check Timing') {
+            steps {
+                script {
+                    def wns = sh(returnStdout: true, 
+                        script: 'grep -oP "WNS\s+=\s+[-\\d.]+" timing.rpt | grep -oP "[-\\d.]+$"').trim()
+                    if (wns.startsWith('-')) {
+                        error "Timing FAILED: WNS = ${wns}"
+                    }
+                    echo "Timing OK: WNS = ${wns}"
+                }
+            }
+        }
+        stage('Archive') {
+            steps {
+                archiveArtifacts artifacts: '*.bit, *.rpt', fingerprint: true
+            }
+        }
+    }
+    post {
+        failure {
+            mail to: 'fpga-team@company.com',
+                subject: "FPGA Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Check ${env.BUILD_URL}"
+        }
+    }
+}
+```
+
+---
+
+## FuseSoC + Edalize: Open-Source CI/CD
+
+FuseSoC is an IP package manager that integrates with Edalize for vendor-agnostic CI builds:
+
+```yaml
+# core_file.core
+CAPI=2:
+name: ::my_design:1.0
+dependencies:
+  uart: "~1.0"
+  spi:  "~1.0"
+filesets:
+  rtl:
+    files: [src/top.v, src/uart_rx.v, src/spi_master.v]
+    file_type: verilogSource
+targets:
+  default:
+    filesets: [rtl]
+  synth_icesugar:
+    default_tool: nextpnr
+    filesets: [rtl]
+    tools:
+      nextpnr:
+        part: iCE40UP5K
+        package: sg48
+  synth_arty:
+    default_tool: vivado
+    filesets: [rtl]
+    tools:
+      vivado:
+        part: xc7a35tcsg324-1
+```
+
+```bash
+# CI commands
+fusesoc library add my_lib .
+fusesoc run --target=synth_icesugar my_design    # iCE40 build
+fusesoc run --target=synth_arty my_design       # Artix-7 build
+```
+
+---
+
+## Timing Regression Detection
+
+Track timing across builds to catch regressions early:
+
+```python
+# timing_regress.py — compare WNS across builds
+import re, sys
+
+def parse_wns(rpt_file):
+    with open(rpt_file) as f:
+        for line in f:
+            m = re.search(r'WNS\s+=\s+([-\d.]+)', line)
+            if m: return float(m.group(1))
+    return None
+
+current = parse_wns(sys.argv[1])
+baseline = parse_wns(sys.argv[2]) if len(sys.argv) > 2 else 0.0
+
+if current is None:
+    print(f"ERROR: Could not parse WNS from {sys.argv[1]}")
+    sys.exit(1)
+
+if current < 0:
+    print(f"FAIL: WNS = {current} ns (negative slack)")
+    sys.exit(1)
+
+if baseline > 0 and current < baseline * 0.8:  # 20% degradation threshold
+    print(f"WARNING: WNS regressed from {baseline} to {current} ns (>20% degradation)")
+    sys.exit(1)
+
+print(f"OK: WNS = {current} ns (baseline: {baseline} ns)")
+```
+
+---
+
+## Artifact Management Strategy
+
+| Artifact Type | Storage | Retention | Size (typical) |
+|---|---|---|---|
+| **Bitstream (.bit/.sof)** | S3 / Artifactory / GitHub Releases | 90 days (dev), permanent (release) | 1–50 MB |
+| **Timing report (.rpt)** | Same as bitstream | Permanent | 100 KB – 5 MB |
+| **Utilization report** | Same as bitstream | Permanent | <1 MB |
+| **Simulation waveforms (VCD/FST)** | Not stored (too large) | On-demand only | 100 MB – 10 GB |
+| **Synthesis checkpoint (.dcp)** | Not stored (vendor-locked) | Current + previous only | 50–500 MB |
+| **Firmware (.bin/.hex)** | Same as bitstream | Permanent | <1 MB |
+
+---
+
 ## Best Practices
 
 1. **Don't check bitstreams into Git** — store in artifact repository (S3, Artifactory, GitHub Releases).
 2. **Pin tool versions in Docker** — "latest Vivado" breaks builds. Tag images with tool version.
 3. **Self-hosted runners for vendor tools** — GitHub-hosted runners don't have Vivado/Quartus. Use self-hosted or a CI service with FPGA tooling.
+4. **Run lint + sim on every push, full P&R nightly** — lint takes seconds; P&R takes hours.
+5. **Parse timing reports programmatically** — grep for WNS/TNS and fail the build on negative slack.
+6. **Use FuseSoC for vendor-agnostic CI** — one `core` file can target Vivado, Quartus, or nextpnr.
+7. **Track WNS across builds** — a 20% WNS degradation is a timing regression even if it's still positive.
 
 ## References
 
@@ -133,3 +282,5 @@ jobs:
 | Intel FPGA CI/CD Documentation |
 | Verilator Manual |
 | FuseSoC (IP package manager + CI) |
+| Edalize Backend Documentation |
+| Jenkins Pipeline Syntax Reference |

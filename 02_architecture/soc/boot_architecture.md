@@ -94,6 +94,110 @@ Power-on
 
 ---
 
+## Device Tree & FPGA Manager (Linux)
+
+When Linux boots on a SoC FPGA, two mechanisms control FPGA interaction:
+
+### FPGA Manager Subsystem
+The Linux kernel FPGA Manager provides a unified API for loading bitstreams from userspace:
+
+```bash
+# Load bitstream via configfs (Linux 5.10+)
+configfs_dir=/sys/kernel/config/device-tree/overlays/fpga
+echo -n "soc_system.rbf" > $configfs_dir/path
+```
+
+### Device Tree Overlay Pattern
+```dts
+/* fpga_overlay.dts — loads bitstream + enumerates FPGA peripherals */
+/dts-v1/;/plugin/;
+
+/ {
+  fragment@0 {
+    target-path = "/fpga_full";
+    __overlay__ {
+      firmware-name = "soc_system.rbf";
+    };
+  };
+  fragment@1 {
+    target-path = "/soc";
+    __overlay__ {
+      my_accel: accel@0x40000000 {
+        compatible = "mycorp,accel-1.0";
+        reg = <0x40000000 0x1000>;
+        interrupts = <0 29 4>;  /* PL→PS IRQ 29 */
+      };
+    };
+  };
+};
+```
+
+**Key point:** The overlay loads the bitstream first (fragment@0), then enumerates the FPGA peripheral (fragment@1). If you reverse the order, the driver probes before the FPGA is configured.
+
+### Bridge Control
+```bash
+# Cyclone V SoC: enable bridges before loading FPGA
+echo 1 > /sys/class/fpga-bridge/fpga2hps/enable
+echo 1 > /sys/class/fpga-bridge/hps2fpga/enable
+echo 1 > /sys/class/fpga-bridge/lwhps2fpga/enable
+```
+
+---
+
+## U-Boot Scripting for FPGA Load
+
+### Cyclone V SoC (DE10-Nano)
+```bash
+# U-Boot commands to load FPGA before Linux
+fatload mmc 0:1 ${loadaddr} soc_system.rbf
+fpga load 0 ${loadaddr} ${filesize}
+# Then boot Linux
+fatload mmc 0:1 ${loadaddr} zImage
+fatload mmc 0:1 ${fdt_addr} socfpga_cyclone5_de10_nano.dtb
+bootz ${loadaddr} - ${fdt_addr}
+```
+
+### Zynq-7000
+```bash
+# FSBL can load PL, but if not, do it from U-Boot
+load mmc 0:1 ${loadaddr} system.bit
+fpga loadb 0 ${loadaddr} ${filesize}
+# Boot Linux
+load mmc 0:1 ${kernel_addr} zImage
+load mmc 0:1 ${fdt_addr} system.dtb
+bootz ${kernel_addr} - ${fdt_addr}
+```
+
+### Zynq MPSoC (Multi-Stage)
+```bash
+# PMU firmware + ATF + U-Boot chain
+# FSBL loads PMU firmware and PL (if specified in bif file)
+# boot.bif example:
+# the_image: {
+#   [fsbl_config] a53_x64
+#   [bootloader] fsbl.elf
+#   [pmufw_image] pmufw.elf
+#   [destination_cpu=a53-0, destination_device=pl] system.bit
+#   [destination_cpu=a53-0] bl31.elf
+#   [destination_cpu=a53-0] u-boot.elf
+# }
+```
+
+---
+
+## Secure Boot Considerations
+
+| Device | Secure Boot Mechanism | Key Storage | Chain of Trust |
+|---|---|---|---|
+| **Zynq MPSoC** | RSA + SHA-256 (boot header authentication) | BBRAM or eFUSE | FSBL verifies PMU + PL bitstream + ATF |
+| **Cyclone V SoC** | No native secure boot | N/A | Add AES-encrypted .rbf in software |
+| **PolarFire SoC** | eNVM + digital signature | Flash (locked) | HSS verifies Linux image before boot |
+| **Agilex 7** | Root of Trust (RoT) + AES-GCM | eFUSE or QSPI | FSBL authenticates each stage |
+
+**Best practice:** If your design includes proprietary IP in the FPGA fabric, enable bitstream encryption. An unencrypted bitstream on an SD card can be reverse-engineered to extract the RTL netlist.
+
+---
+
 ## Common Boot Pitfalls
 
 | Pitfall | Symptom | Root Cause | Fix |
@@ -102,6 +206,33 @@ Power-on
 | **DDR timing mismatch** | Kernel panics randomly under load | U-Boot SPL configured wrong DDR parameters for your board | Validate DDR timing against Terasic/Intel reference |
 | **HPS hangs when FPGA toggles IO** | HPS freezes on FPGA config | FPGA IOs driven before HPS boot OK, causing contention on shared pins | Set FPGA IOs to weak pull-up during config |
 | **Mismatched device trees** | Bridge addresses wrong, DMA crashes | Device tree compiled for different SoC variant | Use exact DTS for your device (not generic socfpga.dtsi) |
+| **Bitstream too large for SPI flash** | FPGA fails to configure from flash | Bitstream exceeds flash capacity after compression | Enable bitstream compression in vendor tools |
+| **Boot ROM can't find bootloader** | No output on serial console | BSEL/boot pins misconfigured or SD card not partitioned correctly | Verify BSEL strap values; use fdisk to check boot partition type |
+
+---
+
+## Boot Time Optimization
+
+| Technique | Savings | Applies To |
+|---|---|---|
+| QSPI ×4 flash (vs ×1) | 300→50 ms FPGA config | All Intel SoC FPGAs |
+| Bitstream compression | 30–50% size reduction | Xilinx 7-series, UltraScale+ |
+| Tandem configuration (PCIe) | Meets 100ms PERST# window | Zynq MPSoC, UltraScale+ |
+| Skip DDR training (warm boot) | 100→5 ms if previously calibrated | Intel EMIF fast boot mode |
+| HPS early IO release | FPGA can use shared pins sooner | Cyclone V SoC |
+| PolarFire instant-on | <1 ms fabric ready | PolarFire, SmartFusion2 |
+
+---
+
+## Cross-References
+
+| Topic | Article |
+|---|---|
+| Hard CPU coupling models | [Hard Processor Integration](hard_processor_integration.md) |
+| AXI bridge initialization | [AXI Bridges & Interconnect](axi_bridges_and_interconnect.md) |
+| Memory topology & DDR | [Memory Hierarchy](memory_hierarchy.md) |
+| FPGA configuration & bitstream | [Configuration & Bitstream](../infrastructure/configuration.md) |
+| PCIe 100ms boot requirement | [PCIe Bringup](../../15_case_studies/pcie_bringup.md) |
 
 ---
 
@@ -114,3 +245,5 @@ Power-on
 | MPSoC Boot and Configuration (UG1085, Ch. 11) | Xilinx/AMD |
 | PolarFire SoC Boot Guide (UG0820) | Microchip |
 | DE10-Nano User Manual | Terasic |
+| Linux FPGA Manager Documentation | kernel.org |
+| U-Boot README.fpga | U-Boot source tree |
