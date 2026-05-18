@@ -151,6 +151,24 @@ For Linux SoCs, application processors, and research.
 
 ---
 
+## Cross-References to Other CPU Core Catalogs
+
+This catalog focuses on RISC-V soft cores. For a complete view of available FPGA CPU cores, see:
+
+| Core Family | Catalog Article | Coverage |
+|---|---|---|
+| **RISC-V cores** | This document | VexRiscv, PicoRV32, NEORV32, SERV, Ibex, Rocket, BOOM, CVA6, XiangShan |
+| **Other open ISA cores** | [Non-RISC-V Core Catalog](other_isa_cores_catalog.md) | OpenRISC (mor1kx), LEON3/4 (SPARC), Microwatt (POWER), NEO430 (MSP430), Plasma (MIPS), ZPU, retro cores (Z80, 6502, 68000) |
+| **Multi-ISA collections** | [Non-RISC-V Core Catalog → Multi-ISA Section](other_isa_cores_catalog.md#multi-isa-core-collections--projects) | MicroCore Labs (68000, 6502, 8086, Z80, 8051, RISC-V), OpenCores, ZipCPU |
+| **Vendor soft processors** | [Vendor Soft Processors (Section 11)](../../11_soft_cores_and_soc_design/vendor_soft/README.md) | MicroBlaze/MicroBlaze-V (Xilinx/AMD), Nios II/Nios V (Intel/Altera) |
+| **Non-RISC-V deep dives** | [Other ISA Cores (Section 11)](../../11_soft_cores_and_soc_design/other_isa/other_isa_cores.md) | Detailed analysis of mor1kx, LEON3/4, Microwatt, ZPU, Plasma, NEO430 |
+| **RISC-V ISA reference** | [RISC-V ISA Overview](../../11_soft_cores_and_soc_design/riscv/riscv_isa.md) | RV32I/RV64I base ISAs, standard extensions (M/A/F/D/C/V), encoding |
+| **RISC-V privileged spec** | [RISC-V Privileged Architecture](../../11_soft_cores_and_soc_design/riscv/riscv_privileged.md) | M/S/U privilege modes, CSRs, virtual memory (Sv32/Sv39/Sv48), PMP, interrupts |
+| **SoC integration** | [SoC Design (Section 11)](../../11_soft_cores_and_soc_design/soc_design/README.md) | Bus matrices, memory maps, interrupt routing, DMA, multi-core coherency, Chipyard |
+| **Peripheral cores** | [Peripheral Cores Catalog](peripheral_cores_catalog.md) | UART, SPI, I2C, GPIO, PWM, timers, Wishbone/AXI infrastructure cores |
+
+---
+
 ## References
 
 - [RISC-V Cores Deep Dives (Section 11)](../../11_soft_cores_and_soc_design/riscv_cores/)
